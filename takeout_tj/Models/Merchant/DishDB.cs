@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.User;
 
 namespace takeout_tj.Models.Merchant
 {
@@ -20,5 +21,6 @@ namespace takeout_tj.Models.Merchant
 		public string DishCategory { get; set; }  // 菜品列别, 可以为空
 
 		public MerchantDB MerchantDB { get; set; }
+		public ICollection<ShoppingCartDB> ShoppingCartDBs { get; set; }
 	}
 }

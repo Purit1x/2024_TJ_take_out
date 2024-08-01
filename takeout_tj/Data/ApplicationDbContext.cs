@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Oracle.EntityFrameworkCore;
 using takeout_tj.Models.Merchant;
+using takeout_tj.Models.Platform;
 using takeout_tj.Models.User;
 
 namespace takeout_tj.Data
@@ -34,6 +35,8 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<FavoriteMerchantDB>().HasKey(um => new {um.UserId, um.MerchantId});
 			modelBuilder.Entity<DishDB>().HasKey(d => new { d.MerchantId, d.DishId });
 			modelBuilder.Entity<ShoppingCartDB>().HasKey(s => new {s.UserId, s.MerchantId, s.DishId, s.ShoppingCartId});
+			modelBuilder.Entity<CouponDB>().HasKey(c => c.CouponId);
+			modelBuilder.Entity<CouponPurchaseDB>().HasKey(c => c.CouponPurchaseId);
 			
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
@@ -59,7 +62,7 @@ namespace takeout_tj.Data
 				.HasOne(d => d.MerchantDB)
 				.WithMany(m => m.DishDBs)
 				.HasForeignKey(d => d.MerchantId);
-			// 定义购物车与用户的多对一联系
+			// 定义购物车项与用户的多对一联系
 			modelBuilder.Entity<ShoppingCartDB>()
 				.HasOne(s => s.UserDB)
 				.WithMany(u => u.shoppingCartDBs)
@@ -69,6 +72,19 @@ namespace takeout_tj.Data
 				.HasOne(s => s.DishDB)
 				.WithMany(d => d.ShoppingCartDBs)
 				.HasForeignKey(s => new { s.MerchantId, s.DishId });
+
+			modelBuilder.Entity<DishDB>()
+				.Property(d => d.DishPrice)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<CouponDB>()
+				.Property(c => c.CouponValue)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<CouponDB>()
+				.Property(c => c.CouponPrice)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<CouponDB>()
+				.Property(c => c.MinPrice)
+				.HasColumnType("numeric(10,2)");
 				
 			modelBuilder.Entity<UserDB>().ToTable("users");
 			modelBuilder.Entity<UserAddressDB>().ToTable("user_address");
@@ -77,6 +93,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<FavoriteMerchantDB>().ToTable("favorite_merchants");
 			modelBuilder.Entity<DishDB>().ToTable("dishes");
 			modelBuilder.Entity<ShoppingCartDB>().ToTable("shoppingcarts");
+			modelBuilder.Entity<CouponDB>().ToTable("coupons");
 		}
 	}
 }
