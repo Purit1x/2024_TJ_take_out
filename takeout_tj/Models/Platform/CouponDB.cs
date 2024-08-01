@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.User;
 
 namespace takeout_tj.Models.Platform
 {
@@ -28,6 +29,7 @@ namespace takeout_tj.Models.Platform
 		public int QuantitySold { get; set; }
 
 		public ICollection<CouponPurchaseDB> CouponPurchaseDBs { get; set; }
+		public ICollection<UserCouponDB> UserCouponDBs { get; set; }
 
 	}
 }

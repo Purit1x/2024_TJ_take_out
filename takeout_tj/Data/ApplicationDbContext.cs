@@ -37,6 +37,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<ShoppingCartDB>().HasKey(s => new {s.UserId, s.MerchantId, s.DishId, s.ShoppingCartId});
 			modelBuilder.Entity<CouponDB>().HasKey(c => c.CouponId);
 			modelBuilder.Entity<CouponPurchaseDB>().HasKey(c => c.CouponPurchaseId);
+			modelBuilder.Entity<UserCouponDB>().HasKey(u => new { u.UserId, u.CouponId, u.ExpirationDate });
 			
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
@@ -72,6 +73,20 @@ namespace takeout_tj.Data
 				.HasOne(s => s.DishDB)
 				.WithMany(d => d.ShoppingCartDBs)
 				.HasForeignKey(s => new { s.MerchantId, s.DishId });
+			// 定义优惠券购买订单与优惠券的多对一联系
+			modelBuilder.Entity<CouponPurchaseDB>()
+				.HasOne(p => p.CouponDB)
+				.WithMany(c => c.CouponPurchaseDBs)
+				.HasForeignKey(p => p.CouponId);
+			// 用户拥有优惠券的多对多联系集
+			modelBuilder.Entity<UserCouponDB>()
+				.HasOne(uc => uc.UserDB)
+				.WithMany(u => u.UserCouponDBs)
+				.HasForeignKey(uc => uc.UserId);
+			modelBuilder.Entity<UserCouponDB>()
+				.HasOne(uc => uc.CouponDB)
+				.WithMany(c => c.UserCouponDBs)
+				.HasForeignKey(uc => uc.CouponId);
 
 			modelBuilder.Entity<DishDB>()
 				.Property(d => d.DishPrice)
@@ -94,6 +109,8 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<DishDB>().ToTable("dishes");
 			modelBuilder.Entity<ShoppingCartDB>().ToTable("shoppingcarts");
 			modelBuilder.Entity<CouponDB>().ToTable("coupons");
+			modelBuilder.Entity<CouponPurchaseDB>().ToTable("coupon_purchases");
+			modelBuilder.Entity<UserCouponDB>().ToTable("user_coupons");
 		}
 	}
 }

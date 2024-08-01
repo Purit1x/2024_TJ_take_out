@@ -25,5 +25,6 @@ namespace takeout_tj.Models.User
 		// 用于收藏商家的导航属性, 这个导航属性应该指向连接实体, 而非联系集的另一侧
 		public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  
 		public ICollection<ShoppingCartDB> shoppingCartDBs { get; set; }
+		public ICollection<UserCouponDB> UserCouponDBs { get; set; }
 	}
 }

@@ -20,5 +20,7 @@ namespace takeout_tj.Models.Platform
 
 		[Required(ErrorMessage = "Payment state is required. ")]
 		public int PaymentState { get; set; } = 0;  // 支付状态, 0为未支付, 1为支付成功
+
+		public CouponDB CouponDB { get; set; }
 	}
 }
