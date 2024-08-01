@@ -20,10 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\platform\" />
-    <Folder Include="Models\rider\" />
-    <Folder Include="Models\merchant\" />
-    <Folder Include="Models\user\" />
+    <Folder Include="Models\Platform\" />
+    <Folder Include="Models\Rider\" />
   </ItemGroup>
 
 </Project>
