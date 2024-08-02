@@ -38,6 +38,9 @@ namespace takeout_tj.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			// modelBuilder.HasDefaultSchema("C##TAKEOUT");
+
 			modelBuilder.Entity<UserDB>().HasKey(u => u.UserId);
 			modelBuilder.Entity<UserAddressDB>().HasKey(u => new {u.UserId, u.UserAddress});
 			modelBuilder.Entity<MerchantDB>().HasKey(m => m.MerchantId);
