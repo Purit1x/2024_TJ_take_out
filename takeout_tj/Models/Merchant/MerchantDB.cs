@@ -28,5 +28,6 @@ namespace takeout_tj.Models.Merchant
 
 		public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  // 用于收藏商家的多对多关系的导航属性
 		public ICollection<DishDB> DishDBs { get; set; }
+		public ICollection<SpecialOfferDB> SpecialOfferDBs { get; set; }
 	}
 }

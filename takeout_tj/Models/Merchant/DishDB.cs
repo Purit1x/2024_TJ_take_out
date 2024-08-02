@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.Platform;
 using takeout_tj.Models.User;
 
 namespace takeout_tj.Models.Merchant
@@ -22,5 +23,6 @@ namespace takeout_tj.Models.Merchant
 
 		public MerchantDB MerchantDB { get; set; }
 		public ICollection<ShoppingCartDB> ShoppingCartDBs { get; set; }
+		public ICollection<OrderDishDB> OrderDishDBs { get; set; }
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using takeout_tj.Models.Merchant;
+using takeout_tj.Models.Platform;
 
 namespace takeout_tj.Models.User
 {
@@ -26,5 +27,6 @@ namespace takeout_tj.Models.User
 		public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  
 		public ICollection<ShoppingCartDB> shoppingCartDBs { get; set; }
 		public ICollection<UserCouponDB> UserCouponDBs { get; set; }
+		public ICollection<OrderUserDB> OrderUserDBs { get; set; }
 	}
 }
