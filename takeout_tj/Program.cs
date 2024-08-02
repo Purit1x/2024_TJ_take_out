@@ -1,7 +1,18 @@
+using Microsoft.EntityFrameworkCore;
+using takeout_tj.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add Entity Framework Core services for Oracle database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+	options.UseOracle(
+		builder.Configuration.GetConnectionString("DefaultConnection"),
+		o => o.MigrationsAssembly("takeout_tj"));
+});
 
 var app = builder.Build();
 

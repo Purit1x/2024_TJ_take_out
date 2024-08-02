@@ -19,9 +19,4 @@
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.50" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Platform\" />
-    <Folder Include="Models\Rider\" />
-  </ItemGroup>
-
 </Project>

@@ -2,6 +2,7 @@
 using Oracle.EntityFrameworkCore;
 using takeout_tj.Models.Merchant;
 using takeout_tj.Models.Platform;
+using takeout_tj.Models.Rider;
 using takeout_tj.Models.User;
 
 namespace takeout_tj.Data
@@ -12,19 +13,27 @@ namespace takeout_tj.Data
 		public DbSet<UserAddressDB> UserAddresses { get; set; }
 		public DbSet<MembershipDB> Memberships { get; set; }
 		public DbSet<MerchantDB> Merchants { get; set; }
+		public DbSet<FavoriteMerchantDB> FavoriteMerchants { get; set; }
+		public DbSet<DishDB> Dishes { get; set; }
+		public DbSet<ShoppingCartDB> ShoppingCarts { get; set; }
+		public DbSet<CouponDB> Coupons { get; set; }
+		public DbSet<CouponPurchaseDB> CouponPurchases { get; set; }
+		public DbSet<UserCouponDB> UserCoupons { get; set; }
+		public DbSet<RiderDB> Riders { get; set; }
+		public DbSet<RiderWageDB> RiderWages { get; set; }
+		public DbSet<StationDB> Stations { get; set; }
+		public DbSet<RiderStationDB> RiderStations { get; set; }
+		public DbSet<SpecialOfferDB> SpecialOffers { get; set; }
+		public DbSet<OrderDB> Orders { get; set; }
+		public DbSet<OrderRiderDB> OrderRiders { get; set; }
+		public DbSet<OrderUserDB> OrderUsers { get; set; }
+		public DbSet<OrderDishDB> OrderDishes { get; set; }
+		public DbSet<OrderCouponDB> OrderCoupons { get; set; }
 		
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
 		{
 		}
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			base.OnConfiguring(optionsBuilder);
-			if(!optionsBuilder.IsConfigured)
-			{
-
-			}
-		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -38,7 +47,17 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<CouponDB>().HasKey(c => c.CouponId);
 			modelBuilder.Entity<CouponPurchaseDB>().HasKey(c => c.CouponPurchaseId);
 			modelBuilder.Entity<UserCouponDB>().HasKey(u => new { u.UserId, u.CouponId, u.ExpirationDate });
-			
+			modelBuilder.Entity<RiderDB>().HasKey(r => r.RiderId);
+			modelBuilder.Entity<RiderWageDB>().HasKey(r => r.WageId);
+			modelBuilder.Entity<StationDB>().HasKey(s =>s.StationId);
+			modelBuilder.Entity<RiderStationDB>().HasKey(rs => rs.RiderId);
+			modelBuilder.Entity<SpecialOfferDB>().HasKey(s => new { s.MerchantId, s.OfferId });
+			modelBuilder.Entity<OrderDB>().HasKey(o => o.OrderId);
+			modelBuilder.Entity<OrderRiderDB>().HasKey(o => o.OrderId);
+			modelBuilder.Entity<OrderUserDB>().HasKey(ou => ou.OrderId);
+			modelBuilder.Entity<OrderDishDB>().HasKey(od => new { od.OrderId, od.MerchantId, od.DishId });
+			modelBuilder.Entity<OrderCouponDB>().HasKey(oc => oc.OrderId);
+
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
 				.HasOne(a => a.UserDB)
@@ -87,6 +106,61 @@ namespace takeout_tj.Data
 				.HasOne(uc => uc.CouponDB)
 				.WithMany(c => c.UserCouponDBs)
 				.HasForeignKey(uc => uc.CouponId);
+			// 定义工资记录与骑手的多对一联系
+			modelBuilder.Entity<RiderWageDB>()
+				.HasOne(rw => rw.RiderDB)
+				.WithMany(r => r.RiderWageDBs)
+				.HasForeignKey(rw => rw.RiderId);
+			// 骑手与站点的多对一联系集
+			modelBuilder.Entity<RiderStationDB>()
+				.HasOne(rs => rs.RiderDB)
+				.WithOne(r => r.RiderStationDB)
+				.HasForeignKey<RiderStationDB>(rs => rs.RiderId);
+			modelBuilder.Entity<RiderStationDB>()
+				.HasOne(rs => rs.StationDB)
+				.WithMany(s => s.RiderStationDBs)
+				.HasForeignKey(rs => rs.StationId);
+			// 定义满减活动到商家的多对一关系
+			modelBuilder.Entity<SpecialOfferDB>()
+				.HasOne(so => so.MerchantDB)
+				.WithMany(m => m.SpecialOfferDBs)
+				.HasForeignKey(so => so.MerchantId);
+			// 订单与骑手的多对一联系集
+			modelBuilder.Entity<OrderRiderDB>()
+				.HasOne(or => or.OrderDB)
+				.WithOne(o => o.OrderRiderDB)
+				.HasForeignKey<OrderRiderDB>(or => or.OrderId);
+			modelBuilder.Entity<OrderRiderDB>()
+				.HasOne(or => or.RiderDB)
+				.WithMany(r => r.OrderRiderDBs)
+				.HasForeignKey(or => or.RiderId);
+			// 订单与用户的多对一联系集
+			modelBuilder.Entity<OrderUserDB>()
+				.HasOne(ou => ou.UserDB)
+				.WithMany(u => u.OrderUserDBs)
+				.HasForeignKey(ou => ou.UserId);
+			modelBuilder.Entity<OrderUserDB>()
+				.HasOne(ou => ou.OrderDB)
+				.WithOne(o => o.OrderUserDB)
+				.HasForeignKey<OrderUserDB>(ou => ou.OrderId);
+			// 订单到菜品的多对多联系集
+			modelBuilder.Entity<OrderDishDB>()
+				.HasOne(od => od.DishDB)
+				.WithMany(d => d.OrderDishDBs)
+				.HasForeignKey(od => new { od.MerchantId, od.DishId });
+			modelBuilder.Entity<OrderDishDB>()
+				.HasOne(od => od.OrderDB)
+				.WithMany(o => o.OrderDishDBs)
+				.HasForeignKey(od => od.OrderId);
+			// 订单到优惠券的多对一联系集
+			modelBuilder.Entity<OrderCouponDB>()
+				.HasOne(oc => oc.CouponDB)
+				.WithMany(c => c.OrderCouponDBs)
+				.HasForeignKey(oc => oc.CouponId);
+			modelBuilder.Entity<OrderCouponDB>()
+				.HasOne(oc => oc.OrderDB)
+				.WithOne(o => o.OrderCouponDB)
+				.HasForeignKey<OrderCouponDB>(oc => oc.OrderId);
 
 			modelBuilder.Entity<DishDB>()
 				.Property(d => d.DishPrice)
@@ -100,6 +174,21 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<CouponDB>()
 				.Property(c => c.MinPrice)
 				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<RiderWageDB>()
+				.Property(rw => rw.Wage)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<SpecialOfferDB>()
+				.Property(so => so.MinPrice)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<SpecialOfferDB>()
+				.Property(so => so.AmountRemission)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<OrderDB>()
+				.Property(o => o.Price)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<OrderRiderDB>()
+				.Property(or => or.RiderPrice)
+				.HasColumnType("numeric(10,2)");
 				
 			modelBuilder.Entity<UserDB>().ToTable("users");
 			modelBuilder.Entity<UserAddressDB>().ToTable("user_address");
@@ -111,6 +200,16 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<CouponDB>().ToTable("coupons");
 			modelBuilder.Entity<CouponPurchaseDB>().ToTable("coupon_purchases");
 			modelBuilder.Entity<UserCouponDB>().ToTable("user_coupons");
+			modelBuilder.Entity<RiderDB>().ToTable("riders");
+			modelBuilder.Entity<RiderWageDB>().ToTable("rider_wages");
+			modelBuilder.Entity<StationDB>().ToTable("stations");
+			modelBuilder.Entity<RiderStationDB>().ToTable("rider_stations");
+			modelBuilder.Entity<SpecialOfferDB>().ToTable("special_offers");
+			modelBuilder.Entity<OrderDB>().ToTable("orders");
+			modelBuilder.Entity<OrderRiderDB>().ToTable("order_riders");
+			modelBuilder.Entity<OrderUserDB>().ToTable("order_users");
+			modelBuilder.Entity<OrderDishDB>().ToTable("order_dishes");
+			modelBuilder.Entity<OrderCouponDB>().ToTable("order_coupons");
 		}
 	}
 }
