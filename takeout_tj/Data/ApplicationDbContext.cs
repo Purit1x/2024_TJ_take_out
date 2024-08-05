@@ -32,6 +32,7 @@ namespace takeout_tj.Data
 		
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
 		{
+			
 		}
 
 
