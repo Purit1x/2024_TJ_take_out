@@ -29,6 +29,7 @@ namespace takeout_tj.Data
 		public DbSet<OrderUserDB> OrderUsers { get; set; }
 		public DbSet<OrderDishDB> OrderDishes { get; set; }
 		public DbSet<OrderCouponDB> OrderCoupons { get; set; }
+		public DbSet<AdminDB> Admins { get; set; }
 		
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
 		{
@@ -61,6 +62,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderUserDB>().HasKey(ou => ou.OrderId);
 			modelBuilder.Entity<OrderDishDB>().HasKey(od => new { od.OrderId, od.MerchantId, od.DishId });
 			modelBuilder.Entity<OrderCouponDB>().HasKey(oc => oc.OrderId);
+			modelBuilder.Entity<AdminDB>().HasKey(a => a.AdminId);
 
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
@@ -214,6 +216,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderUserDB>().ToTable("order_users");
 			modelBuilder.Entity<OrderDishDB>().ToTable("order_dishes");
 			modelBuilder.Entity<OrderCouponDB>().ToTable("order_coupons");
+			modelBuilder.Entity<AdminDB>().ToTable("admins");
 		}
 	}
 }

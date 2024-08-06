@@ -8,6 +8,10 @@ namespace takeout_tj.Models.Rider
 		[Required(ErrorMessage = "Rider ID is required. ")]
 		public int RiderId { get; set; }
 
+		[Required(ErrorMessage = "User password is required. ")]
+		[StringLength(20, MinimumLength = 6, ErrorMessage = "The password should be at least 6 characters and at most 20 characters long. ")]
+		public string Password { get; set; }
+
 		[Required(ErrorMessage = "Rider name is required. ")]
 		[StringLength(50, ErrorMessage = "Rider name must be at most 50 characters long. ")]
 		public string RiderName { get; set; }

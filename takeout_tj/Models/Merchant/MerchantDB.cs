@@ -8,6 +8,10 @@ namespace takeout_tj.Models.Merchant
 		[Required(ErrorMessage = "Merchant ID is required. ")]
 		public int MerchantId { get; set; }
 
+		[Required(ErrorMessage = "User password is required. ")]
+		[StringLength(20, MinimumLength = 6, ErrorMessage = "The password should be at least 6 characters and at most 20 characters long. ")]
+		public string Password { get; set; }
+
 		[Required(ErrorMessage = "Merchant name is required. ")]
 		[StringLength(255, ErrorMessage = "Merchant name must be at most 255 characters long. ")]
 		public string MerchantName { get; set; }
