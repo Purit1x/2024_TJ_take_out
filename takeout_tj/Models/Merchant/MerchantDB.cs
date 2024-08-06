@@ -30,7 +30,15 @@ namespace takeout_tj.Models.Merchant
 		[StringLength(20, ErrorMessage = "DishType must be at most 255 characters long. ")]
 		public string DishType { get; set; }
 
-		public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  // 用于收藏商家的多对多关系的导航属性
+        [Required(ErrorMessage = "Expected time for open business is required. ")]
+        [DisplayFormat(DataFormatString = "HH:mm:ss", ApplyFormatInEditMode = true)]
+        public DateTime TimeforOpenBusiness { get; set; }
+
+        [Required(ErrorMessage = "Expected time for close business is required. ")]
+        [DisplayFormat(DataFormatString = "HH:mm:ss", ApplyFormatInEditMode = true)]
+        public DateTime TimeforCloseBusiness { get; set; }
+
+        public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  // 用于收藏商家的多对多关系的导航属性
 		public ICollection<DishDB> DishDBs { get; set; }
 		public ICollection<SpecialOfferDB> SpecialOfferDBs { get; set; }
 	}
