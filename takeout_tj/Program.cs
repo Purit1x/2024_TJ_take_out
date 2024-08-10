@@ -5,6 +5,7 @@ using System.Text.Unicode;
 using takeout_tj.Data;
 using takeout_tj.Utility;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +57,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 在Program.cs注册上下文并指定数据库连接字符串
 // builder.Services.AddDbContext<ModelContext>(option => option.UseOracle(builder.Configuration.GetConnectionString("WaiMaiDBCon")));
 
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "外卖平台管理系统测试",
+        Description = "这里是swagger测试"
+    });
+});
 // 测试环境或开发环境下, 任何跨域请求都通过
 builder.Services.AddCors(c =>
 {
@@ -83,8 +91,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
+
 
 app.MapControllers();
 
 app.Run();
+
