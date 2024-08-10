@@ -2,7 +2,6 @@
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.User;
-using takeout_tj.Service;
 
 namespace takeout_tj.Controllers
 {
@@ -11,12 +10,10 @@ namespace takeout_tj.Controllers
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserService _userService;
 
         public UsersController(ApplicationDbContext context)
         {
             _context = context;
-            _userService = new UserService(_context);
         }
 
         // <summary>
@@ -32,7 +29,6 @@ namespace takeout_tj.Controllers
             {
                 UserDB user = new UserDB()
                 {
-                    UserId = _userService.AssignId(),
                     UserName = dto.UserName,
                     Password = dto.Password,
                     PhoneNumber = dto.PhoneNumber,
@@ -43,7 +39,7 @@ namespace takeout_tj.Controllers
                 if (result > 0)
                 {
                     tran.Commit();//多表添加才用到
-                    return Ok(new { data = user.UserId, msg = "注册成功" });
+                    return StatusCode(200, new { data = user.UserId, msg = "ok" });
                 }
                 else
                 {
@@ -55,7 +51,7 @@ namespace takeout_tj.Controllers
             {
                 tran.Rollback();    //多表添加才用到
 
-                return StatusCode(20000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
+                return StatusCode(20000, new { errorCode = 20000, msg = $"创建异常: {ex.Message}" });
             }
         }
 
@@ -73,14 +69,14 @@ namespace takeout_tj.Controllers
             {
                 UserDB _user = new UserDB()
                 {
-                    UserId = user.UserId,
+                    UserName = user.UserName,
                     Password = user.Password
                 };
 
                 //var result = _context.Users.Where(n => n.UserName == user.UserName).ToList();
 
                 // 条件查询
-                var result1 = _context.Users.Where(n => n.UserId == _user.UserId && n.Password == _user.Password).ToList();
+                var result1 = _context.Users.Where(n => n.UserName == _user.UserName && n.Password == _user.Password).ToList();
 
                 // 模糊查询
                 // var result2 = await _context.Users.Where(n => n.UserName.Contains("Test")).ToListAsync();
@@ -119,7 +115,7 @@ namespace takeout_tj.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message.ToString() });
+                return StatusCode(20000, new { errorCode = 20000, msg = ex.Message.ToString() });
             }      
         }
     }
