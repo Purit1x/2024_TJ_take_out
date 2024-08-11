@@ -13,8 +13,9 @@ import Login from './views/Login.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" /> -->
-
-  <Login></Login>
+  <main>  
+    <router-view></router-view> <!-- 显示路由内容 -->  
+  </main>
 </template>
 
 <style scoped>
