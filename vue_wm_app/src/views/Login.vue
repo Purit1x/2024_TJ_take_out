@@ -2,7 +2,7 @@
 // 导入element-plus的提示组件
 import { ElMessage } from 'element-plus'
 // 导入用户图标和锁图标
-import { User, Lock } from '@element-plus/icons-vue'
+import { User, Lock, Dish } from '@element-plus/icons-vue'
 // 导入引用
 import { ref } from 'vue'
 // 状态管理
@@ -15,8 +15,9 @@ const cookie = useCookies()
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
-//控制注册与登录表单的显示， 默认显示注册
+//控制注册与登录表单的显示， 默认显示用户注册
 const isRegister = ref(false)
+const roleType = ref("user")
 const refForm =ref(null);
 
 //控制全局登录
@@ -42,8 +43,8 @@ const merchantRegisterData = ref({
     MerchantAddress:'',
     Contact:'',
     DishType:'',
-    TimeForOpenBussiness:null,
-    TimeForCloseBussiness:null,
+    TimeforOpenBusiness: '',
+    TimeforCloseBusiness: '',
     rePassword:'',
 })
 
@@ -67,8 +68,8 @@ const clearRegisterData = () =>{
         MerchantAddress:'',
         Contact:'',
         DishType:'',
-        TimeForOpenBussiness:null,
-        TimeForCloseBussiness:null,
+        TimeforOpenBusiness: '',
+        TimeforCloseBusiness: '',
         rePassword:'',
     },
     loginInfo.value = {
@@ -83,15 +84,20 @@ const clearRegisterData = () =>{
 const checkRePassword = (rule,value,callback) => {
     if(value == ''){
         callback(new Error('请再次确认密码'))
-    } else if( value !== userRegisterData.value.password){
+    } else if( roleType.value === 'user' && value !== userRegisterData.value.password){
         callback('二次确认密码不相同请重新输入')
-    } else{
+    } else if( roleType.value ==='merchant' && value !== merchantRegisterData.value.Password){
+        callback('二次确认密码不相同请重新输入')
+    }else if( roleType.value === 'rider' && value !== riderRegisterData.value.password){
+        callback('二次确认密码不相同请重新输入')
+    }
+    else{
         callback()
     }
 }
  
 //定义表单校验规则
-const rules = ref({
+const userRules = ref({
     username:[
         {required:true, message:'请输入用户名', trigger:'blur'},
         {min:2, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
@@ -105,6 +111,19 @@ const rules = ref({
     ],
     rePassword:[{validator:checkRePassword,trigger:'blur'}] //校验二次输入密码是否相同
 })
+const merchantRules = ref({  
+    MerchantName: [{ required: true, message: '请输入商家名称', trigger: 'blur' }],  
+    MerchantAddress: [{ required: true, message: '请填写商家地址', trigger: 'blur' }],  
+    Contact: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],  
+    Password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 5, max: 16, message: '请输入长度5~16非空字符', trigger: 'blur' }],  
+    rePassword: [{ validator: checkRePassword, trigger: 'blur' }], 
+    TimeforOpenBusiness: [{ required: true, message: '请选择营业开始时间', trigger: 'change' }],  
+    TimeforCloseBusiness: [{ required: true, message: '请选择营业结束时间', trigger: 'change' }],
+    DishType: [{ required: true, message: '请输入菜品类型', trigger: 'blur' }]  
+});
+const riderRules = ref({
+
+});
 const loginRules = ref({
     loginType:[
         {required:true, message:'请选择用户类型', trigger:'blur'},
@@ -120,31 +139,65 @@ const loginRules = ref({
 //调用后台接口完成注册
 import {userRegisterService, userLoginService} from '@/api/user.js'
 import {merchantRegisterService, merchantLoginService} from '@/api/merchant.js'
+import { start } from 'nprogress';
 const register = ()=> {
      // 先验证数据
-     refForm.value.validate((valid) => {
+    refForm.value.validate((valid) => {
         if (!valid) {
             return false;
         }
+        if (roleType.value === 'merchant') {
+            // 转换时间为秒数
+            const openTime = merchantRegisterData.value.TimeforOpenBusiness;  
+            const closeTime = merchantRegisterData.value.TimeforCloseBusiness;
+            const startHour = openTime.getUTCHours()-16;  
+            const startMinute = openTime.getUTCMinutes();  
+            const startSecond = openTime.getUTCSeconds();  
+            merchantRegisterData.value.TimeforOpenBusiness = startHour * 3600 + startMinute * 60 + startSecond;  
 
+            const endHour = closeTime.getUTCHours()-16;  
+            const endMinute = closeTime.getUTCMinutes();  
+            const endSecond = closeTime.getUTCSeconds();  
+            merchantRegisterData.value.TimeforCloseBusiness = endHour * 3600 + endMinute * 60 + endSecond;
+            merchantRegisterService({
+                Password: merchantRegisterData.value.Password,  
+                MerchantName: merchantRegisterData.value.MerchantName,    
+                MerchantAddress: merchantRegisterData.value.MerchantAddress,  
+                Contact: merchantRegisterData.value.Contact,  
+                DishType: merchantRegisterData.value.DishType,  
+                TimeforOpenBusiness: merchantRegisterData.value.TimeforOpenBusiness,  
+                TimeforCloseBusiness: merchantRegisterData.value.TimeforCloseBusiness,  
+            }).then(res => {  
+                ElMessage.success({  
+                    message: '商家注册成功，商家ID为 ' + res.data + '，请牢记该Id。',  
+                    duration: 10000 // 设置显示时间为10秒  
+                });   
+                clearRegisterData();  
+            }).catch(err => {  
+                ElMessage.error(`注册失败: ${err.response.data.msg || '未知错误'}`);  
+            });
+        } else if (roleType.value === 'rider') {
+            // 骑手注册暂不支持
+        } else {
        // 调用注册接口  
-       userRegisterService({  
-            UserName: userRegisterData.value.username, // 后端要求的字段  
-            Password: userRegisterData.value.password,  
-            PhoneNumber: userRegisterData.value.phoneNumber  
-        }).then(res => {  
-            // 成功  
-            ElMessage.success({  
-                message: '注册成功，用户ID为 ' + res.data + '，请牢记该Id。',  
-                duration: 10000 // 设置显示时间为10秒  
-            });  
-            clearRegisterData() // 注册成功后清空输入  
-            // 可选择跳转到其他页面，例如登录 page  
-            // router.push('/login')  
-        }).catch(err => {  
-            // 处理错误  
-            ElMessage.error(`注册失败: ${err.response.data.msg || '未知错误'}`)  
-        })  
+            userRegisterService({  
+                UserName: userRegisterData.value.username, // 后端要求的字段  
+                Password: userRegisterData.value.password,  
+                PhoneNumber: userRegisterData.value.phoneNumber  
+            }).then(res => {  
+                // 成功  
+                ElMessage.success({  
+                    message: '用户注册成功，用户ID为 ' + res.data + '，请牢记该Id。',  
+                    duration: 10000 // 设置显示时间为10秒  
+                });  
+                clearRegisterData() // 注册成功后清空输入  
+                // 可选择跳转到其他页面，例如登录 page  
+                router.push('/login')  
+            }).catch(err => {  
+                // 处理错误  
+                ElMessage.error(`注册失败: ${err.response.data.msg || '未知错误'}`)  
+            })
+        }  
     }); 
 }
 
@@ -164,11 +217,11 @@ const login = () =>{
                 if(data.msg=== "ok"){
                     ElMessage.success('登录成功');
                     // 将用户信息保存到管理器
-                    store.state.user = userRegisterData.value;
+                    store.dispatch('setUser', userRegisterData.value); // 设置用户状态
                     // 保持cookie
                     cookie.set('user', userRegisterData.value);
                     // 跳转
-                    router.push('/');
+                    router.push('/user-home');
                 }
             }).catch(error => {
                 // 根据错误码处理不同的错误  
@@ -190,14 +243,17 @@ const login = () =>{
             });
         } else if (loginTypeValue === 'merchant') {  //商家登录
             //调用接口完成登录
-            merchantRegisterData.value.MerchantId = loginInfo.value.loginId;
+            merchantRegisterData.value.MerchantId = +loginInfo.value.loginId;
             merchantRegisterData.value.Password = loginInfo.value.loginPassword;
+            merchantRegisterData.value.TimeforOpenBusiness = +merchantRegisterData.value.TimeforOpenBusiness;
+            merchantRegisterData.value.TimeforCloseBusiness = +merchantRegisterData.value.TimeforCloseBusiness;
+            console.log('Merchant login data:', merchantRegisterData.value);  
             merchantLoginService(merchantRegisterData.value).then(data => {
                 if(data.msg=== "ok"){
                     ElMessage.success('登录成功');
-                    store.state.merchant = merchantRegisterData.value;
+                    store.dispatch('setMerchant', merchantRegisterData.value); // 设置商家状态
                     cookie.set('merchant', merchantRegisterData.value);
-                    router.push('/');
+                    router.push('/merchant-home');
                 }
             }).catch(error => {
                 // 根据错误码处理不同的错误  
@@ -233,20 +289,56 @@ const login = () =>{
         <el-col :span="6" :offset="3" class="form">
             
             <!-- 注册表单 -->
-            <el-form ref="refForm" size="large" autocomplete="off" v-if="isRegister" :model="userRegisterData" :rules="rules">
-                <el-form-item>
-                    <h1>注册</h1>
+            <el-form ref="refForm" size="large" autocomplete="off" v-if="isRegister"   
+                     :model="roleType === 'merchant' ? merchantRegisterData : roleType === 'rider' ? riderRegisterData : userRegisterData"   
+                     :rules="roleType === 'merchant' ? merchantRules : roleType === 'rider' ? riderRules : userRules">  
+                <el-form-item>  
+                    <h1>{{ roleType === 'merchant' ? '商家注册' : roleType === 'rider' ? '骑手注册' : '用户注册' }}</h1>  
+                </el-form-item>  
+                <div>  
+                    <el-radio-group v-model="roleType">  
+                        <el-radio label="user">用户注册</el-radio>  
+                        <el-radio label="merchant">商家注册</el-radio>  
+                        <el-radio label="rider">骑手注册</el-radio>  
+                    </el-radio-group>
+                    <div>&nbsp;</div>  
+                </div>
+                <!--商家注册--> 
+                <el-form-item v-if="roleType === 'merchant'" prop="MerchantName">  
+                    <el-input :prefix-icon="User" placeholder="请输入商家名称" v-model="merchantRegisterData.MerchantName"></el-input>  
+                </el-form-item>  
+                <el-form-item v-if="roleType === 'merchant'" prop="MerchantAddress">  
+                    <el-input :prefix-icon="User" placeholder="请输入商家地址" v-model="merchantRegisterData.MerchantAddress"></el-input>  
+                </el-form-item>  
+                <el-form-item v-if="roleType === 'merchant'" prop="Contact">  
+                    <el-input :prefix-icon="User" placeholder="请输入联系方式" v-model="merchantRegisterData.Contact"></el-input>  
                 </el-form-item>
-                <el-form-item prop="username">
+                <el-form-item v-if="roleType === 'merchant'" prop="DishType">  
+                    <el-input :prefix-icon="User" placeholder="请输入菜品类型" v-model="merchantRegisterData.DishType"></el-input>  
+                </el-form-item>
+                <el-form-item v-if="roleType === 'merchant'" prop="TimeforOpenBusiness">  
+                    <el-time-picker placeholder="请选择营业开始时间" v-model="merchantRegisterData.TimeforOpenBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
+                </el-form-item>  
+                <el-form-item v-if="roleType === 'merchant'" prop="TimeForCloseBusiness">  
+                    <el-time-picker placeholder="请选择营业结束时间" v-model="merchantRegisterData.TimeforCloseBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
+                </el-form-item>  
+                <el-form-item v-if="roleType === 'merchant'" prop="Password">
+                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="merchantRegisterData.Password"></el-input>
+                </el-form-item>
+                <el-form-item v-if="roleType === 'merchant'" prop="rePassword">
+                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="merchantRegisterData.rePassword"></el-input>
+                </el-form-item>
+                <!--用户注册-->    
+                <el-form-item v-if="roleType === 'user'" prop="username">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="userRegisterData.username"></el-input>
                 </el-form-item>
-                <el-form-item prop="phoneNumber">
+                <el-form-item v-if="roleType === 'user'" prop="phoneNumber">
                     <el-input :prefix-icon="User" placeholder="请输入手机号码" v-model="userRegisterData.phoneNumber"></el-input>
                 </el-form-item>
-                <el-form-item prop="password">
+                <el-form-item v-if="roleType === 'user'" prop="password">
                     <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="userRegisterData.password"></el-input>
                 </el-form-item>
-                <el-form-item prop="rePassword">
+                <el-form-item v-if="roleType === 'user'" prop="rePassword">
                     <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="userRegisterData.rePassword"></el-input>
                 </el-form-item>
                 <!-- 注册按钮 -->

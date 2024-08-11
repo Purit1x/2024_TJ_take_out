@@ -6,12 +6,17 @@ import {
 import Index from '@/views/Index.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/404.vue'
+import store from '@/store/index.js'
+import UserHome from '@/views/UserHome.vue'
+import MerchantHome from '@/views/MerchantHome.vue'
 
 // 默认路由，所有用户共享
 const routers = [
     { path: "/", name: "index", component: Index }, // 添加name 是方便后续添加嵌套路由时方便
     { path: "/login", component: Login, meta: { title: "登录页面" } },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
+    { path: "/merchant-home", component: MerchantHome, meta: { requiresAuth: true } }, 
+    { path: "/user-home", component: UserHome, meta: { requiresAuth: true } },  
 ]
 
 // 动态路由，用于匹配菜单动态添加路由
@@ -30,7 +35,16 @@ export const router = createRouter({
     history: createWebHashHistory(),
     routes: routers
 })
-
+// 路由守卫  
+router.beforeEach((to, from, next) => {  
+    const isAuthenticated = store.state.user || store.state.merchant ||store.state.rider;  
+    const requiresAuth = to.meta.requiresAuth; // 确保获取到目标路由的 requiresAuth 属性  
+    if (requiresAuth && !isAuthenticated) {  
+        next({ path: '/login' }); // 重定向到登录  
+    } else {  
+        next(); // 继续导航  
+    }  
+});  
 // 动态添加路由的方法
 export function addRoutes(menus) {
     // 是否有新的路由
