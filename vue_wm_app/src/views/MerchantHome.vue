@@ -1,5 +1,4 @@
 <script setup>  
-
 import { ref, onMounted, watch } from 'vue';  
 import { useCookies } from '@vueuse/integrations/useCookies'  
 import { useRouter } from 'vue-router';
@@ -13,7 +12,6 @@ onMounted(() => {
   const merchantData = cookies.get('merchant');  
   cookies.set('merchant', {});
   isMerchantHome.value = true; // 页面是否为商家主页。这里之所以设置这个是因为子路由会默认渲染父路由的一切渲染内容，所以这里设置一个标识符来控制是否显示父路由内容
-
   if (merchantData) {  
     merchant.value = merchantData;  
   } else {  
@@ -21,7 +19,6 @@ onMounted(() => {
     router.push('/login');
   }  
 });  
-
 // 监视路由变化  
 watch(  
     () => router.currentRoute.value.path,  
@@ -44,7 +41,6 @@ const goToPersonal = () => {
 };  
 // 提供 merchant 对象 给其它子网页 
 provide('merchant', merchant); 
-
 </script>  
 
 <template>  
@@ -55,6 +51,5 @@ provide('merchant', merchant);
          <!-- 按钮 -->
         <button v-if="isMerchantHome" @click="goToMenu">菜单</button>  
         <button v-if="isMerchantHome" @click="goToPersonal">我的</button>  
-
     </div>  
 </template>  
