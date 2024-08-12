@@ -6,6 +6,7 @@ using takeout_tj.Data;
 using takeout_tj.Utility;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,8 +92,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthorization();
+
+// 使 uploads 文件夹对外可访问  
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+    RequestPath = "/uploads"
+});
 
 app.MapControllers();
 
+
 app.Run();
+
+
+
