@@ -21,7 +21,14 @@ namespace takeout_tj.Models.Merchant
 
 		public string DishCategory { get; set; }  // 菜品列别, 可以为空
 
-		public MerchantDB MerchantDB { get; set; }
+        [Required(ErrorMessage = "Image Url is required. ")]
+        public string ImageUrl { get; set; } = "https://img.zcool.cn/community/0138245e5218c4a80120a8950b14a0.png@1280w_1l_2o_100sh.png"; //菜品图片链接
+
+        [Required(ErrorMessage = "Dish inventory is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Dish inventory must be non-negative. ")]
+        public int DishInventory {  get; set; }  //菜品库存
+
+        public MerchantDB MerchantDB { get; set; }
 		public ICollection<ShoppingCartDB> ShoppingCartDBs { get; set; }
 		public ICollection<OrderDishDB> OrderDishDBs { get; set; }
 	}
