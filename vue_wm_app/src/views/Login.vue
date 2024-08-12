@@ -240,6 +240,8 @@ const login = () =>{
                 }  
                 store.state.user = null;  
                 cookie.set('user', {});  
+
+
             });
         } else if (loginTypeValue === 'merchant') {  //商家登录
             //调用接口完成登录
@@ -247,6 +249,7 @@ const login = () =>{
             merchantRegisterData.value.Password = loginInfo.value.loginPassword;
             merchantRegisterData.value.TimeforOpenBusiness = +merchantRegisterData.value.TimeforOpenBusiness;
             merchantRegisterData.value.TimeforCloseBusiness = +merchantRegisterData.value.TimeforCloseBusiness;
+
             merchantLoginService(merchantRegisterData.value).then(data => {
                 if(data.msg=== "ok"){
                     ElMessage.success('登录成功');
@@ -271,6 +274,7 @@ const login = () =>{
                 }  
 
                 store.state.merchant = null;  
+
                 cookie.set('merchant', {});  
             });
             
