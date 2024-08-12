@@ -9,14 +9,26 @@ import NotFound from '@/views/404.vue'
 import store from '@/store/index.js'
 import UserHome from '@/views/UserHome.vue'
 import MerchantHome from '@/views/MerchantHome.vue'
+import MerchantDish from '@/views/MerchantDish.vue'
+import MerchantPersonal from '@/views/MerchantPersonal.vue'
+
 
 // 默认路由，所有用户共享
 const routers = [
     { path: "/", name: "index", component: Index }, // 添加name 是方便后续添加嵌套路由时方便
     { path: "/login", component: Login, meta: { title: "登录页面" } },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
-    { path: "/merchant-home", component: MerchantHome, meta: { requiresAuth: true } }, 
-    { path: "/user-home", component: UserHome, meta: { requiresAuth: true } },  
+    { path: "/merchant-home", component: MerchantHome, meta: { requiresAuth: true },children: [  
+        {  
+          path: 'dish', // 子路由路径  
+          component: MerchantDish, // 子组件  
+        },
+        {  
+            path: 'personal', // 新增路径  
+            component: MerchantPersonal, // 新的子组件  
+        },], 
+    }, 
+    { path: "/user-home", component: UserHome, meta: { requiresAuth: true } },
 ]
 
 // 动态路由，用于匹配菜单动态添加路由
@@ -44,7 +56,8 @@ router.beforeEach((to, from, next) => {
     } else {  
         next(); // 继续导航  
     }  
-});  
+});
+
 // 动态添加路由的方法
 export function addRoutes(menus) {
     // 是否有新的路由
