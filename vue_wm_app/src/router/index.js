@@ -11,10 +11,10 @@ import UserHome from '@/views/UserHome.vue'
 import MerchantHome from '@/views/MerchantHome.vue'
 import MerchantDish from '@/views/MerchantDish.vue'
 import MerchantPersonal from '@/views/MerchantPersonal.vue'
-
 import RiderHome from '@/views/rider/RiderHome.vue'
 import RiderAssignment from '@/views/rider/RiderAssignment.vue'
 import RiderInfo from '@/views/rider/RiderInfo.vue'
+
 
 // 默认路由，所有用户共享
 const routers = [
@@ -71,7 +71,6 @@ router.beforeEach((to, from, next) => {
         next(); // 继续导航  
     }  
 });
-
 
 // 动态添加路由的方法
 export function addRoutes(menus) {
