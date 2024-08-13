@@ -12,7 +12,6 @@ import MerchantHome from '@/views/MerchantHome.vue'
 import MerchantDish from '@/views/MerchantDish.vue'
 import MerchantPersonal from '@/views/MerchantPersonal.vue'
 
-
 // 默认路由，所有用户共享
 const routers = [
     { path: "/", name: "index", component: Index }, // 添加name 是方便后续添加嵌套路由时方便
@@ -57,7 +56,6 @@ router.beforeEach((to, from, next) => {
         next(); // 继续导航  
     }  
 });
-
 // 动态添加路由的方法
 export function addRoutes(menus) {
     // 是否有新的路由
