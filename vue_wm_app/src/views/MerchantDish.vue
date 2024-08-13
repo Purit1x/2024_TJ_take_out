@@ -128,7 +128,7 @@ const submitEdit = async () => {
     currentDish.value.imageUrl = imageUrl; // 更新图片 URL  
     currentDish.value.MerchantId = merchant.value.MerchantId; // 设置 MerchantId  
     console.log(currentDish.value);
-    axios.post(`http://localhost:5079/api/Merchant/dishEdit`, currentDish.value) // 修改为 post 方法  
+    axios.put(`http://localhost:5079/api/Merchant/dishEdit`, currentDish.value) // 修改为 post 方法  
     .then(() => {  
         const index = dishes.value.findIndex(dish => dish.dishId === currentDish.value.dishId);  
         if (index !== -1) {  

@@ -11,7 +11,7 @@
   
   <style scoped lang="scss">
   .container {
-    position: relative;
+    position: relative;  //相对定位
     width: 100vw;
     height: 100vh;
     overflow: hidden;
@@ -20,21 +20,21 @@
   .background {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    position: absolute;
+    object-fit: cover;  //确保全覆盖
+    position: absolute;  //绝对定位
     top: 0;
     left: 0;
     z-index: 1;
   }
   
-  .overlay {
+  .overlay {  //覆盖层
     position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+    z-index: 2;  //覆盖层的层级
+    display: flex;  //弹性布局
+    flex-direction: column;  //垂直排列
+    align-items: center;  //居中对齐
+    justify-content: center;  //居中对齐
+    height: 100%;  //高度为100%
   }
   
   .cover {
@@ -45,7 +45,7 @@
   }
   
   .link-button{
-    position: absolute;
+    position: absolute;  
     z-index: 3;
     display: flex;
     justify-content: center;

@@ -7,7 +7,7 @@ const vuexPersistedState = new VuexPersistence({
     rehydrate: (state) => {  
         // 获取时间戳  
         const storedTimestamp = localStorage.getItem('store-timestamp');  
-    // 如果存储的时间戳存在，并计算其与当前时间的差值  
+        // 如果存储的时间戳存在，并计算其与当前时间的差值  
         if (storedTimestamp) {  
             const currentTime = new Date().getTime();  
             const timeDiff = currentTime - storedTimestamp;  
@@ -42,13 +42,7 @@ const store = createStore({
     },  
     CLEAR_MERCHANT(state) {  
         state.merchant = null;  
-    }, 
-    SET_RIDER(state, user) {
-        state.rider = rider;
-    } ,
-    CLEAR_RIDER(state) {
-        state.rider = null;
-    }
+    },  
 },  
 actions: {  
     setUser({ commit }, user) {  
@@ -65,12 +59,6 @@ actions: {
     clearMerchant({ commit }) {  
         commit('CLEAR_MERCHANT');  
     },  
-    setRider({ commit }, rider) {  
-        commit('SET_RIDER', rider);  
-    },  
-    clearRider({ commit }) {  
-        commit('CLEAR_RIDER');  
-    }, 
   },  
   plugins: [vuexPersistedState.plugin] // 使用持久化插件  
 })

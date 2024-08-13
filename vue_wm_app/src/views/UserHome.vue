@@ -4,7 +4,6 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import { useRouter } from 'vue-router';
 const router = useRouter()
 const user = ref({}); // 初始化用户信息对象  
-const cookies = useCookies(); // 使用 useCookies 钩子  
 
 onMounted(() => {  
   // 从 cookie 中读取用户信息  
