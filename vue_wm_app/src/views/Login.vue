@@ -8,11 +8,9 @@ import { ref } from 'vue'
 // 状态管理
 import { useStore } from "vuex"
 const store = useStore()
-// 使用cookie
-import { useCookies } from '@vueuse/integrations/useCookies'
-const cookie = useCookies()
 // 路由
 import { useRouter } from 'vue-router';
+
 const router = useRouter()
 
 //控制注册与登录表单的显示， 默认显示用户注册
@@ -104,6 +102,11 @@ const userRules = ref({
     ],
     phoneNumber:[
         {required:true, message:'请输入手机号码', trigger:'blur'},
+        {  
+            pattern: /^[0-9]{11}$/, // 确保输入是长度为11的数字  
+            message: '电话号码必须是11位数字', // 错误提示消息  
+            trigger: 'blur', 
+        },  
     ],
     password:[
         {required:true, message:'请输入密码', trigger:'blur'},
@@ -114,7 +117,14 @@ const userRules = ref({
 const merchantRules = ref({  
     MerchantName: [{ required: true, message: '请输入商家名称', trigger: 'blur' }],  
     MerchantAddress: [{ required: true, message: '请填写商家地址', trigger: 'blur' }],  
-    Contact: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],  
+    Contact: [
+        { required: true, message: '请输入联系方式', trigger: 'blur' },
+        {  
+            pattern: /^[0-9]{11}$/, // 确保输入是长度为11的数字  
+            message: '电话号码必须是11位数字', // 错误提示消息  
+            trigger: 'blur', 
+        },  
+    ],  
     Password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 5, max: 16, message: '请输入长度5~16非空字符', trigger: 'blur' }],  
     rePassword: [{ validator: checkRePassword, trigger: 'blur' }], 
     TimeforOpenBusiness: [{ required: true, message: '请选择营业开始时间', trigger: 'change' }],  
@@ -167,7 +177,8 @@ const register = ()=> {
                 DishType: merchantRegisterData.value.DishType,  
                 TimeforOpenBusiness: merchantRegisterData.value.TimeforOpenBusiness,  
                 TimeforCloseBusiness: merchantRegisterData.value.TimeforCloseBusiness,  
-            }).then(res => {  
+            }).then(res => { 
+                router.push('/login')   
                 ElMessage.success({  
                     message: '商家注册成功，商家ID为 ' + res.data + '，请牢记该Id。',  
                     duration: 10000 // 设置显示时间为10秒  
@@ -219,7 +230,7 @@ const login = () =>{
                     // 将用户信息保存到管理器
                     store.dispatch('setUser', userRegisterData.value); // 设置用户状态
                     // 保持cookie
-                    cookie.set('user', userRegisterData.value);
+                    //cookie.set('user', userRegisterData.value, { expires: '1d' }); // 保存到 Cookie
                     // 跳转
                     router.push('/user-home');
                 }
@@ -239,7 +250,7 @@ const login = () =>{
                      ElMessage.error('网络错误，请重试');  
                 }  
                 store.state.user = null;  
-                cookie.set('user', {});  
+                //cookie.set('user', {});  
             });
         } else if (loginTypeValue === 'merchant') {  //商家登录
             //调用接口完成登录
@@ -251,7 +262,7 @@ const login = () =>{
                 if(data.msg=== "ok"){
                     ElMessage.success('登录成功');
                     store.dispatch('setMerchant', merchantRegisterData.value); // 设置商家状态
-                    cookie.set('merchant', merchantRegisterData.value);
+                   // cookie.set('merchant', merchantRegisterData.value);
                     router.push('/merchant-home');
                 }
             }).catch(error => {
@@ -271,7 +282,7 @@ const login = () =>{
                 }  
 
                 store.state.merchant = null;  
-                cookie.set('merchant', {});  
+                //cookie.set('merchant', {});  
             });
             
         } else {  

@@ -1,17 +1,21 @@
 <script setup>  
 import { ref, onMounted, watch } from 'vue';  
-import { useCookies } from '@vueuse/integrations/useCookies'  
 import { useRouter } from 'vue-router';
-import { provide } from 'vue';  
+import { provide } from 'vue';
+import { useStore } from "vuex"  
+const store = useStore()    
 const router = useRouter()
 const merchant = ref({MerchantId: ''}); // 初始化商家信息对象  
-const cookies = useCookies(); // 使用 useCookies 钩子  
-const isMerchantHome = ref(true); // 页面是否为商家主页  
+const isMerchantHome = ref(true); // 页面是否为商家主页 
+
 onMounted(() => {  
-  // 从 cookie 中读取用户信息  
-  const merchantData = cookies.get('merchant');  
-  cookies.set('merchant', {});
-  isMerchantHome.value = true; // 页面是否为商家主页。这里之所以设置这个是因为子路由会默认渲染父路由的一切渲染内容，所以这里设置一个标识符来控制是否显示父路由内容
+  // 从 store 中读取用户信息  
+  const merchantData = store.state.merchant;
+  console.log(merchantData);
+  if(router.currentRoute.value.path !== '/merchant-home')
+    isMerchantHome.value = false; // 页面是否为商家主页。这里之所以设置这个是因为子路由会默认渲染父路由的一切渲染内容，所以这里设置一个标识符来控制是否显示父路由内容
+  else
+    isMerchantHome.value = true; 
   if (merchantData) {  
     merchant.value = merchantData;  
   } else {  
@@ -27,20 +31,25 @@ watch(
             isMerchantHome.value = true; // 返回到商家主页时显示欢迎信息和按钮  
         } else {  
             isMerchantHome.value = false; // 进入子路由时隐藏  
-        }  
+        } 
+        // 保存状态到 localStorage  
+        localStorage.setItem('isMerchantHome', isMerchantHome.value);  
     }  
 );  
 // 跳转到菜单  
 const goToMenu = () => { 
     router.push('/merchant-home/dish');  
+    isMerchantHome.value = false; // 进入菜单页面时隐藏欢迎信息和按钮  
 };  
 
 // 跳转到个人信息  
 const goToPersonal = () => { 
     router.push('/merchant-home/personal');  
+    isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
 };  
 // 提供 merchant 对象 给其它子网页 
 provide('merchant', merchant); 
+provide('isMerchantHome', isMerchantHome); 
 </script>  
 
 <template>  
