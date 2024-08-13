@@ -8,11 +8,9 @@ import { ref } from 'vue'
 // 状态管理
 import { useStore } from "vuex"
 const store = useStore()
-// 使用cookie
-import { useCookies } from '@vueuse/integrations/useCookies'
-const cookie = useCookies()
 // 路由
 import { useRouter } from 'vue-router';
+
 const router = useRouter()
 
 //控制注册与登录表单的显示， 默认显示用户注册
@@ -167,7 +165,8 @@ const register = ()=> {
                 DishType: merchantRegisterData.value.DishType,  
                 TimeforOpenBusiness: merchantRegisterData.value.TimeforOpenBusiness,  
                 TimeforCloseBusiness: merchantRegisterData.value.TimeforCloseBusiness,  
-            }).then(res => {  
+            }).then(res => { 
+                router.push('/login')   
                 ElMessage.success({  
                     message: '商家注册成功，商家ID为 ' + res.data + '，请牢记该Id。',  
                     duration: 10000 // 设置显示时间为10秒  
@@ -219,7 +218,7 @@ const login = () =>{
                     // 将用户信息保存到管理器
                     store.dispatch('setUser', userRegisterData.value); // 设置用户状态
                     // 保持cookie
-                    cookie.set('user', userRegisterData.value);
+                    //cookie.set('user', userRegisterData.value, { expires: '1d' }); // 保存到 Cookie
                     // 跳转
                     router.push('/user-home');
                 }
@@ -239,7 +238,7 @@ const login = () =>{
                      ElMessage.error('网络错误，请重试');  
                 }  
                 store.state.user = null;  
-                cookie.set('user', {});  
+                //cookie.set('user', {});  
             });
         } else if (loginTypeValue === 'merchant') {  //商家登录
             //调用接口完成登录
@@ -251,7 +250,7 @@ const login = () =>{
                 if(data.msg=== "ok"){
                     ElMessage.success('登录成功');
                     store.dispatch('setMerchant', merchantRegisterData.value); // 设置商家状态
-                    cookie.set('merchant', merchantRegisterData.value);
+                   // cookie.set('merchant', merchantRegisterData.value);
                     router.push('/merchant-home');
                 }
             }).catch(error => {
@@ -271,7 +270,7 @@ const login = () =>{
                 }  
 
                 store.state.merchant = null;  
-                cookie.set('merchant', {});  
+                //cookie.set('merchant', {});  
             });
             
         } else {  

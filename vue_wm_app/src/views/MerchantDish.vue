@@ -1,9 +1,10 @@
 <script setup>  
-import { ref, onMounted, computed } from 'vue'; 
+import { ref, onMounted, computed} from 'vue'; 
 import { useRouter } from 'vue-router';
 import { inject } from 'vue'; 
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import store from '../store';
 const router = useRouter();
 const merchant =inject('merchant');
 const dishes = ref([]);  // 用于存储菜品列表 
@@ -15,7 +16,7 @@ const currentDish = ref(null); // 用于存储当前编辑的菜品
 const selectedImage = ref(null); // 用于存储用户选择的图片
 const dishForm = ref(null); // 创建一个 ref 来引用 el-form
 onMounted(async () => {  
-    
+    merchant.value=store.state.merchant;
     try {  
         const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${merchant.value.MerchantId}`);
         dishes.value = response.data.data;  // 更新菜品列表
@@ -49,13 +50,6 @@ const editRules = computed(() => {
             },    
         ],  
     };  
-    // 当 isCreating 为 true 时添加 selectedImage 的规则  
-    /*if (isCreating.value) {  
-        rules.selectedImage = [  
-            { required: true, message: '请上传图片', trigger: 'blur' }, // 使用 'change' 事件来触发验证  
-        ];  
-    } */
-
     return rules; // 返回动态生成的规则  
 });  
 const validateField = (field) => {  //编辑规则的应用
@@ -248,11 +242,15 @@ const cancelCreate = () => {
     currentDish.value = null; // 清空当前菜品  
     selectedImage.value = null; // 清空选择的图片  
 };  
+const goBack = () => {  
+    router.go(-1); // 使用 router.go(-1) 返回上一页  
+};  
 </script>
 
 <template>  
     <div>  
         <h1>这里是菜单页面，{{ merchant.MerchantId }}</h1>  
+        <button @click="goBack">返回</button>  <!-- 添加返回按钮 -->  
         <div class="search-container" v-if="!isEditing">  
             <input   
                 type="text"   
