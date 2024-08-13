@@ -12,10 +12,8 @@ import Login from './views/Login.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Vite + Vue" /> -->
-  <main>  
+  <HelloWorld msg="Vite + Vue" /> --> 
     <router-view></router-view> <!-- 显示路由内容 -->  
-  </main>
 </template>
 
 <style scoped>
