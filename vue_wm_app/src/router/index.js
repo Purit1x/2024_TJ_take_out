@@ -12,13 +12,6 @@ import MerchantHome from '@/views/MerchantHome.vue'
 import MerchantDish from '@/views/MerchantDish.vue'
 import MerchantPersonal from '@/views/MerchantPersonal.vue'
 
-<<<<<<< HEAD
-import RiderHome from '@/views/rider/RiderHome.vue'
-import RiderAssignment from '@/views/rider/RiderAssignment.vue'
-import RiderInfo from '@/views/rider/RiderInfo.vue'
-
-=======
->>>>>>> db695a6362f0b5e5133c5e8606aa9e6dd4e2dc2d
 // 默认路由，所有用户共享
 const routers = [
     { path: "/", name: "index", component: Index }, // 添加name 是方便后续添加嵌套路由时方便
@@ -34,17 +27,16 @@ const routers = [
             component: MerchantPersonal, // 新的子组件  
         },], 
     }, 
-    { path: "/user-home", component: UserHome, meta: { requiresAuth: true } },
-    { path: "/rider-home", component: RiderHome, meta: { requiresAuth: true}, children: [
-        {
-            path: "assignment",
-            component: RiderAssignment
+    { path: "/user-home", component: UserHome, meta: { requiresAuth: true },children: [  
+        {  
+          path: 'order', //订单
+          component: UserHome, 
         },
-        {
-            path: "information",
-            component: RiderInfo
-        },] 
-    } 
+        {  
+            path: 'personal', //个人主页
+            component: UserHome, 
+        },], 
+    }, 
 ]
 
 // 动态路由，用于匹配菜单动态添加路由
@@ -63,7 +55,6 @@ export const router = createRouter({
     history: createWebHashHistory(),
     routes: routers
 })
-
 // 路由守卫  
 router.beforeEach((to, from, next) => {  
     const isAuthenticated = store.state.user || store.state.merchant ||store.state.rider;  
@@ -74,11 +65,6 @@ router.beforeEach((to, from, next) => {
         next(); // 继续导航  
     }  
 });
-<<<<<<< HEAD
-
-
-=======
->>>>>>> db695a6362f0b5e5133c5e8606aa9e6dd4e2dc2d
 // 动态添加路由的方法
 export function addRoutes(menus) {
     // 是否有新的路由
