@@ -22,7 +22,12 @@ namespace takeout_tj.Models.User
 		[StringLength(20, MinimumLength = 6, ErrorMessage = "The password should be at least 6 characters and at most 20 characters long. ")]
 		public string Password { get; set; }
 
-		public ICollection<UserAddressDB> UserAddressDBs { get; set; } = new HashSet<UserAddressDB>();	
+        [Required(ErrorMessage = "Wallet is required. ")]
+        public decimal Wallet { get; set; } = 0.00m; // 默认值为0.00
+
+        [Required(ErrorMessage = "WalletPassword is required. ")]
+        public string WalletPassword { get; set; }
+        public ICollection<UserAddressDB> UserAddressDBs { get; set; } = new HashSet<UserAddressDB>();	
 		// 用于收藏商家的导航属性, 这个导航属性应该指向连接实体, 而非联系集的另一侧
 		public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }
         public ICollection<ShoppingCartDB> shoppingCartDBs { get; set; }

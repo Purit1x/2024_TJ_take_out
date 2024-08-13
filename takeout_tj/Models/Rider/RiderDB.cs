@@ -21,7 +21,13 @@ namespace takeout_tj.Models.Rider
 		[RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number can only contain digits. ")]
 		public string PhoneNumber { get; set; }
 
-		public ICollection<RiderWageDB> RiderWageDBs { get; set; }
+        [Required(ErrorMessage = "Wallet is required. ")]
+        public decimal Wallet { get; set; } = 0.00m; // 默认值为0.00
+
+        [Required(ErrorMessage = "WalletPassword is required. ")]
+        public string WalletPassword { get; set; }
+
+        public ICollection<RiderWageDB> RiderWageDBs { get; set; }
 		public RiderStationDB RiderStationDB { get; set; }
 		public ICollection<OrderRiderDB> OrderRiderDBs { get; set;}
 	}
