@@ -102,6 +102,11 @@ const userRules = ref({
     ],
     phoneNumber:[
         {required:true, message:'请输入手机号码', trigger:'blur'},
+        {  
+            pattern: /^[0-9]{11}$/, // 确保输入是长度为11的数字  
+            message: '电话号码必须是11位数字', // 错误提示消息  
+            trigger: 'blur', 
+        },  
     ],
     password:[
         {required:true, message:'请输入密码', trigger:'blur'},
@@ -112,7 +117,14 @@ const userRules = ref({
 const merchantRules = ref({  
     MerchantName: [{ required: true, message: '请输入商家名称', trigger: 'blur' }],  
     MerchantAddress: [{ required: true, message: '请填写商家地址', trigger: 'blur' }],  
-    Contact: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],  
+    Contact: [
+        { required: true, message: '请输入联系方式', trigger: 'blur' },
+        {  
+            pattern: /^[0-9]{11}$/, // 确保输入是长度为11的数字  
+            message: '电话号码必须是11位数字', // 错误提示消息  
+            trigger: 'blur', 
+        },  
+    ],  
     Password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 5, max: 16, message: '请输入长度5~16非空字符', trigger: 'blur' }],  
     rePassword: [{ validator: checkRePassword, trigger: 'blur' }], 
     TimeforOpenBusiness: [{ required: true, message: '请选择营业开始时间', trigger: 'change' }],  
