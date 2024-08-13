@@ -173,6 +173,17 @@ namespace takeout_tj.Controllers
                 {
                     return StatusCode(20000, new { errorCode = 20000, msg = "菜品未找到" });
                 }
+                // 删除菜品前先删除对应的图片文件  
+                if (!string.IsNullOrEmpty(dish.ImageUrl)) // 确保图片 URL 不为空  
+                {
+                    var fileName = Path.GetFileName(dish.ImageUrl); // 从 URL 中提取文件名  
+                    var filePath = Path.Combine(_uploadsFolder, fileName);
+
+                    if (System.IO.File.Exists(filePath)) // 检查文件是否存在  
+                    {
+                        System.IO.File.Delete(filePath); // 删除文件  
+                    }
+                }
                 // 删除菜品  
                 _context.Dishes.Remove(dish);
                 var result = _context.SaveChanges();
