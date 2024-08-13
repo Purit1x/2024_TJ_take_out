@@ -45,13 +45,6 @@ const merchantRegisterData = ref({
     TimeforCloseBusiness: '',
     rePassword:'',
 })
-const riderRegisterData = ref({
-    riderId:null,
-    riderName:'',
-    phoneNumber:'',
-    password:'',
-    rePassword:'',
-})
 
 
 //定义函数，清空数据模型
@@ -75,13 +68,6 @@ const clearRegisterData = () =>{
         DishType:'',
         TimeforOpenBusiness: '',
         TimeforCloseBusiness: '',
-        rePassword:'',
-    },
-    riderRegisterData.value = {
-        riderId:null,
-        riderName:'',
-        phoneNumber:'',
-        password:'',
         rePassword:'',
     },
     loginInfo.value = {
@@ -112,7 +98,7 @@ const checkRePassword = (rule,value,callback) => {
 const userRules = ref({
     username:[
         {required:true, message:'请输入用户名', trigger:'blur'},
-        {min:5, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
+        {min:2, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
     ],
     phoneNumber:[
         {required:true, message:'请输入手机号码', trigger:'blur'},
@@ -124,7 +110,7 @@ const userRules = ref({
     ],
     password:[
         {required:true, message:'请输入密码', trigger:'blur'},
-        {min:5, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
+        {min:3, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
     ],
     rePassword:[{validator:checkRePassword,trigger:'blur'}] //校验二次输入密码是否相同
 })
@@ -146,20 +132,8 @@ const merchantRules = ref({
     DishType: [{ required: true, message: '请输入菜品类型', trigger: 'blur' }]  
 });
 const riderRules = ref({
-    riderName:[
-        {required:true, message:'请输入用户名', trigger:'blur'},
-        {min:5, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
-    ],
-    phoneNumber:[
-        {required:true, message:'请输入手机号码', trigger:'blur'},
-    ],
-    password:[
-        {required:true, message:'请输入密码', trigger:'blur'},
-        {min:5, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
-    ],
-    rePassword:[{validator:checkRePassword,trigger:'blur'}] //校验二次输入密码是否相同
-});
 
+});
 const loginRules = ref({
     loginType:[
         {required:true, message:'请选择用户类型', trigger:'blur'},
@@ -169,13 +143,12 @@ const loginRules = ref({
     ],
     loginPassword:[
         {required:true, message:'请输入密码', trigger:'blur'},
-        {min:5, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
+        {min:3, max:16, message:'请输入长度5~16非空字符', trigger:'blur'}
     ]
 })
 //调用后台接口完成注册
 import {userRegisterService, userLoginService} from '@/api/user.js'
 import {merchantRegisterService, merchantLoginService} from '@/api/merchant.js'
-import {riderRegisterService, riderLoginService} from '@/api/rider.js'
 import { start } from 'nprogress';
 const register = ()=> {
      // 先验证数据
@@ -215,21 +188,7 @@ const register = ()=> {
                 ElMessage.error(`注册失败: ${err.response.data.msg || '未知错误'}`);  
             });
         } else if (roleType.value === 'rider') {
-            riderRegisterService({
-                UserName: riderRegisterData.value.riderName,
-                Password: riderRegisterData.value.password,
-                PhoneNumber: riderRegisterData.value.phoneNumber  
-            }).then(res => {
-                // 成功  
-                ElMessage.success({  
-                    message: '骑手注册成功，骑手ID为 ' + res.data + '，请牢记该Id。',  
-                    duration: 10000 // 设置显示时间为10秒  
-                });  
-                clearRegisterData() // 注册成功后清空输入  
-                router.push('/login') 
-            }).catch(err => {  
-                ElMessage.error(`注册失败: ${err.response.data.msg || '未知错误'}`);  
-            });
+            // 骑手注册暂不支持
         } else {
        // 调用注册接口  
             userRegisterService({  
@@ -292,39 +251,6 @@ const login = () =>{
                 }  
                 store.state.user = null;  
                 //cookie.set('user', {});  
-            });
-        } else if (loginTypeValue === 'rider') {  //骑手登录
-            //调用接口完成登录
-            riderRegisterData.value.userId = loginInfo.value.loginId;
-            riderRegisterData.value.password = loginInfo.value.loginPassword;
-            riderLoginService(riderRegisterData.value).then(data => {
-                if(data.msg=== "ok"){
-                    ElMessage.success('登录成功');
-                    // 将骑手信息保存到管理器
-                    store.dispatch('setRider', riderRegisterData.value); // 设置骑手状态
-                    // 保持cookie
-                    cookie.set('rider', riderRegisterData.value);
-                    // 跳转
-                    router.push('/rider-home');
-                }
-            }).catch(error => {
-                // 根据错误码处理不同的错误  
-                if (error.response && error.response.data) {  
-                    const errorCode = error.response.data.errorCode;  
-
-                    if (errorCode === 20000) {  
-                        ElMessage.error('用户名或密码错误');  
-                    } else if (errorCode === 30000) {  
-                        ElMessage.error('登录异常: ' + error.response.data.msg);  
-                    } else {  
-                        ElMessage.error('发生未知错误');  
-                    }  
-                } else {  
-                     ElMessage.error('网络错误，请重试');  
-                }  
-                store.state.rider = null;  
-                cookie.set('rider', {});  
-
             });
         } else if (loginTypeValue === 'merchant') {  //商家登录
             //调用接口完成登录
@@ -424,19 +350,6 @@ const login = () =>{
                 </el-form-item>
                 <el-form-item v-if="roleType === 'user'" prop="rePassword">
                     <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="userRegisterData.rePassword"></el-input>
-                </el-form-item>
-                <!--骑手注册-->    
-                <el-form-item v-if="roleType === 'rider'" prop="riderName">
-                    <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="riderRegisterData.riderName"></el-input>
-                </el-form-item>
-                <el-form-item v-if="roleType === 'rider'" prop="phoneNumber">
-                    <el-input :prefix-icon="User" placeholder="请输入手机号码" v-model="riderRegisterData.phoneNumber"></el-input>
-                </el-form-item>
-                <el-form-item v-if="roleType === 'rider'" prop="password">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="riderRegisterData.password"></el-input>
-                </el-form-item>
-                <el-form-item v-if="roleType === 'rider'" prop="rePassword">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="riderRegisterData.rePassword"></el-input>
                 </el-form-item>
                 <!-- 注册按钮 -->
                 <el-form-item>
