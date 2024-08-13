@@ -42,7 +42,13 @@ const store = createStore({
     },  
     CLEAR_MERCHANT(state) {  
         state.merchant = null;  
-    },  
+    }, 
+    SET_RIDER(state, user) {
+        state.rider = rider;
+    } ,
+    CLEAR_RIDER(state) {
+        state.rider = null;
+    }
 },  
 actions: {  
     setUser({ commit }, user) {  
@@ -59,6 +65,12 @@ actions: {
     clearMerchant({ commit }) {  
         commit('CLEAR_MERCHANT');  
     },  
+    setRider({ commit }, rider) {  
+        commit('SET_RIDER', rider);  
+    },  
+    clearRider({ commit }) {  
+        commit('CLEAR_RIDER');  
+    }, 
   },  
   plugins: [vuexPersistedState.plugin] // 使用持久化插件  
 })

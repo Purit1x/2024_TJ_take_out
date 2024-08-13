@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 14px;
+}
+
+a {
+    outline: none;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+ul,
+li {
+    list-style-type: none;
+}
+
+/* .dr-home */
+.dr-home {
+    display: flex;
+    flex-direction: column; /* 容器内的元素从上至下排列 */
+    height: 100vh;
+}
+
+/* .dr-home .header */
+.dr-home .header {
+    display: flex;
+    height: 55px;
+    background: #393d49;
+}
+
+.dr-home .header .title {
+    display: flex;
+    width: 200px;
+    background: #0c0c0c;
+}
+
+.dr-home .header .title .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+}
+
+.dr-home .header .title .logo i {
+    color: lightslategray;
+    font-size: 30px;
+}
+
+.dr-home .header .title .text {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.dr-home .header .title .text a {
+    color: lightslategray;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.dr-home .header .info {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+}
+
+.dr-home .header .info .admin {
+    display: flex;
+    color: #fff;
+    font-size: 15px;
+}
+
+.dr-home .header .info .admin .name {
+    padding-right: 10px;
+    height: 55px;
+    line-height: 55px;
+    text-align: center;
+}
+
+.dr-home .header .info .admin .name i {
+    color: #FF5722;
+    font-size: 13px;
+}
+
+.dr-home .header .info .admin .logout {
+    width: 90px;
+    height: 55px;
+    line-height: 55px;
+    text-align: center;
+    background: #555c64;
+    cursor: pointer;
+}
+
+/* .dr-home .main */
+.dr-home .main {
+    display: flex;
+    height: calc(100vh - 55px); /* 减去 header 高度 */
+}
+
+.dr-home .main .side {
+    width: 200px;
+    background: #545c64;
+}
+
+.dr-home .main .content {
+    padding: 5px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* color */
+.blue {
+    color: #1e9eff;
+}
+
+.green {
+    color: #15baaa;
+}
+
+.orange {
+    color: #feb801;
+}
+
+.red {
+    color: #f75a23;
+}
+
+/* 重写 ElementPlus 默认样式 */
+/* 表格 */
+.el-table {
+    margin-top: 7px;
+    width: 1000px;
+}
+
+/* 面包屑 */
+.el-breadcrumb {
+    margin-bottom: 7px;
+}
