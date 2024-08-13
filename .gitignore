@@ -5,7 +5,7 @@
 
 takeout_tj/appsettings.json
 takeout_tj/appsettings.Development.json
-/**/Migrations/
+
 
 # User-specific files
 *.rsuser

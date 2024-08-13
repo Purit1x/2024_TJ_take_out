@@ -34,6 +34,9 @@ namespace takeout_tj.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
+                    b.Property<int>("DishInventory")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<string>("DishName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -93,9 +96,34 @@ namespace takeout_tj.Migrations
                     b.Property<int>("TimeforOpenBusiness")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<decimal>("Wallet")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("WalletPassword")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("MerchantId");
 
                     b.ToTable("merchants", (string)null);
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.Merchant.MerchantStationDB", b =>
+                {
+                    b.Property<int>("MerchantId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("StationId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("MerchantId", "StationId");
+
+                    b.HasIndex("MerchantId")
+                        .IsUnique();
+
+                    b.HasIndex("StationId");
+
+                    b.ToTable("merchant_stations", (string)null);
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Merchant.SpecialOfferDB", b =>
@@ -333,6 +361,13 @@ namespace takeout_tj.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR2(50)");
 
+                    b.Property<decimal>("Wallet")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("WalletPassword")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("RiderId");
 
                     b.ToTable("riders", (string)null);
@@ -513,6 +548,13 @@ namespace takeout_tj.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR2(50)");
 
+                    b.Property<decimal>("Wallet")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("WalletPassword")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("UserId");
 
                     b.ToTable("users", (string)null);
@@ -527,6 +569,25 @@ namespace takeout_tj.Migrations
                         .IsRequired();
 
                     b.Navigation("MerchantDB");
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.Merchant.MerchantStationDB", b =>
+                {
+                    b.HasOne("takeout_tj.Models.Merchant.MerchantDB", "MerchantDB")
+                        .WithOne("MerchantStationDB")
+                        .HasForeignKey("takeout_tj.Models.Merchant.MerchantStationDB", "MerchantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("takeout_tj.Models.Rider.StationDB", "StationDB")
+                        .WithMany("MerchantStationDBs")
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MerchantDB");
+
+                    b.Navigation("StationDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Merchant.SpecialOfferDB", b =>
@@ -749,6 +810,9 @@ namespace takeout_tj.Migrations
 
                     b.Navigation("FavoriteMerchantDBs");
 
+                    b.Navigation("MerchantStationDB")
+                        .IsRequired();
+
                     b.Navigation("SpecialOfferDBs");
                 });
 
@@ -787,6 +851,8 @@ namespace takeout_tj.Migrations
 
             modelBuilder.Entity("takeout_tj.Models.Rider.StationDB", b =>
                 {
+                    b.Navigation("MerchantStationDBs");
+
                     b.Navigation("RiderStationDBs");
                 });
 

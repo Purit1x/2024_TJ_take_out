@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.Merchant;
 
 namespace takeout_tj.Models.Rider
 {
@@ -16,5 +17,6 @@ namespace takeout_tj.Models.Rider
 		public string StationAddress { get; set; }
 
 		public ICollection<RiderStationDB> RiderStationDBs { get; set; }
+		public ICollection<MerchantStationDB> MerchantStationDBs { get; set;}
 	}
 }

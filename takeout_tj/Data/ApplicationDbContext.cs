@@ -30,6 +30,7 @@ namespace takeout_tj.Data
 		public DbSet<OrderDishDB> OrderDishes { get; set; }
 		public DbSet<OrderCouponDB> OrderCoupons { get; set; }
 		public DbSet<AdminDB> Admins { get; set; }
+		public DbSet<MerchantStationDB> MerchantStations { get; set; }
 		
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
 		{
@@ -63,6 +64,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderDishDB>().HasKey(od => new { od.OrderId, od.MerchantId, od.DishId });
 			modelBuilder.Entity<OrderCouponDB>().HasKey(oc => oc.OrderId);
 			modelBuilder.Entity<AdminDB>().HasKey(a => a.AdminId);
+			modelBuilder.Entity<MerchantStationDB>().HasKey(ms => new { ms.MerchantId, ms.StationId });
 
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
@@ -167,6 +169,15 @@ namespace takeout_tj.Data
 				.HasOne(oc => oc.OrderDB)
 				.WithOne(o => o.OrderCouponDB)
 				.HasForeignKey<OrderCouponDB>(oc => oc.OrderId);
+			// 商家到站点的多对一联系集
+			modelBuilder.Entity<MerchantStationDB>()
+				.HasOne(ms => ms.MerchantDB)
+				.WithOne(m => m.MerchantStationDB)
+				.HasForeignKey<MerchantStationDB>(ms => ms.MerchantId);
+			modelBuilder.Entity<MerchantStationDB>()
+				.HasOne(ms => ms.StationDB)
+				.WithMany(s => s.MerchantStationDBs)
+				.HasForeignKey(ms => ms.StationId);
 
 			modelBuilder.Entity<DishDB>()
 				.Property(d => d.DishPrice)
@@ -195,7 +206,16 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderRiderDB>()
 				.Property(or => or.RiderPrice)
 				.HasColumnType("numeric(10,2)");
-				
+			modelBuilder.Entity<UserDB>()
+				.Property(u => u.Wallet)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<RiderDB>()
+				.Property(u => u.Wallet)
+				.HasColumnType("numeric(10,2)");
+			modelBuilder.Entity<MerchantDB>()
+				.Property(u => u.Wallet)
+				.HasColumnType("numeric(10,2)");
+
 			modelBuilder.Entity<UserDB>().ToTable("users");
 			modelBuilder.Entity<UserAddressDB>().ToTable("user_address");
 			modelBuilder.Entity<MembershipDB>().ToTable("memberships");
@@ -217,6 +237,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderDishDB>().ToTable("order_dishes");
 			modelBuilder.Entity<OrderCouponDB>().ToTable("order_coupons");
 			modelBuilder.Entity<AdminDB>().ToTable("admins");
+			modelBuilder.Entity<MerchantStationDB>().ToTable("merchant_stations");
 		}
 	}
 }
