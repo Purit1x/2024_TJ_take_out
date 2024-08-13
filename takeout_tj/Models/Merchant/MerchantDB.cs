@@ -36,6 +36,12 @@ namespace takeout_tj.Models.Merchant
         [Required(ErrorMessage = "Time for Close Business is required. ")]
         public int TimeforCloseBusiness { get; set; }
 
+        [Required(ErrorMessage = "Wallet is required. ")]
+        public decimal Wallet { get; set; } = 0.00m; // 默认值为0.00
+
+        [Required(ErrorMessage = "WalletPassword is required. ")]
+        public string WalletPassword { get; set; }
+
         public ICollection<FavoriteMerchantDB> FavoriteMerchantDBs { get; set; }  // 用于收藏商家的多对多关系的导航属性
 		public ICollection<DishDB> DishDBs { get; set; }
 		public ICollection<SpecialOfferDB> SpecialOfferDBs { get; set; }

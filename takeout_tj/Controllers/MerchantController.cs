@@ -29,7 +29,7 @@ namespace takeout_tj.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
+        [Route("register")]  //注册
         public IActionResult InitMerchant([FromBody] MerchantDBDto dto)
         {
             var tran = _context.Database.BeginTransaction();  //开启一个事务，确保出错可以回滚
@@ -46,6 +46,7 @@ namespace takeout_tj.Controllers
                     DishType = dto.DishType,
                     TimeforOpenBusiness = dto.TimeforOpenBusiness,
                     TimeforCloseBusiness = dto.TimeforCloseBusiness,
+                    Wallet = 0.00m // 初始化钱包  
                 };
                 _context.Merchants.Add(merchant);
                 var result = _context.SaveChanges();
@@ -67,7 +68,7 @@ namespace takeout_tj.Controllers
             }
         }
         [HttpPost]
-        [Route("login")]
+        [Route("login")] //登录
         public IActionResult Login([FromBody] MerchantDBDto merchant)
         {
             try
@@ -95,7 +96,7 @@ namespace takeout_tj.Controllers
             }
         }
         [HttpGet]
-        [Route("persenalInfo")]
+        [Route("merchantSearch")]  //查询个人信息
         public IActionResult GetMerchantInfo(int merchantId)  //根据ID获取商家信息
         {
             try
@@ -118,7 +119,8 @@ namespace takeout_tj.Controllers
                     merchant.CouponType,
                     merchant.DishType,
                     merchant.TimeforOpenBusiness,
-                    merchant.TimeforCloseBusiness
+                    merchant.TimeforCloseBusiness,
+                    merchant.Wallet // 添加钱包信息  
                 };
 
                 return Ok(new { data = merchantInfo, msg = "获取成功" });
@@ -126,6 +128,45 @@ namespace takeout_tj.Controllers
             catch (Exception ex)
             {
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+        [HttpPut]
+        [Route("merchantEdit")]  //编辑个人信息
+        public IActionResult EditMerchant([FromBody] MerchantDBDto dto)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务  
+            try
+            {
+                // 查找商家
+                var merchant = _context.Merchants.FirstOrDefault(u => u.MerchantId == dto.MerchantId);
+                if (merchant == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                // 更新商家信息  
+                merchant.Password = dto.Password;
+                merchant.MerchantName=dto.MerchantName;
+                merchant.MerchantAddress=dto.MerchantAddress;
+                merchant.Contact=dto.Contact;
+                merchant.DishType=dto.DishType;
+                merchant.TimeforOpenBusiness=dto.TimeforCloseBusiness;
+                merchant.TimeforCloseBusiness=dto.TimeforOpenBusiness;
+
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 500, msg = "更新失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 500, msg = $"更新异常: {ex.Message}" });
             }
         }
         [HttpGet]
@@ -173,6 +214,17 @@ namespace takeout_tj.Controllers
                 {
                     return StatusCode(20000, new { errorCode = 20000, msg = "菜品未找到" });
                 }
+                // 删除菜品前先删除对应的图片文件  
+                if (!string.IsNullOrEmpty(dish.ImageUrl)) // 确保图片 URL 不为空  
+                {
+                    var fileName = Path.GetFileName(dish.ImageUrl); // 从 URL 中提取文件名  
+                    var filePath = Path.Combine(_uploadsFolder, fileName);
+
+                    if (System.IO.File.Exists(filePath)) // 检查文件是否存在  
+                    {
+                        System.IO.File.Delete(filePath); // 删除文件  
+                    }
+                }
                 // 删除菜品  
                 _context.Dishes.Remove(dish);
                 var result = _context.SaveChanges();
@@ -212,7 +264,7 @@ namespace takeout_tj.Controllers
             var imageUrl = $"http://localhost:5079/uploads/{fileName}"; //生成URL  
             return Ok(new { url = imageUrl }); //返回JSON  
         }
-        [HttpPost("dishEdit")]
+        [HttpPut("dishEdit")]
         public IActionResult EditDish([FromBody] DishDBDto dishDto)
         {
             var tran = _context.Database.BeginTransaction(); // 开启一个事务  

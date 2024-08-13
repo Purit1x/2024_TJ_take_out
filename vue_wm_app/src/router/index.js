@@ -12,10 +12,13 @@ import MerchantHome from '@/views/MerchantHome.vue'
 import MerchantDish from '@/views/MerchantDish.vue'
 import MerchantPersonal from '@/views/MerchantPersonal.vue'
 
+<<<<<<< HEAD
 import RiderHome from '@/views/rider/RiderHome.vue'
 import RiderAssignment from '@/views/rider/RiderAssignment.vue'
 import RiderInfo from '@/views/rider/RiderInfo.vue'
 
+=======
+>>>>>>> db695a6362f0b5e5133c5e8606aa9e6dd4e2dc2d
 // 默认路由，所有用户共享
 const routers = [
     { path: "/", name: "index", component: Index }, // 添加name 是方便后续添加嵌套路由时方便
@@ -71,8 +74,11 @@ router.beforeEach((to, from, next) => {
         next(); // 继续导航  
     }  
 });
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> db695a6362f0b5e5133c5e8606aa9e6dd4e2dc2d
 // 动态添加路由的方法
 export function addRoutes(menus) {
     // 是否有新的路由
