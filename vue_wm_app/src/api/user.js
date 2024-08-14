@@ -23,3 +23,11 @@ export const userLoginService = async(loginData) => {
         throw error;   
     }  
 }
+
+export const updateUser = async(data) => {
+
+}
+
+export const userInfo = async(id) => {
+
+}
