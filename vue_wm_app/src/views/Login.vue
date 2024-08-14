@@ -204,14 +204,14 @@ const register = ()=> {
             // 转换时间为秒数
             const openTime = merchantRegisterData.value.TimeforOpenBusiness;  
             const closeTime = merchantRegisterData.value.TimeforCloseBusiness;
-            const startHour = openTime.getUTCHours()-16;  
-            const startMinute = openTime.getUTCMinutes();  
-            const startSecond = openTime.getUTCSeconds();  
+            const startHour = openTime.getHours();  
+            const startMinute = openTime.getMinutes();  
+            const startSecond = openTime.getSeconds();  
             merchantRegisterData.value.TimeforOpenBusiness = startHour * 3600 + startMinute * 60 + startSecond;  
 
-            const endHour = closeTime.getUTCHours()-16;  
-            const endMinute = closeTime.getUTCMinutes();  
-            const endSecond = closeTime.getUTCSeconds();  
+            const endHour = closeTime.getHours();  
+            const endMinute = closeTime.getMinutes();  
+            const endSecond = closeTime.getSeconds();  
             merchantRegisterData.value.TimeforCloseBusiness = endHour * 3600 + endMinute * 60 + endSecond;
             merchantRegisterService({
                 Password: merchantRegisterData.value.Password,  

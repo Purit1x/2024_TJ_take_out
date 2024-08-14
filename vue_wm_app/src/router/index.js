@@ -7,10 +7,10 @@ import Index from '@/views/Index.vue'
 import Login from '@/views/Login.vue'
 import NotFound from '@/views/404.vue'
 import store from '@/store/index.js'
-import UserHome from '@/views/UserHome.vue'
-import MerchantHome from '@/views/MerchantHome.vue'
-import MerchantDish from '@/views/MerchantDish.vue'
-import MerchantPersonal from '@/views/MerchantPersonal.vue'
+import UserHome from '@/views/user/UserHome.vue'
+import MerchantHome from '@/views/Merchant/MerchantHome.vue'
+import MerchantDish from '@/views/Merchant/MerchantDish.vue'
+import MerchantPersonal from '@/views/Merchant/MerchantPersonal.vue'
 
 // 默认路由，所有用户共享
 const routers = [

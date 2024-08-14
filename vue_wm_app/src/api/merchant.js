@@ -23,7 +23,7 @@ export const merchantLoginService = async(loginData) => {
     }  
 }
 
-export const updateUser = async(data) => {
+export const updateMerchant = async(data) => {
     try {  
         const response = await axios.put(`${BASE_URL}/Merchant/merchantEdit`, data);  
         return response.data; // 返回后端返回的数据  
@@ -32,10 +32,18 @@ export const updateUser = async(data) => {
     } 
 }
 
-export const userInfo = async(id) => {
+export const merchantInfo = async(id) => {
     try {  
-        const response = await axios.get(`${BASE_URL}/Merchant/merchantSearch/${id}`);  
+        const response = await axios.get(`${BASE_URL}/Merchant/merchantSearch?MerchantId=${id}`);  
         return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const walletRecharge=async(id,addMoney) => {
+    try {  
+        const response = await axios.put(`${BASE_URL}/Merchant/recharge?merchantId=${id}&addMoney=${addMoney}`);  
+        return response.data; // 返回后端返回的数据
     } catch (error) {  
         throw error;   
     }
