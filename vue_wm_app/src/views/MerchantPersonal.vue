@@ -1,5 +1,27 @@
 <template>
     <div>
+      <!-- 左侧导航栏 -->
+    <nav class="sidebar">
+      <div class="sidebar-content">
+        <img class="sidebar-img" src="@\assets\logo.png" alt="logo"/>
+        <button class="sidebar-button" @click="goBack">
+          <img src="@\assets\merchant_home.png" alt="主页"/>
+          <span>主页</span>
+        </button>
+
+        <button class="sidebar-button" @click="goToMenu">
+          <img src="@\assets\merchant_menu.png" alt="菜单"/>
+          <span>本店菜单</span>
+        </button>
+        
+        <button class="sidebar-button" @click="goToPersonal">
+          <img src="@\assets\merchant_personal.png" alt="个人信息"/>
+          <span>个人信息</span>
+        </button>
+        <router-view /> <!-- 渲染子路由 -->
+      </div>
+    </nav>
+    <div class="content">
         <div class="person_body">
             <el-descriptions class="margin-top" title="简介" :column="2" border v-if="isOnlyShow">
                 <template #extra>
@@ -60,6 +82,7 @@
                 </div>
             </el-form>
         </div>
+    </div>
     </div>
 </template>
   
@@ -171,36 +194,6 @@ function logout() {
 }
 </script>
 
-<template>  
-  <div>  
-    <!-- 左侧导航栏 -->
-    <nav class="sidebar">
-      <div class="sidebar-content">
-        <img class="sidebar-img" src="@\assets\logo.png" alt="logo"/>
-        <button class="sidebar-button" @click="goBack">
-          <img src="@\assets\merchant_home.png" alt="主页"/>
-          <span>主页</span>
-        </button>
-
-        <button class="sidebar-button" @click="goToMenu">
-          <img src="@\assets\merchant_menu.png" alt="菜单"/>
-          <span>本店菜单</span>
-        </button>
-        
-        <button class="sidebar-button" @click="goToPersonal">
-          <img src="@\assets\merchant_personal.png" alt="个人信息"/>
-          <span>个人信息</span>
-        </button>
-        <router-view /> <!-- 渲染子路由 -->
-      </div>
-    </nav>
-    <div class="content">
-        <h1>这里是个人主页页面，{{merchant.MerchantId}}</h1>  
-        <!-- 其他用户信息 --> 
-    </div>
-  </div>  
-</template>  
-
 <style scoped>
 .me-video-player {
     background-color: transparent;
@@ -310,9 +303,9 @@ function logout() {
 
 /*下面部分样式*/
 .person_body {
-    width: 1200px;
-    position: absolute;
-    left: 15%;
+    width: 85vw;
+    position:relative;
+    left: 0%;
     border-radius: 5px;
     top: 10%;
 }
