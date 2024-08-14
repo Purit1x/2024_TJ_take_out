@@ -46,7 +46,8 @@ namespace takeout_tj.Controllers
                     DishType = dto.DishType,
                     TimeforOpenBusiness = dto.TimeforOpenBusiness,
                     TimeforCloseBusiness = dto.TimeforCloseBusiness,
-                    Wallet = 0.00m // 初始化钱包  
+                    Wallet = 0.00m, // 初始化钱包  
+                    WalletPassword=dto.WalletPassword,
                 };
                 _context.Merchants.Add(merchant);
                 var result = _context.SaveChanges();
@@ -113,6 +114,7 @@ namespace takeout_tj.Controllers
                 var merchantInfo = new
                 {
                     merchant.MerchantId,
+                    merchant.Password,
                     merchant.MerchantName,
                     merchant.MerchantAddress,
                     merchant.Contact,
@@ -120,7 +122,8 @@ namespace takeout_tj.Controllers
                     merchant.DishType,
                     merchant.TimeforOpenBusiness,
                     merchant.TimeforCloseBusiness,
-                    merchant.Wallet // 添加钱包信息  
+                    merchant.Wallet,      // 添加钱包信息  
+                    merchant.WalletPassword,
                 };
 
                 return Ok(new { data = merchantInfo, msg = "获取成功" });
@@ -151,6 +154,7 @@ namespace takeout_tj.Controllers
                 merchant.DishType=dto.DishType;
                 merchant.TimeforOpenBusiness=dto.TimeforCloseBusiness;
                 merchant.TimeforCloseBusiness=dto.TimeforOpenBusiness;
+                merchant.WalletPassword=dto.WalletPassword;
 
                 var result = _context.SaveChanges();
                 if (result > 0)
@@ -160,13 +164,48 @@ namespace takeout_tj.Controllers
                 }
                 else
                 {
-                    return StatusCode(20000, new { errorCode = 500, msg = "更新失败" });
+                    return StatusCode(20000, new { errorCode = 20000, msg = "更新失败" });
                 }
             }
             catch (Exception ex)
             {
                 tran.Rollback(); // 回滚事务  
-                return StatusCode(30000, new { errorCode = 500, msg = $"更新异常: {ex.Message}" });
+                return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
+        [HttpPut]
+        [Route("recharge")]
+        public IActionResult WalletRecharge(int merchantId,int addMoney)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务 
+            try
+            { 
+                var merchant = _context.Merchants.FirstOrDefault(u => u.MerchantId == merchantId);
+                if (merchant == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                if(addMoney==0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = merchant.Wallet, msg = "用户信息更新成功" });
+                }
+                merchant.Wallet = merchant.Wallet + addMoney;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data= merchant.Wallet,msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "充值失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"充值异常: {ex.Message}" });
             }
         }
         [HttpGet]
@@ -345,5 +384,6 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
             }
         }
+
     }
 }

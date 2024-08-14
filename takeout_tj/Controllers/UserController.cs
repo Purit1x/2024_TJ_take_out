@@ -36,6 +36,8 @@ namespace takeout_tj.Controllers
                     UserName = dto.UserName,
                     Password = dto.Password,
                     PhoneNumber = dto.PhoneNumber,
+                    Wallet = 0.00m, // 初始化钱包
+                    WalletPassword=dto.WalletPassword,
                 };
 
                 _context.Users.Add(user);
