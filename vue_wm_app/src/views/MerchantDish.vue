@@ -242,15 +242,48 @@ const cancelCreate = () => {
     currentDish.value = null; // 清空当前菜品  
     selectedImage.value = null; // 清空选择的图片  
 };  
+//跳转回主页
 const goBack = () => {  
-    router.go(-1); // 使用 router.go(-1) 返回上一页  
+    router.push('/merchant-home');  
+    isMerchantHome.value = true;  
 };  
+// 跳转到菜单  
+const goToMenu = () => { 
+    router.push('/merchant-home/dish');  
+    isMerchantHome.value = false; // 进入菜单页面时隐藏欢迎信息和按钮  
+};  
+// 跳转到个人信息  
+const goToPersonal = () => { 
+    router.push('/merchant-home/personal');  
+    isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
+}; 
 </script>
 
 <template>  
-    <div>  
-        <h1>这里是菜单页面，{{ merchant.MerchantId }}</h1>  
-        <button @click="goBack">返回</button>  <!-- 添加返回按钮 -->  
+  <div>
+    <!-- 左侧导航栏 -->
+    <nav class="sidebar">
+      <div class="sidebar-content">
+        <img class="sidebar-img" src="@\assets\logo.png" alt="logo"/>
+        <button class="sidebar-button" @click="goBack">
+        <img src="@\assets\merchant_home.png" alt="主页"/>
+        <span>主页</span>
+        </button>
+        
+        <button class="sidebar-button" @click="goToMenu">
+        <img src="@\assets\merchant_menu.png" alt="菜单"/>
+        <span>本店菜单</span>
+        </button>
+    
+        <button class="sidebar-button" @click="goToPersonal">
+        <img src="@\assets\merchant_personal.png" alt="个人信息"/>
+        <span>个人信息</span>
+        </button>
+      <router-view /> <!-- 渲染子路由 -->
+      </div>
+    </nav>
+  <div class="content">
+        <div class="content-header">这里是菜单页面，{{ merchant.MerchantId }}</div>  
         <div class="search-container" v-if="!isEditing">  
             <input   
                 type="text"   
@@ -282,7 +315,7 @@ const goBack = () => {
                 <el-form-item label="价格" prop="dishPrice"><input type="number" v-model="currentDish.dishPrice" placeholder="价格" @blur="validateField('dishPrice')"/></el-form-item>  
                 <el-form-item label="类别描述" prop="dishCategory"><input v-model="currentDish.dishCategory" placeholder="类别描述" @blur="validateField('dishCategory')"/> </el-form-item>
                 <el-form-item label="库存" prop="dishInventory"><input type="number" v-model="currentDish.dishInventory" placeholder="库存" @blur="validateField('dishInventory')"/> </el-form-item> 
-           </el-form>  
+        </el-form>  
             <button @click="submitEdit">提交</button>  
             <button @click="cancelEdit">取消</button>
         </div>
@@ -298,5 +331,19 @@ const goBack = () => {
             <button @click="submitCreate">提交</button>  
             <button @click="cancelCreate">取消</button>
         </div>
-    </div>  
+    </div>
+</div>
 </template>  
+
+<style>
+.content-header {
+  margin-top: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  height: 50px;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>

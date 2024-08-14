@@ -1,5 +1,27 @@
 <template>
     <div>
+      <!-- 左侧导航栏 -->
+    <nav class="sidebar">
+      <div class="sidebar-content">
+        <img class="sidebar-img" src="@\assets\logo.png" alt="logo"/>
+        <button class="sidebar-button" @click="goBack">
+          <img src="@\assets\merchant_home.png" alt="主页"/>
+          <span>主页</span>
+        </button>
+
+        <button class="sidebar-button" @click="goToMenu">
+          <img src="@\assets\merchant_menu.png" alt="菜单"/>
+          <span>本店菜单</span>
+        </button>
+        
+        <button class="sidebar-button" @click="goToPersonal">
+          <img src="@\assets\merchant_personal.png" alt="个人信息"/>
+          <span>个人信息</span>
+        </button>
+        <router-view /> <!-- 渲染子路由 -->
+      </div>
+    </nav>
+    <div class="content">
         <div class="person_body">
             <el-descriptions class="margin-top" title="简介" :column="2" border v-if="isOnlyShow">
                 <template #extra>
@@ -61,6 +83,7 @@
             </el-form>
         </div>
     </div>
+    </div>
 </template>
   
 <script setup>
@@ -102,23 +125,40 @@ const merchantRules = ref({
 });
 
 onMounted(() => {  
+    merchant.value=store.state.merchant;
     const merchantData = store.state.merchant;
 
-    userInfo(merchantData.MerchantId)
-        .then((res) => {
-            merchantForm.value.MerchantId = res.data.merchantId;  
-            merchantForm.value.MerchantName = res.data.merchantName;  
-            merchantForm.value.Password = merchantData.Password;  
-            merchantForm.value.MerchantAddress = res.data.merchantAddress;  
-            merchantForm.value.Contact = res.data.contact;  
-            merchantForm.value.CouponType = res.data.couponType;  
-            merchantForm.value.DishType = res.data.dishType;  
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+  userInfo(merchantData.MerchantId)
+      .then((res) => {
+          merchantForm.value.MerchantId = res.data.merchantId;  
+          merchantForm.value.MerchantName = res.data.merchantName;  
+          merchantForm.value.Password = merchantData.Password;  
+          merchantForm.value.MerchantAddress = res.data.merchantAddress;  
+          merchantForm.value.Contact = res.data.contact;  
+          merchantForm.value.CouponType = res.data.couponType;  
+          merchantForm.value.DishType = res.data.dishType;  
+      })
+      .catch((err) => {
+          console.log(err);
+      });
 });
 
+const goBack = () => {
+    router.push('/merchant-home');
+    isMerchantHome.value = true;  
+}
+
+// 跳转到菜单  
+const goToMenu = () => { 
+    router.push('/merchant-home/dish');  
+    isMerchantHome.value = false; // 进入菜单页面时隐藏欢迎信息和按钮  
+};  
+
+// 跳转到个人信息  
+const goToPersonal = () => { 
+    router.push('/merchant-home/personal');  
+    isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
+};  
 const isOnlyShow = ref(true);
 
 function editUser() {
@@ -153,7 +193,7 @@ function logout() {
     router.push('/login') 
 }
 </script>
-  
+
 <style scoped>
 .me-video-player {
     background-color: transparent;
@@ -263,9 +303,9 @@ function logout() {
 
 /*下面部分样式*/
 .person_body {
-    width: 1200px;
-    position: absolute;
-    left: 15%;
+    width: 85vw;
+    position:relative;
+    left: 0%;
     border-radius: 5px;
     top: 10%;
 }
