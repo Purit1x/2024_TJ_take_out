@@ -10,6 +10,8 @@
         public string DishType { get; set; }
         public int TimeforOpenBusiness { get; set; }
         public int TimeforCloseBusiness { get; set; }
+        public decimal Wallet { get; set; }
+        public string WalletPassword { get; set; }
 
     }
 }
