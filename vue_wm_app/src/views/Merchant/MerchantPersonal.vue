@@ -110,11 +110,11 @@ onMounted(() => {
         });
 });
 const formatTime=(seconds)=> {  
-            const hours = Math.floor(seconds / 3600);  
-            const minutes = Math.floor((seconds % 3600) / 60);  
-            const secs = seconds % 60;  
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  
-        }  
+    const hours = Math.floor(seconds / 3600);  
+    const minutes = Math.floor((seconds % 3600) / 60);  
+    const secs = seconds % 60;  
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  
+}  
 const isOnlyShow = ref(true);
 
 function editMerchant() {
@@ -161,17 +161,17 @@ const saveMerchant = async()=> {
         const endMinute = closeTime.getMinutes();  
         const endSecond = closeTime.getSeconds();  
         currentMerchant.value.TimeforCloseBusiness = endHour * 3600 + endMinute * 60 + endSecond;
-        merchantForm.value.MerchantName = currentMerchant.value.MerchantName;  
-        merchantForm.value.Password = currentMerchant.value.Password;  
-        merchantForm.value.rePassword = currentMerchant.value.rePassword;  
-        merchantForm.value.MerchantAddress = currentMerchant.value.MerchantAddress;  
-        merchantForm.value.Contact = currentMerchant.value.Contact;  
-        merchantForm.value.DishType = currentMerchant.value.DishType;  
-        merchantForm.value.TimeforOpenBusiness=currentMerchant.value.TimeforOpenBusiness;  
-        merchantForm.value.TimeforCloseBusiness=currentMerchant.value.TimeforCloseBusiness;  
-        updateMerchant(merchantForm.value).then(data=>{
+        updateMerchant(currentMerchant.value).then(data=>{
             ElMessage.success('修改成功');
             isOnlyShow.value = true;
+            merchantForm.value.MerchantName = currentMerchant.value.MerchantName;  
+            merchantForm.value.Password = currentMerchant.value.Password;  
+            merchantForm.value.rePassword = currentMerchant.value.rePassword;  
+            merchantForm.value.MerchantAddress = currentMerchant.value.MerchantAddress;  
+            merchantForm.value.Contact = currentMerchant.value.Contact;  
+            merchantForm.value.DishType = currentMerchant.value.DishType;  
+            merchantForm.value.TimeforOpenBusiness=currentMerchant.value.TimeforOpenBusiness;  
+            merchantForm.value.TimeforCloseBusiness=currentMerchant.value.TimeforCloseBusiness;  
         }).catch(error => {
         if (error.response && error.response.data) {  
                 const errorCode = error.response.data.errorCode;  
@@ -372,6 +372,7 @@ function leaveWPWindow(){  //关闭修改支付密码界面
                 <div>充值金额</div>
                 <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentMerchant.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
                 <button @click="SaveRecharge">充值</button>
+                <button>提现</button>
             </div>
             <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
                 <button @click="leaveWPWindow">返回</button>

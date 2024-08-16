@@ -24,10 +24,68 @@ export const userLoginService = async(loginData) => {
     }  
 }
 
-export const updateUser = async(data) => {
-
+export const updateUser = async(data) => {  //更新用户信息
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/userEdit`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    } 
 }
 
-export const userInfo = async(id) => {
-
+export const userInfo = async(id) => {  //获取用户信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/userSearch?userId=${id}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const walletRecharge=async(id,addMoney) => {  //充值
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/recharge?userId=${id}&addMoney=${addMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getMerchantIds = async() => {  //获取商户id
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/GetMerchantIds`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getMerchantsInfo = async(id) => {  //获取商户信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/merchantsSearch?MerchantId=${id}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const createFavouriteMerchant=async(data) => {  //创建收藏商户
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/CreateFM`,data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const searchFavouriteMerchant=async(userId) => {  //搜索收藏商户
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getFM?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const deleteFavouriteMerchant=async(data) => {  //删除收藏商户
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/deleteFM`,{data});  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
 }

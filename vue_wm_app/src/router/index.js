@@ -11,6 +11,10 @@ import UserHome from '@/views/user/UserHome.vue'
 import MerchantHome from '@/views/Merchant/MerchantHome.vue'
 import MerchantDish from '@/views/Merchant/MerchantDish.vue'
 import MerchantPersonal from '@/views/Merchant/MerchantPersonal.vue'
+import UserPersonal from '@/views/user/UserPersonal.vue'
+import Menu from '@/views/user/Menu.vue'
+import ShoppingCart from '@/views/user/ShoppingCart.vue'    
+import UserAddress from '@/views/user/UserAddress.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -34,8 +38,22 @@ const routers = [
         },
         {  
             path: 'personal', //个人主页
-            component: UserHome, 
-        },], 
+            component: UserPersonal, 
+        },
+        {  
+            path: 'merchant/:id',  
+            component: Menu, // 显示商家菜单的组件  
+            props: true, // 允许将路由参数作为 props 传递  
+        },  
+        {
+            path:'cart',
+            component:ShoppingCart,
+        },
+        {
+            path:'address',
+            component:UserAddress,
+        },
+    ], 
     }, 
 ]
 
