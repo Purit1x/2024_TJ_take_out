@@ -48,3 +48,11 @@ export const walletRecharge=async(id,addMoney) => {
         throw error;   
     }
 }
+export const searchDishes = async(id) => {
+    try {  
+        const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${id}`);
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        ElMessage.error("Error fetching dishes:", error);  
+    }
+}
