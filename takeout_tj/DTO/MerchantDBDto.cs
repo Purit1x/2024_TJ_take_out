@@ -12,6 +12,7 @@
         public int TimeforCloseBusiness { get; set; }
         public decimal Wallet { get; set; }
         public string WalletPassword { get; set; }
+        public int CouponType { get; set; }
 
     }
 }

@@ -277,7 +277,7 @@ namespace takeout_tj.Controllers
             }
         }
         [HttpPost]
-        [Route("CreateFM")]  // 创建收藏项
+        [Route("CreateFM")]
         public IActionResult CreateFavouriteMerchant([FromBody] FavoriteMerchantDBDto dto)
         {
             var tran = _context.Database.BeginTransaction(); // 开始事务 
@@ -308,7 +308,7 @@ namespace takeout_tj.Controllers
             }
         }
         [HttpGet]
-        [Route("getFM")]  // 获取收藏项
+        [Route("getFM")]
         public IActionResult GetFavouriteMerchant(int userId)
         {
             try
@@ -340,7 +340,7 @@ namespace takeout_tj.Controllers
 
         }
         [HttpDelete]
-        [Route("deleteFM")]  // 删除收藏项
+        [Route("deleteFM")]
         public IActionResult DeleteFavouriteMerchant(FavoriteMerchantDBDto dto)
         {
             var tran = _context.Database.BeginTransaction();  // 开启一个事务  
@@ -372,7 +372,6 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
             }
         }
-
         [HttpPost]
         [Route("addToShoppingCart")] // 将菜品加入购物车
         public IActionResult addToShoppingCart([FromBody] ShoppingCartDto dto)

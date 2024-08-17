@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace takeout_tj.DTO
+ï»¿namespace takeout_tj.DTO
 {
     public class ShoppingCartDto
     {
@@ -8,6 +6,6 @@ namespace takeout_tj.DTO
         public int ShoppingCartId { get; set; }
         public int MerchantId { get; set; }
         public int DishId { get; set; }
-        public int DishNum { get; set; }  // ²ËÆ·ÊıÁ¿
+        public int DishNum { get; set; }  // èœå“æ•°é‡
     }
 }

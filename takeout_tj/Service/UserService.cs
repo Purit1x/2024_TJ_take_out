@@ -24,7 +24,6 @@ namespace takeout_tj.Service
             }
             return -1;
         }
-
         public int AssignCartId()
         {
             // 找到所有已存在的 ShoppingCartId  
