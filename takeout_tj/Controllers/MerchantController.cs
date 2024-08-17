@@ -152,6 +152,7 @@ namespace takeout_tj.Controllers
                 merchant.MerchantAddress=dto.MerchantAddress;
                 merchant.Contact=dto.Contact;
                 merchant.DishType=dto.DishType;
+                merchant.CouponType = dto.CouponType;
                 merchant.TimeforOpenBusiness=dto.TimeforCloseBusiness;
                 merchant.TimeforCloseBusiness=dto.TimeforOpenBusiness;
                 merchant.WalletPassword=dto.WalletPassword;

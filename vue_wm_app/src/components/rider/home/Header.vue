@@ -1,14 +1,13 @@
 <script setup>
     import { useRouter } from 'vue-router';
-    import { useCookies } from '@vueuse/integrations/useCookies'  
-
+    import { useStore } from "vuex" 
+    import { ref,onMounted} from 'vue'
     const router = useRouter()
-    const cookies = useCookies(); // 使用 useCookies 钩子  
-
+    const store = useStore()    
+    const rider = ref({})
     onMounted(() => {  
         // 从 cookie 中读取用户信息  
-        const riderData = cookies.get('rider');  
-        cookies.set('rider', {});
+        const riderData = store.state.rider; 
         if (riderData) {  
         rider.value = riderData;  
         } else {  
@@ -19,8 +18,10 @@
 
     //退出
     const logout = () => {
-        router.push("/login")
+        store.dispatch('clearRider'); 
+        router.push('/login');
     }
+
 </script>
 
 <template>
@@ -37,7 +38,7 @@
         <div class="info">
             <div class="admin">
                 <div class="name">
-                    <span>{{ rider.value.name }}</span> <el-icon><Bell /></el-icon>
+                    <span>&nbsp;欢迎，Id为{{ rider.RiderId }}的骑手!</span> <el-icon><Bell /></el-icon>
                 </div>
 
                 <div class="logout" @click="logout">

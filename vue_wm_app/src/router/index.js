@@ -15,6 +15,15 @@ import UserPersonal from '@/views/user/UserPersonal.vue'
 import Menu from '@/views/user/Menu.vue'
 import ShoppingCart from '@/views/user/ShoppingCart.vue'    
 import UserAddress from '@/views/user/UserAddress.vue'
+import RiderHome from '@/views/rider/RiderHome.vue'
+import RiderAssignment from '@/views/rider/RiderAssignment.vue'
+import RiderInfo from '@/views/rider/RiderInfo.vue'
+import RiderWage from '@/views/rider/RiderWage.vue'
+import PlatformHome from '@/views/platform/PlatformHome.vue'
+import MerchantManage from '@/views/platform/MerchantManage.vue'
+import RiderManage from '@/views/platform/RiderManage.vue'
+import OrderManage from '@/views/platform/OrderManage.vue'
+import CouponManage from '@/views/platform/CouponManage.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -53,8 +62,39 @@ const routers = [
             path:'address',
             component:UserAddress,
         },
-    ], 
-    }, 
+    ], }, 
+    { path: "/rider-home",component:RiderHome,meta:{requiresAuth:true}, children: [  
+        {  
+            path: 'assignment', //订单
+            component: RiderAssignment, 
+        },
+        {
+            path:'information',
+            component:RiderInfo,
+        },
+        {
+            path:'wage',
+            component:RiderWage,
+        }
+    ], },
+    { path: "/platform-home", component: PlatformHome, meta: { requiresAuth: true },children:[
+        {
+            path:'merchant-manage',
+            component:MerchantManage,
+        },
+        {
+            path:'rider-manage',
+            component:RiderManage,
+        },
+        {
+            path:'order-manage',
+            component:OrderManage,
+        },
+        {
+            path:'coupon-manage',
+            component:CouponManage,
+        },
+    ]},
 ]
 
 // 动态路由，用于匹配菜单动态添加路由
