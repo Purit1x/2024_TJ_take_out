@@ -170,6 +170,7 @@ const saveMerchant = async()=> {
             merchantForm.value.MerchantAddress = currentMerchant.value.MerchantAddress;  
             merchantForm.value.Contact = currentMerchant.value.Contact;  
             merchantForm.value.DishType = currentMerchant.value.DishType;  
+            merchantForm.value.CouponType = currentMerchant.value.CouponType;  
             merchantForm.value.TimeforOpenBusiness=currentMerchant.value.TimeforOpenBusiness;  
             merchantForm.value.TimeforCloseBusiness=currentMerchant.value.TimeforCloseBusiness;  
         }).catch(error => {
@@ -264,6 +265,9 @@ function OpenWPWindow(){  //打开修改支付密码界面
 function leaveWPWindow(){  //关闭修改支付密码界面
     isChangeWP.value=false;
 }
+function gobackHome(){
+    router.push('/merchant-home');
+}
 </script>
 
 <template>
@@ -271,6 +275,7 @@ function leaveWPWindow(){  //关闭修改支付密码界面
         <div class="person_body" v-if="!isWallet">
             <el-descriptions class="margin-top" title="简介" :column="2" border v-if="isOnlyShow">
                 <template #extra>
+                    <button @click="gobackHome">返回</button>
                     <el-button type="primary" size="small" @click="editMerchant">编辑</el-button>
                     <el-button type="primary" size="small" @click="logout">退出</el-button>
                 </template>
@@ -309,7 +314,13 @@ function leaveWPWindow(){  //关闭修改支付密码界面
                     </template>
                     {{ merchantForm.DishType }}
                 </el-descriptions-item>
-                
+                <el-descriptions-item>
+                    <template #label>
+                        <i class="el-icon-judge"></i>
+                        是否允许通用优惠券
+                    </template>
+                    {{ merchantForm.CouponType === 0 ? '是' : '否' }}
+                </el-descriptions-item>
                 <el-descriptions-item>
                     <template #label>
                         <i class="el-icon-time"></i>
@@ -345,6 +356,12 @@ function leaveWPWindow(){  //关闭修改支付密码界面
                     </el-form-item>
                     <el-form-item label="菜品类型" prop="DishType">
                         <el-input v-model="currentMerchant.DishType"></el-input>
+                    </el-form-item>
+                    <el-form-item label="是否允许通用优惠券" prop="CouponType">
+                        <el-radio-group v-model="currentMerchant.CouponType">  
+                            <el-radio label=0>是</el-radio>  
+                            <el-radio label=1>否</el-radio>  
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="营业开始时间" prop="TimeforOpenBusiness">
                         <el-time-picker placeholder="选择日期" v-model="currentMerchant.TimeforOpenBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>

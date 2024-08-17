@@ -1,7 +1,6 @@
 //导入request.js请求工具
 import request from '@/utils/request.js'
 import axios from 'axios'  
-import { ElMessage } from 'element-plus';
 // 设置基本URL，这里使用你后端的地址  
 const BASE_URL = 'http://localhost:5079/api'; 
 
@@ -54,6 +53,6 @@ export const searchDishes = async(id) => {
         const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${id}`);
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
-        ElMessage.error("Error fetching dishes:", error);  
+        throw error;   
     }
 }

@@ -22,3 +22,27 @@ export const riderLoginService = async(riderData) => {
         throw error;   
     }  
 }
+export const riderInfo = async(id) => {  //获取骑手信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Rider/riderSearch?riderId=${id}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const updateRider = async(data) => {  //更新用户信息
+    try {  
+        const response = await axios.put(`${BASE_URL}/Rider/riderEdit`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    } 
+}
+export const walletRecharge=async(id,addMoney) => {  //充值
+    try {  
+        const response = await axios.put(`${BASE_URL}/Rider/recharge?riderId=${id}&addMoney=${addMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}

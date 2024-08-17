@@ -89,7 +89,6 @@ export const deleteFavouriteMerchant=async(data) => {  //删除收藏商户
         throw error;   
     }
 }
-
 export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车项
     try {  
         const response = await axios.post(`${BASE_URL}/Users/addToShoppingCart`,shoppingCartItem);  
@@ -98,7 +97,6 @@ export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车
         throw error;   
     }
 }
-
 export const decrementDishInCart=async(shoppingCartItem) => {  //逐个删除购物车中的商品
     try {  
         const response = await axios.put(`${BASE_URL}/Users/decrementDishInCart`,shoppingCartItem);  
@@ -107,7 +105,6 @@ export const decrementDishInCart=async(shoppingCartItem) => {  //逐个删除购
         throw error;   
     }
 }
-
 export const removeFromShoppingCart=async(shoppingCartItem) => {  //删除购物车中的商品（数量清零）
     try {  
         const response = await axios.delete(`${BASE_URL}/Users/removeFromShoppingCart`, {
@@ -121,7 +118,6 @@ export const removeFromShoppingCart=async(shoppingCartItem) => {  //删除购物
         throw error;   
     }
 }
-
 export const getShoppingCartItems=async(userId) => {  //获取用户购物车
     try {  
         const response = await axios.get(`${BASE_URL}/Users/getShoppingCartItems?userId=${userId}`);  
@@ -130,4 +126,3 @@ export const getShoppingCartItems=async(userId) => {  //获取用户购物车
         throw error;   
     }
 }
-

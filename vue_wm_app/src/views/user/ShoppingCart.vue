@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref,onMounted, inject,watch,computed } from 'vue';
+import { ref,onMounted,computed } from 'vue';
 import {addToShoppingCart,decrementDishInCart,removeFromShoppingCart,getShoppingCartItems} from '@/api/user';
 import { useStore } from "vuex";
 import { ElMessage } from 'element-plus';
@@ -26,7 +26,6 @@ onMounted(async() => {
         items.value = data.data; // 假设后端返回的菜品数据是一个数组
         items.value.forEach(item => item.checked = false); // 初始化时将所有的商品设为未勾选状态
     }  
-    console.log(items.value);
 
 })
 

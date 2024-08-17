@@ -29,6 +29,7 @@ const store = createStore({
       user: null,
       merchant:null,
       rider:null,
+      admin:null,
   },
   mutations: {  
     SET_USER(state, user) {  
@@ -42,6 +43,18 @@ const store = createStore({
     },  
     CLEAR_MERCHANT(state) {  
         state.merchant = null;  
+    },  
+    SET_RIDER(state, rider) {  
+        state.rider = rider;  
+    },  
+    CLEAR_RIDER(state) {  
+        state.rider = null;  
+    },  
+    SET_ADMIN(state, admin) {  
+        state.admin = admin;  
+    },  
+    CLEAR_ADMIN(state) {  
+        state.admin = null;  
     },  
 },  
 actions: {  
@@ -58,6 +71,20 @@ actions: {
     },  
     clearMerchant({ commit }) {  
         commit('CLEAR_MERCHANT');  
+    },  
+    setRider({ commit }, rider) {  
+        commit('SET_RIDER', rider);  
+        localStorage.setItem('store-timestamp', new Date().getTime()); // 更新时间戳 
+    },  
+    clearRider({ commit }) {  
+        commit('CLEAR_RIDER');  
+    },  
+    setAdmin({ commit }, admin) {  
+        commit('SET_ADMIN', admin);  
+        localStorage.setItem('store-timestamp', new Date().getTime()); // 更新时间戳 
+    },  
+    clearAdmin({ commit }) {  
+        commit('CLEAR_ADMIN');  
     },  
   },  
   plugins: [vuexPersistedState.plugin] // 使用持久化插件  
