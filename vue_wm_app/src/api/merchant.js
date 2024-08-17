@@ -1,6 +1,7 @@
 //导入request.js请求工具
 import request from '@/utils/request.js'
 import axios from 'axios'  
+import { ElMessage } from 'element-plus';
 // 设置基本URL，这里使用你后端的地址  
 const BASE_URL = 'http://localhost:5079/api'; 
 

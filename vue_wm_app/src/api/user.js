@@ -89,3 +89,45 @@ export const deleteFavouriteMerchant=async(data) => {  //删除收藏商户
         throw error;   
     }
 }
+
+export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车项
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/addToShoppingCart`,shoppingCartItem);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
+export const decrementDishInCart=async(shoppingCartItem) => {  //逐个删除购物车中的商品
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/decrementDishInCart`,shoppingCartItem);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
+export const removeFromShoppingCart=async(shoppingCartItem) => {  //删除购物车中的商品（数量清零）
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/removeFromShoppingCart`, {
+            data: shoppingCartItem,  // DELETE 请求通常通过 `data` 属性来发送请求体
+            headers: {
+                'Content-Type': 'application/json'  // 确保 Content-Type 设置为 JSON
+            }
+        }); 
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
+export const getShoppingCartItems=async(userId) => {  //获取用户购物车
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getShoppingCartItems?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+

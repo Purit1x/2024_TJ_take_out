@@ -24,5 +24,21 @@ namespace takeout_tj.Service
             }
             return -1;
         }
+
+        public int AssignCartId()
+        {
+            // 找到所有已存在的 ShoppingCartId  
+            var usedCartIds = _context.ShoppingCarts.Select(c => c.ShoppingCartId).ToList();
+
+            // 从 1 开始找到一个未使用的 ID  
+            for (int id = 1; id <= usedCartIds.Count + 1; id++)
+            {
+                if (!usedCartIds.Contains(id))
+                {
+                    return id; // 返回第一个未使用的 ID  
+                }
+            }
+            return -1;
+        }
     }
 }
