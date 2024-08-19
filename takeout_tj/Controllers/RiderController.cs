@@ -183,5 +183,25 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"充值异常: {ex.Message}" });
             }
         }
+        [HttpGet]
+        [Route("StIdSearch")]
+        public IActionResult GetStationIdByRiderId(int riderId)
+        {
+            try
+            {
+                var riderStation = _context.RiderStations.FirstOrDefault(u => u.RiderId == riderId);
+
+                if (riderStation == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "未分配" });
+                }
+                return Ok(new { data=riderStation.StationId, msg = "获取成功" });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+
     }
 }
