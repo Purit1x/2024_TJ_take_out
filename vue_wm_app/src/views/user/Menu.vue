@@ -118,6 +118,7 @@ const addToCart = async(dish) => {
       <div>地址：{{MerchantInfo.merchantAddress}}</div>
       <div>营业时间：{{ MerchantInfo.timeforOpenBusiness }} - {{ MerchantInfo.timeforCloseBusiness }}</div>
       <div>联系电话：{{MerchantInfo.contact}}</div>
+      <div>是否可以使用通用优惠券：{{MerchantInfo.couponType ? '否' : '是'}}</div>
       <div>
         <div>
           <input type="text" v-model="searchQuery" placeholder="搜索菜品或类别" v-on:keyup.enter="handleSearch()"/> 

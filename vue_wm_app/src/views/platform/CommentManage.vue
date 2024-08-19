@@ -12,7 +12,7 @@ const gobackHome = () => {
 
 <template>
     <div>
-        优惠券管理
+        评论管理
         <button @click="gobackHome">返回</button>
     </div>
 </template>

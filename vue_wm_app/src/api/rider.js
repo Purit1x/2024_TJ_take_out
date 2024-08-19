@@ -46,3 +46,12 @@ export const walletRecharge=async(id,addMoney) => {  //充值
         throw error;   
     }
 }
+export const stIdSearch=async(id) => {  //通过id查询站点
+    try {  
+        const response = await axios.get(`${BASE_URL}/Rider/StIdSearch?riderId=${id}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+
