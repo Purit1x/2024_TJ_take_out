@@ -24,6 +24,8 @@ import MerchantManage from '@/views/platform/MerchantManage.vue'
 import RiderManage from '@/views/platform/RiderManage.vue'
 import OrderManage from '@/views/platform/OrderManage.vue'
 import CouponManage from '@/views/platform/CouponManage.vue'
+import CommentManage from '@/views/platform/CommentManage.vue'
+import StationManage from '@/views/platform/StationManage.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -94,6 +96,14 @@ const routers = [
             path:'coupon-manage',
             component:CouponManage,
         },
+        {
+            path:'comment-manage',
+            component:CommentManage,
+        },
+        {
+            path:'station-manage',
+            component:StationManage,
+        }
     ]},
 ]
 
