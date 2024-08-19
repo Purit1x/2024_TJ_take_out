@@ -126,3 +126,32 @@ export const getShoppingCartItems=async(userId) => {  //获取用户购物车
         throw error;   
     }
 }
+// 提交地址服务
+export const submitAddressService = async (addressData) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
+        return response.data; // 返回后端返回的数据
+    } catch (error) {
+        throw error;
+    }
+}
+
+// 获取用户地址服务
+export const getAddressService = async (userId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Users/getAddress?userId=${userId}`);
+        return response.data; // 返回后端返回的地址数据
+    } catch (error) {
+        throw error;
+    }
+}
+
+// 删除地址服务
+export const deleteAddressService = async (addressId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/Addresses?addressId=${addressId}`);
+        return response.data; // 返回删除操作的结果
+    } catch (error) {
+        throw error;
+    }
+}

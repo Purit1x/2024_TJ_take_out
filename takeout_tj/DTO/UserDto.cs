@@ -13,4 +13,12 @@ namespace takeout_tj.DTO
         public decimal Wallet { get; set; }
         public string WalletPassword { get; set; }
     }
+    public class AddressDto
+    {
+        public int UserId { get; set; }
+        public string Address { get; set; }
+        public string HouseNumber { get; set; }
+        public string ContactName { get; set; }
+        public string PhoneNumber { get; set; }
+    }
 }
