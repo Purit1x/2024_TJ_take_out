@@ -1,0 +1,708 @@
+[
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "CreateDish",
+    "RelativePath": "api/Merchant/createDish",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dishDto",
+        "Type": "takeout_tj.DTO.DishDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "DeleteDish",
+    "RelativePath": "api/Merchant/dishDelete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "dishId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "EditDish",
+    "RelativePath": "api/Merchant/dishEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dishDto",
+        "Type": "takeout_tj.DTO.DishDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "GetDishesByMerchantId",
+    "RelativePath": "api/Merchant/dishSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "Login",
+    "RelativePath": "api/Merchant/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchant",
+        "Type": "takeout_tj.DTO.MerchantDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "EditMerchant",
+    "RelativePath": "api/Merchant/merchantEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.MerchantDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "GetMerchantInfo",
+    "RelativePath": "api/Merchant/merchantSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "WalletRecharge",
+    "RelativePath": "api/Merchant/recharge",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "addMoney",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "InitMerchant",
+    "RelativePath": "api/Merchant/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.MerchantDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.MerchantController",
+    "Method": "UploadImage",
+    "RelativePath": "api/Merchant/uploadImage",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "GetAllStationIds",
+    "RelativePath": "api/Platform/GetStationIds",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "Login",
+    "RelativePath": "api/Platform/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "admin",
+        "Type": "takeout_tj.DTO.AdminDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "DeleteMerchant",
+    "RelativePath": "api/Platform/merchantDelete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "AddRiderStation",
+    "RelativePath": "api/Platform/riderStationAssign",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.RiderStationDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "DeleteRiderStation",
+    "RelativePath": "api/Platform/riderStationDelete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "riderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "EditRiderStation",
+    "RelativePath": "api/Platform/riderStationEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.RiderStationDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "GetUnassignedRiders",
+    "RelativePath": "api/Platform/SeparateRiders",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "AddStation",
+    "RelativePath": "api/Platform/stationCreate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.StationDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "DeleteStation",
+    "RelativePath": "api/Platform/stationDelete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "stationId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "EditStation",
+    "RelativePath": "api/Platform/stationEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.StationDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.PlatformController",
+    "Method": "GetStationInfo",
+    "RelativePath": "api/Platform/stationSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "stationId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "Login",
+    "RelativePath": "api/Rider/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "rider",
+        "Type": "takeout_tj.DTO.RiderDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "WalletRecharge",
+    "RelativePath": "api/Rider/recharge",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "riderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "addMoney",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "AddRider",
+    "RelativePath": "api/Rider/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.RiderDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "EditMerchant",
+    "RelativePath": "api/Rider/riderEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.RiderDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "GetRiderInfo",
+    "RelativePath": "api/Rider/riderSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "riderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.RiderController",
+    "Method": "GetStationIdByRiderId",
+    "RelativePath": "api/Rider/StIdSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "riderId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "addToShoppingCart",
+    "RelativePath": "api/Users/addToShoppingCart",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.ShoppingCartDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "CreateFavouriteMerchant",
+    "RelativePath": "api/Users/CreateFM",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.FavoriteMerchantDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "decrementDishInCart",
+    "RelativePath": "api/Users/decrementDishInCart",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.ShoppingCartDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "DeleteAddress",
+    "RelativePath": "api/Users/deleteAddress",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "addressId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "DeleteFavouriteMerchant",
+    "RelativePath": "api/Users/deleteFM",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.FavoriteMerchantDBDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "GetAddress",
+    "RelativePath": "api/Users/getAddress",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "GetFavouriteMerchant",
+    "RelativePath": "api/Users/getFM",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "GetAllMerchantIds",
+    "RelativePath": "api/Users/GetMerchantIds",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "getShoppingCartItems",
+    "RelativePath": "api/Users/getShoppingCartItems",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "Login",
+    "RelativePath": "api/Users/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "user",
+        "Type": "takeout_tj.DTO.UserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "GetMerchantsInfo",
+    "RelativePath": "api/Users/merchantsSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "merchantId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "WalletRecharge",
+    "RelativePath": "api/Users/recharge",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "addMoney",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "AddUser",
+    "RelativePath": "api/Users/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.UserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "removeFromShoppingCart",
+    "RelativePath": "api/Users/removeFromShoppingCart",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.ShoppingCartDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "SubmitAddress",
+    "RelativePath": "api/Users/submitAddress",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "addressDto",
+        "Type": "takeout_tj.DTO.AddressDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "EditMerchant",
+    "RelativePath": "api/Users/userEdit",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "takeout_tj.DTO.UserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "takeout_tj.Controllers.UsersController",
+    "Method": "GetMerchantInfo",
+    "RelativePath": "api/Users/userSearch",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

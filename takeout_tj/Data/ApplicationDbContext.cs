@@ -45,7 +45,7 @@ namespace takeout_tj.Data
 			// modelBuilder.HasDefaultSchema("C##TAKEOUT");
 
 			modelBuilder.Entity<UserDB>().HasKey(u => u.UserId);
-			modelBuilder.Entity<UserAddressDB>().HasKey(u => new {u.UserId, u.UserAddress});
+			modelBuilder.Entity<UserAddressDB>().HasKey(u => new {u.AddressId});
 			modelBuilder.Entity<MerchantDB>().HasKey(m => m.MerchantId);
 			modelBuilder.Entity<FavoriteMerchantDB>().HasKey(um => new {um.UserId, um.MerchantId});
 			modelBuilder.Entity<DishDB>().HasKey(d => new { d.MerchantId, d.DishId });
@@ -68,7 +68,7 @@ namespace takeout_tj.Data
 
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
-				.HasOne(a => a.UserDB)
+				.HasOne(a => a.User)
 				.WithMany(u => u.UserAddressDBs)
 				.HasForeignKey(a => a.UserId);
 			modelBuilder.Entity<MembershipDB>().HasKey(m => m.UserId);
