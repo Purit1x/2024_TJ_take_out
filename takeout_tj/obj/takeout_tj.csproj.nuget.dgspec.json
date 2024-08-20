@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\liliangStudy\\DB大项目\\后端\\takeout_tj\\takeout_tj.csproj": {}
+    "E:\\English program\\DBClassDesion\\2024_TJ_take_out\\takeout_tj\\takeout_tj.csproj": {}
   },
   "projects": {
-    "D:\\liliangStudy\\DB大项目\\后端\\takeout_tj\\takeout_tj.csproj": {
+    "E:\\English program\\DBClassDesion\\2024_TJ_take_out\\takeout_tj\\takeout_tj.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\liliangStudy\\DB大项目\\后端\\takeout_tj\\takeout_tj.csproj",
+        "projectUniqueName": "E:\\English program\\DBClassDesion\\2024_TJ_take_out\\takeout_tj\\takeout_tj.csproj",
         "projectName": "takeout_tj",
-        "projectPath": "D:\\liliangStudy\\DB大项目\\后端\\takeout_tj\\takeout_tj.csproj",
-        "packagesPath": "C:\\Users\\liliang\\.nuget\\packages\\",
-        "outputPath": "D:\\liliangStudy\\DB大项目\\后端\\takeout_tj\\obj\\",
+        "projectPath": "E:\\English program\\DBClassDesion\\2024_TJ_take_out\\takeout_tj\\takeout_tj.csproj",
+        "packagesPath": "C:\\Users\\13164\\.nuget\\packages\\",
+        "outputPath": "E:\\English program\\DBClassDesion\\2024_TJ_take_out\\takeout_tj\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\liliang\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\13164\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -93,19 +92,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.33, 6.0.33]"
+              "version": "[6.0.30, 6.0.30]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[6.0.33, 6.0.33]"
+              "version": "[6.0.30, 6.0.30]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.33, 6.0.33]"
+              "version": "[6.0.30, 6.0.30]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[6.0.33, 6.0.33]"
+              "version": "[6.0.30, 6.0.30]"
             }
           ],
           "frameworkReferences": {
@@ -116,7 +115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }
