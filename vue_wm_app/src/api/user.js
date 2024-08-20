@@ -90,35 +90,6 @@ export const deleteFavouriteMerchant=async(data) => {  //删除收藏商户
     }  
 }
 
-// 提交地址服务
-export const submitAddressService = async (addressData) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
-        return response.data; // 返回后端返回的数据
-    } catch (error) {
-        throw error;
-    }
-}
-
-// 获取用户地址服务
-export const getAddressService = async (userId) => {
-    try {
-        const response = await axios.get(`${BASE_URL}/Users/getAddresses?userID=${userId}`);
-        return response.data; // 返回后端返回的地址数据
-    } catch (error) {
-        throw error;
-    }
-}
-
-// 删除地址服务
-export const deleteAddressService = async (addressId) => {
-    try {
-        const response = await axios.delete(`${BASE_URL}/Addresses/${addressId}`);
-        return response.data; // 返回删除操作的结果
-    } catch (error) {
-        throw error;
-    }
-}
 export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车项
     try {  
         const response = await axios.post(`${BASE_URL}/Users/addToShoppingCart`,shoppingCartItem);  
@@ -159,7 +130,7 @@ export const getShoppingCartItems=async(userId) => {  //获取用户购物车
 // 提交地址服务
 export const submitAddressService = async (addressData) => {
     try {
-        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
+        const response = await axios.post(`${BASE_URL}/Users/submitAddress`, addressData);
         return response.data; // 返回后端返回的数据
     } catch (error) {
         throw error;
@@ -169,7 +140,7 @@ export const submitAddressService = async (addressData) => {
 // 获取用户地址服务
 export const getAddressService = async (userId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/Users/getAddress?userId=${userId}`);
+        const response = await axios.get(`${BASE_URL}/Users/getAddress/${userId}`);
         return response.data; // 返回后端返回的地址数据
     } catch (error) {
         throw error;
@@ -180,7 +151,7 @@ export const getAddressService = async (userId) => {
 export const deleteAddressService = async (addressId) => {
     try {
         const response = await axios.delete(`${BASE_URL}/Addresses?addressId=${addressId}`);
-        return response.data; // 返回删除操作的结果
+        return response.data || {}; // 返回删除操作的结果
     } catch (error) {
         throw error;
     }

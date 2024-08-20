@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("takeout_tj")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91f62eb8f581026d8e61cfe1f7f0f964186fc01f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e3a3df9df92dc007657b37bbac050f14fe63d8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("takeout_tj")]
 [assembly: System.Reflection.AssemblyTitleAttribute("takeout_tj")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
