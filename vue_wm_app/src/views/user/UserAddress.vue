@@ -7,12 +7,15 @@ import { submitAddressService, getAddressService, deleteAddressService } from '@
 
 const refForm = ref(null);
 const addressForm = ref({
-  address: '',
-  doorNumber: '',
-  contactPerson: '',
-  phone: '',
+    AddressId: 0, 
+    UserId: 0, 
+    Address: '', 
+    HouseNumber: '', 
+    ContactName: '', 
+    PhoneNumber: '',
 });
-
+const router = useRouter();
+const store = useStore();
 const userAddresses = ref([]);
 
 // 提交地址表单函数
@@ -31,10 +34,12 @@ const submitAddress = async () => {
 
 // 重置表单函数
 const resetForm = () => {
-    addressForm.value.address = '';
-    addressForm.value.houseNumber = '';
-    addressForm.value.contactName = '';
-    addressForm.value.phoneNumber = '';
+    addressForm.value.AddressId = 0;
+    addressForm.value.UserId = 0;
+    addressForm.value.Address = '';
+    addressForm.value.HouseNumber = '';
+    addressForm.value.ContactName = '';
+    addressForm.value.PhoneNumber = '';
 };
 
 // 返回主页函数
@@ -45,16 +50,19 @@ const gobackHome = () => {
 // 初始化页面
 onMounted(async () => {
   try{
-    const userId = 7; // 假设用户ID是1，实际情况下应通过登录信息获取
+    const userId = store.state.user.userId; 
     const userAddress = await getAddressService(userId);
     userAddresses.value = [userAddress]; // 假设返回的是一个地址对象，放入数组中以便显示在表格里
 
     addressForm.value = {
-      address: userAddress.address || '',
-      houseNumber: userAddress.houseNumber || '',
-      contactName: userAddress.contactName || '',
-      phoneNumber: userAddress.phoneNumber || '',
+      Address: userAddress.address || '',
+      HouseNumber: userAddress.houseNumber || '',
+      ContactName: userAddress.contactName || '',
+      PhoneNumber: userAddress.phoneNumber || '',
+      AddressId: userAddress.addressId || 0,
+      UserId: userAddress.userId || 0,
     };
+    console.log('addressForm.value:', addressForm.value);
   } catch (error) {
     console.error('加载用户地址信息失败：',error);
   }
@@ -85,16 +93,17 @@ const deleteAddress = async (addressId) => {
             <th>门牌号</th>
             <th>联系人</th>
             <th>联系电话</th>
+            
           </tr>
         </thead>
       <tbody>
         <tr v-for="(address, index) in userAddresses" :key="index">
-          <td>{{ address.address }}</td>
-          <td>{{ address.houseNumber }}</td>
-          <td>{{ address.contactName }}</td>
-          <td>{{ address.phoneNumber }}</td>
+          <td>{{ address.Address }}</td>
+          <td>{{ address.HouseNumber }}</td>
+          <td>{{ address.ContactName }}</td>
+          <td>{{ address.PhoneNumber }}</td>
           <td>
-            <button @click="deleteAddress(address.id)">删除</button>
+            <button @click="deleteAddress(address.AddressId)">删除</button>
           </td>
         </tr>
       </tbody>
@@ -103,19 +112,19 @@ const deleteAddress = async (addressId) => {
     <form ref="refForm" @submit.prevent="submitAddress">
       <div>
         <label for="address">具体地址</label>
-        <input v-model="addressForm.address" id="address" type="text" placeholder="请输入具体地址" />
+        <input v-model="addressForm.Address" id="address" type="text" placeholder="请输入具体地址" />
       </div>
       <div>
         <label for="houseNumber">门牌号</label>
-        <input v-model="addressForm.houseNumber" id="houseNumber" type="text" placeholder="请输入门牌号" />
+        <input v-model="addressForm.HouseNumber" id="houseNumber" type="text" placeholder="请输入门牌号" />
       </div>
       <div>
         <label for="contactName">联系人</label>
-        <input v-model="addressForm.contactName" id="contactName" type="text" placeholder="请输入联系人姓名" />
+        <input v-model="addressForm.ContactName" id="contactName" type="text" placeholder="请输入联系人姓名" />
       </div>
       <div>
         <label for="phoneNumber">联系电话</label>
-        <input v-model="addressForm.phoneNumber" id="phoneNumber" type="text" placeholder="请输入联系电话" />
+        <input v-model="addressForm.PhoneNumber" id="phoneNumber" type="text" placeholder="请输入联系电话" />
       </div>
       <div>
         <button type="submit">提交</button>

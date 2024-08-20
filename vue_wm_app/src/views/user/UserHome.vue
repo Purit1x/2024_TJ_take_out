@@ -97,7 +97,7 @@ const addToFavorite = async (merchantId) => {
         }  
     }  
 };  
-const handleSearch = () => {  
+const handleSearch = () => {   //字符串匹配搜索商家
   const query = searchQuery.value.trim();  
   if (query) {  
     showMerchantsInfo.value = merchantsInfo.value.filter(merchant =>  

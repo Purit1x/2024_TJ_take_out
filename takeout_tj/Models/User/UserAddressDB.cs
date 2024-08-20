@@ -2,19 +2,19 @@
 
 namespace takeout_tj.Models.User
 {
-	public class UserAddressDB
-	{
-		[Required(ErrorMessage = "Address ID is required.")]
-		public int AddressId { get; set; }
+    public class UserAddressDB
+    {
+        [Required(ErrorMessage = "Address ID is required.")]
+        public int AddressId { get; set; }
 
-		[Required(ErrorMessage = "User ID is required.")]
-		public int UserId { get; set; }
+        [Required(ErrorMessage = "User ID is required.")]
+        public int UserId { get; set; }
 
-		[Required(ErrorMessage = "User address is needed. ")]
-		[StringLength(255, ErrorMessage = "The field UserAddress must be at most 255 characters long. ")]
-		public string UserAddress { get; set; }
+        [Required(ErrorMessage = "User address is needed. ")]
+        [StringLength(255, ErrorMessage = "The field UserAddress must be at most 255 characters long. ")]
+        public string UserAddress { get; set; }
 
-		[StringLength(50, ErrorMessage = "The field HouseNumber must be at most 50 characters long.")]
+        [StringLength(50, ErrorMessage = "The field HouseNumber must be at most 50 characters long.")]
         public string HouseNumber { get; set; } // 门牌号
 
         [Required(ErrorMessage = "Contact Name is required.")]
@@ -26,6 +26,6 @@ namespace takeout_tj.Models.User
         [RegularExpression(@"^\d{11}$", ErrorMessage = "Phone number can only contain digits.")]
         public string PhoneNumber { get; set; } // 联系电话
 
-        public UserDB UserDB { get; set; }  // 导航属性，用于直接找到外键引用的类
-	}
+        public UserDB User { get; set; }  // 导航属性，用于直接找到外键引用的类
+    }
 }

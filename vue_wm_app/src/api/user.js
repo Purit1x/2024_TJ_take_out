@@ -119,3 +119,69 @@ export const deleteAddressService = async (addressId) => {
         throw error;
     }
 }
+export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车项
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/addToShoppingCart`,shoppingCartItem);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const decrementDishInCart=async(shoppingCartItem) => {  //逐个删除购物车中的商品
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/decrementDishInCart`,shoppingCartItem);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const removeFromShoppingCart=async(shoppingCartItem) => {  //删除购物车中的商品（数量清零）
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/removeFromShoppingCart`, {
+            data: shoppingCartItem,  // DELETE 请求通常通过 `data` 属性来发送请求体
+            headers: {
+                'Content-Type': 'application/json'  // 确保 Content-Type 设置为 JSON
+            }
+        }); 
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getShoppingCartItems=async(userId) => {  //获取用户购物车
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getShoppingCartItems?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+// 提交地址服务
+export const submitAddressService = async (addressData) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
+        return response.data; // 返回后端返回的数据
+    } catch (error) {
+        throw error;
+    }
+}
+
+// 获取用户地址服务
+export const getAddressService = async (userId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Users/getAddress?userId=${userId}`);
+        return response.data; // 返回后端返回的地址数据
+    } catch (error) {
+        throw error;
+    }
+}
+
+// 删除地址服务
+export const deleteAddressService = async (addressId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/Addresses?addressId=${addressId}`);
+        return response.data; // 返回删除操作的结果
+    } catch (error) {
+        throw error;
+    }
+}

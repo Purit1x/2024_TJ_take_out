@@ -283,9 +283,9 @@ const SavedeleteFM=async(merchantId)=>{
         <div>
             <el-form ref="refForm" :model="currentUser" :rules="userRules">
                 <el-form-item label="用户名" prop="UserName"><input v-model="currentUser.UserName" placeholder="用户名" @blur="validateField('UserName')"/></el-form-item>
-                <el-form-item label="手机号" prop="PhoneNumber"><input v-model="currentUser.PhoneNumber" placeholder="手机号" @blur="validateField('PhoneNumber')"/></el-form-item>
-                <el-form-item label="密码" prop="Password"><input v-model="currentUser.Password" placeholder="密码" @blur="validateField('Password')"/></el-form-item>
-                <el-form-item label="确认密码" prop="rePassword"><input v-model="currentUser.rePassword" placeholder="确认密码" @blur="validateField('rePassword')"/></el-form-item>
+                <el-form-item label="手机号" prop="PhoneNumber"><input type="number" v-model="currentUser.PhoneNumber" placeholder="手机号" @blur="validateField('PhoneNumber')"/></el-form-item>
+                <el-form-item label="密码" prop="Password"><input type="password" v-model="currentUser.Password" placeholder="密码" @blur="validateField('Password')"/></el-form-item>
+                <el-form-item label="确认密码" prop="rePassword"><input type="password" v-model="currentUser.rePassword" placeholder="确认密码" @blur="validateField('rePassword')"/></el-form-item>
             </el-form>
             <button @click="submitEdit()">提交</button>
             <button @click="leaveEdit()">取消</button>
