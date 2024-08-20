@@ -14,6 +14,7 @@ namespace takeout_tj.Data
 		public DbSet<MembershipDB> Memberships { get; set; }
 		public DbSet<MerchantDB> Merchants { get; set; }
 		public DbSet<FavoriteMerchantDB> FavoriteMerchants { get; set; }
+		public DbSet<UserAddressDB> userAddresses { get; set; }
 		public DbSet<DishDB> Dishes { get; set; }
 		public DbSet<ShoppingCartDB> ShoppingCarts { get; set; }
 		public DbSet<CouponDB> Coupons { get; set; }

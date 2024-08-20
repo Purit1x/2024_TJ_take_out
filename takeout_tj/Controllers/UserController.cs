@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.Merchant;
@@ -372,5 +373,103 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
             }
         }
+        [HttpPost]
+        [Route("submitAddress")]
+        public IActionResult SubmitAddress(AddressDto addressDto)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            var user = _context.Users.Find(addressDto.UserId);
+            if (user == null)
+            {
+                return StatusCode(404, new { errorCode = 404, msg = "未找到该用户" });
+            }
+            try
+            {
+                // 创建新的地址对象并保存到数据库
+                var newAddress = new UserAddressDB()
+                {
+                    UserId = addressDto.UserId,
+                    UserAddress = addressDto.Address,
+                    HouseNumber = addressDto.HouseNumber,
+                    ContactName = addressDto.ContactName,
+                    PhoneNumber = addressDto.PhoneNumber,
+                    User = user
+                };
+
+                _context.UserAddresses.Add(newAddress);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "地址提交成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "地址提交失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"提交异常: {ex.Message}", details = ex.InnerException?.Message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteAddress/{id}")]
+        public IActionResult DeleteAddress(int id)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            try
+            {
+                // 查询要删除的地址  
+                var address = _context.UserAddresses.FirstOrDefault(d => d.AddressID == id);
+                if (address == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除未找到" });
+                }
+                // 删除地址  
+                _context.UserAddresses.Remove(address);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "地址删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        [Route("getAddress/{userId}")]
+        public IActionResult GetAddress(int userId)
+        {
+            try
+            {
+                // 获取用户的所有地址
+                var addresses = _context.UserAddresses.Where(a => a.UserId == userId).ToList();
+                if (addresses == null || addresses.Count == 0)
+                {
+                    return NotFound(new { errorCode = 404, msg = "未找到地址" });
+                }
+
+                return Ok(addresses);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"获取地址异常: {ex.Message}" });
+            }
+        }
+
     }
 }

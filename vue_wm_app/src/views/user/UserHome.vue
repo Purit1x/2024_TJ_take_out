@@ -17,7 +17,7 @@ const searchQuery = ref(''); // 搜索框内容
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 
 onMounted(() => {  
-  const userData = store.state.user; 
+  const userData = store.state.user;
   if(router.currentRoute.value.path !== '/user-home')
     isUserHome.value = false;
   else
@@ -136,4 +136,4 @@ provide('merchantsInfo', merchantsInfo);
         </div>  
         <router-view /> <!-- 确保这里可以渲染子路由 -->  
     </div>  
-</template>  
+</template>   

@@ -22,7 +22,7 @@ const userForm = ref({
     UserName:'',
     PhoneNumber: '',
     Password: '',
-    rePassword:'',  
+    rePassword:'',   
     Wallet: 0,
     WalletPassword: '',
     reWalletPassword:'',
