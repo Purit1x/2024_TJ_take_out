@@ -26,7 +26,7 @@ onMounted(() => {
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
-        if (newPath.startsWith('/merchant-home') && newPath !== '/merchant-home/dish' && newPath !== '/merchant-home/personal') {  
+        if (newPath.startsWith('/merchant-home') && newPath !== '/merchant-home/dish' && newPath !== '/merchant-home/personal'&& newPath !== '/merchant-home/specialOffer') {  
             isMerchantHome.value = true; // 返回到商家主页时显示欢迎信息和按钮  
         } else {  
             isMerchantHome.value = false; // 进入子路由时隐藏  
@@ -46,6 +46,12 @@ const goToPersonal = () => {
     router.push('/merchant-home/personal');  
     isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
 };  
+// 跳转到满减活动  
+const goToSpecialOffer = () => { 
+    router.push('/merchant-home/specialOffer');  
+    isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
+};  
+
 // 提供 merchant 对象 给其它子网页 
 provide('merchant', merchant); 
 provide('isMerchantHome', isMerchantHome); 
@@ -57,7 +63,8 @@ provide('isMerchantHome', isMerchantHome);
         <!-- 渲染子路由 -->
         <router-view /> 
          <!-- 按钮 -->
-        <button v-if="isMerchantHome" @click="goToMenu">菜单</button>  
+        <button v-if="isMerchantHome" @click="goToMenu">菜单</button>
+        <button v-if="isMerchantHome" @click="goToSpecialOffer">满减活动</button>  
         <button v-if="isMerchantHome" @click="goToPersonal">我的</button>  
     </div>  
 </template>  

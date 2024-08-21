@@ -7,9 +7,9 @@ import { submitAddressService, getAddressService, deleteAddressService } from '@
 
 const refForm = ref(null);
 const addressForm = ref({
+    AddressId: 0, 
     UserId: 0, 
     Address: '', 
-    AddressId: 0, 
     HouseNumber: '', 
     ContactName: '', 
     PhoneNumber: '',
@@ -34,9 +34,9 @@ const submitAddress = async () => {
 
 // 重置表单函数
 const resetForm = () => {
+    addressForm.value.AddressId = 0;
     addressForm.value.UserId = 0;
     addressForm.value.Address = '';
-    addressForm.value.AddressId = 0;
     addressForm.value.HouseNumber = '';
     addressForm.value.ContactName = '';
     addressForm.value.PhoneNumber = '';
@@ -86,36 +86,51 @@ const deleteAddress = async (addressId) => {
     <h1>地址录入</h1>
 
     <!-- 显示已有地址的表格 -->
-    <el-table :data="userAddresses" border style="width: 100%">
-      <el-table-column prop="Address" label="具体地址" width="180"></el-table-column>
-      <el-table-column prop="HouseNumber" label="门牌号" width="180"></el-table-column>
-      <el-table-column prop="ContactName" label="联系人" width="180"></el-table-column>
-      <el-table-column prop="PhoneNumber" label="联系电话" width="180"></el-table-column>
-      <el-table-column label="操作" width="100">
-        <template v-slot="scope">
-          <el-button @click="deleteAddress(scope.row.AddressId)" type="danger" size="small">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <table border="1">
+        <thead>
+          <tr>
+            <th>具体地址</th>
+            <th>门牌号</th>
+            <th>联系人</th>
+            <th>联系电话</th>
+            
+          </tr>
+        </thead>
+      <tbody>
+        <tr v-for="(address, index) in userAddresses" :key="index">
+          <td>{{ address.Address }}</td>
+          <td>{{ address.HouseNumber }}</td>
+          <td>{{ address.ContactName }}</td>
+          <td>{{ address.PhoneNumber }}</td>
+          <td>
+            <button @click="deleteAddress(address.AddressId)">删除</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-    <el-form ref="refForm" @submit.prevent="submitAddress" :model="addressForm" label-width="100px">
-      <el-form-item label="具体地址">
-        <el-input v-model="addressForm.Address" placeholder="请输入具体地址"></el-input>
-      </el-form-item>
-      <el-form-item label="门牌号">
-        <el-input v-model="addressForm.HouseNumber" placeholder="请输入门牌号"></el-input>
-      </el-form-item>
-      <el-form-item label="联系人">
-        <el-input v-model="addressForm.ContactName" placeholder="请输入联系人姓名"></el-input>
-      </el-form-item>
-      <el-form-item label="联系电话">
-        <el-input v-model="addressForm.PhoneNumber" placeholder="请输入联系电话"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitAddress">提交</el-button>
-        <el-button @click="resetForm">重置</el-button>
-        <el-button @click="gobackHome">返回</el-button>
-      </el-form-item>
-    </el-form>
+    <form ref="refForm" @submit.prevent="submitAddress">
+      <div>
+        <label for="address">具体地址</label>
+        <input v-model="addressForm.Address" id="address" type="text" placeholder="请输入具体地址" />
+      </div>
+      <div>
+        <label for="houseNumber">门牌号</label>
+        <input v-model="addressForm.HouseNumber" id="houseNumber" type="text" placeholder="请输入门牌号" />
+      </div>
+      <div>
+        <label for="contactName">联系人</label>
+        <input v-model="addressForm.ContactName" id="contactName" type="text" placeholder="请输入联系人姓名" />
+      </div>
+      <div>
+        <label for="phoneNumber">联系电话</label>
+        <input v-model="addressForm.PhoneNumber" id="phoneNumber" type="text" placeholder="请输入联系电话" />
+      </div>
+      <div>
+        <button type="submit">提交</button>
+        <button type="button" @click="resetForm">重置</button>
+        <button type="button" @click="gobackHome">返回</button>
+      </div>
+    </form>
   </div>
 </template>

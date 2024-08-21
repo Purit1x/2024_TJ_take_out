@@ -26,6 +26,9 @@ import OrderManage from '@/views/platform/OrderManage.vue'
 import CouponManage from '@/views/platform/CouponManage.vue'
 import CommentManage from '@/views/platform/CommentManage.vue'
 import StationManage from '@/views/platform/StationManage.vue'
+import UserCoupon from '@/views/user/UserCoupon.vue'
+import CouponPurchase from '@/views/user/CouponPurchase.vue'
+import SpecialOffer from '@/views/Merchant/SpecialOffer.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -36,6 +39,10 @@ const routers = [
         {  
           path: 'dish', // 子路由路径  
           component: MerchantDish, // 子组件  
+        },
+        {
+          path:'specialOffer',
+          component:SpecialOffer,
         },
         {  
             path: 'personal', // 新增路径  
@@ -50,6 +57,20 @@ const routers = [
         {  
             path: 'personal', //个人主页
             component: UserPersonal, 
+            children: [  
+                {  
+                    path:'coupon', 
+                    component: UserCoupon, 
+                    props: true, 
+                    children: [  
+                        {  
+                            path:'couponPurchase', 
+                            component: CouponPurchase, 
+                            props: true,    
+                        },
+                    ],
+                },
+            ],
         },
         {  
             path: 'merchant/:id',  

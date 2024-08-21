@@ -7,7 +7,7 @@ import { inject } from 'vue';
 import store from '@/store';
 const router = useRouter();
 const merchant = inject('merchant');
-import { merchantInfo, updateMerchant, walletRecharge} from "@/api/merchant";
+import { merchantInfo, updateMerchant, walletRecharge,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
 const isWallet=ref(false);  //是否是钱包界面
 const isRecharge=ref(false);  //是否是充值界面
 const isChangeWP=ref(false);  //是否是修改钱包密码界面
@@ -104,6 +104,7 @@ onMounted(() => {
             merchantForm.value.TimeforCloseBusiness=res.data.timeforCloseBusiness;  
             merchantForm.value.Wallet=res.data.wallet;  
             merchantForm.value.WalletPassword=res.data.walletPassword;  
+            
         })
         .catch((err) => {
             console.log(err);
@@ -173,6 +174,25 @@ const saveMerchant = async()=> {
             merchantForm.value.CouponType = currentMerchant.value.CouponType;  
             merchantForm.value.TimeforOpenBusiness=currentMerchant.value.TimeforOpenBusiness;  
             merchantForm.value.TimeforCloseBusiness=currentMerchant.value.TimeforCloseBusiness;  
+            assignStationToMerchant(merchantForm.value.MerchantAddress).then(res=>{
+                const stationId=res;
+                const data={
+                    MerchantId:merchantForm.value.MerchantId,
+                    StationId:stationId,
+                }
+                AssignStation(data).then(data=>{
+                    console.log(data);
+                }).catch(error => {
+                    console.log(error);
+                });
+                EditMerchantStation(data).then(data=>{
+                    console.log(data);
+                }).catch(error => {
+                    console.log(error);
+                });
+            }).catch(error => {
+                console.log(error);
+            });
         }).catch(error => {
         if (error.response && error.response.data) {  
                 const errorCode = error.response.data.errorCode;  
