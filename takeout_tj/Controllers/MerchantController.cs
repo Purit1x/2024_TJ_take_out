@@ -406,6 +406,11 @@ namespace takeout_tj.Controllers
             var tran = _context.Database.BeginTransaction();  //开启一个事务，确保出错可以回滚
             try
             {
+                var mS = _context.MerchantStations.FirstOrDefault(d => d.MerchantId == dto.MerchantId);
+                if (mS != null)  //已经有该元素，无需创建
+                {
+                    return Ok(new { data = mS, msg = "站点分配已创建" });
+                }
                 MerchantStationDB merchantStation = new MerchantStationDB()
                 {
                     MerchantId = dto.MerchantId,
@@ -432,7 +437,7 @@ namespace takeout_tj.Controllers
         }
         [HttpPut]
         [Route("editMerchantStation")]
-        public IActionResult EditDish([FromBody] MerchantStationDBDto dto)
+        public IActionResult EditMerchantStation([FromBody] MerchantStationDBDto dto)
         {
             var tran = _context.Database.BeginTransaction(); // 开启一个事务  
             try
@@ -443,7 +448,11 @@ namespace takeout_tj.Controllers
                 {
                     return StatusCode(20000, new { errorCode = 20000, msg = "站点分配未找到" });
                 }
-
+                if (merchantStation.StationId == dto.StationId)
+                {
+                    tran.Commit();
+                    return Ok(new { data = merchantStation, msg = "站点分配未更新" });
+                }
                 // 更新站点分配  
                 merchantStation.StationId = dto.StationId;
 
