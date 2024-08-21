@@ -336,5 +336,117 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
             }
         }
+        [HttpPost]
+        [Route("couponCreate")]
+        public IActionResult AddCoupon([FromBody] CouponDBDto dto)  //创建优惠券
+        {
+            var tran = _context.Database.BeginTransaction();//多表添加才用到
+            try
+            {
+                CouponDB coupon = new CouponDB()
+                {
+                    CouponId = _platformService.AssignCouponId(),
+                    CouponName=dto.CouponName,
+                    CouponValue=dto.CouponValue,
+                    CouponPrice=dto.CouponPrice,
+                    CouponType=dto.CouponType,
+                    MinPrice=dto.MinPrice,
+                    PeriodOfValidity = dto.PeriodOfValidity,
+                    QuantitySold=0,
+                    IsOnShelves=1,
+                };
+                _context.Coupons.Add(coupon);
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit();//多表添加才用到
+                    return Ok(new { data = coupon.CouponId, msg = "创建成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "创建失败" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();    //多表添加才用到
+
+                return StatusCode(20000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("couponSearch")]
+        public IActionResult GetCouponInfo(int couponId)  //查询优惠券
+        {
+            try
+            {
+                var coupon = _context.Coupons.FirstOrDefault(m => m.CouponId == couponId);
+
+                if (coupon == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "优惠券未找到" });
+                }
+
+                // 获取商户的其他属性  
+                var couponInfo = new
+                {
+                    coupon.CouponId,
+                    coupon.CouponName,
+                    coupon.CouponValue,
+                    coupon.CouponPrice,
+                    coupon.CouponType,
+                    coupon.MinPrice,
+                    coupon.PeriodOfValidity,
+                    coupon.QuantitySold,
+                    coupon.IsOnShelves
+                };
+
+                return Ok(new { data = couponInfo, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+        [HttpPut]
+        [Route("couponEdit")]  //编辑优惠券
+        public IActionResult EditCoupon(int couponId,int isOnShelves)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务  
+            try
+            {
+                var coupon = _context.Coupons.FirstOrDefault(u => u.CouponId == couponId);
+                if (coupon == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "优惠券未找到" });
+                }
+                coupon.IsOnShelves = isOnShelves;
+
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { msg = "优惠券信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "更新失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
+        [HttpGet("GetCouponIds")]
+        public async Task<IActionResult> GetAllCouponIds()
+        {
+            var couponIds = await _context.Coupons
+                .Select(m => m.CouponId)
+                .ToListAsync(); // 异步获取列表  
+            return Ok(new { data = couponIds }); // 返回商家 ID 列表  
+        }
     }
 }

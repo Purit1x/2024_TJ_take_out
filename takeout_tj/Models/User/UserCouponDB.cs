@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using takeout_tj.Models.Platform;
+using Newtonsoft.Json;
 
 namespace takeout_tj.Models.User
 {
@@ -16,8 +17,9 @@ namespace takeout_tj.Models.User
 
 		[DisplayFormat(DataFormatString = "yyyy-MM-dd HH:mm:ss", ApplyFormatInEditMode = true)]
 		public DateTime ExpirationDate { get; set; }  // 优惠券到期时间
-
-		public UserDB UserDB { get; set; }
-		public CouponDB CouponDB { get; set; }
+        [JsonIgnore]
+        public UserDB UserDB { get; set; }
+        [JsonIgnore]
+        public CouponDB CouponDB { get; set; }
 	}
 }

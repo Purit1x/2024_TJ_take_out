@@ -28,7 +28,9 @@ namespace takeout_tj.Models.Platform
 		[Required(ErrorMessage = "QuantitySold is required. ")]
 		public int QuantitySold { get; set; }
 
-		public ICollection<CouponPurchaseDB> CouponPurchaseDBs { get; set; }
+        [Required(ErrorMessage = "IsOnShelves is required.")]
+        public int IsOnShelves { get; set; }  //是否上架
+        public ICollection<CouponPurchaseDB> CouponPurchaseDBs { get; set; }
 		public ICollection<UserCouponDB> UserCouponDBs { get; set; }
 		public ICollection<OrderCouponDB> OrderCouponDBs { get; set; }
 
