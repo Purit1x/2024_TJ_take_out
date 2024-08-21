@@ -63,6 +63,13 @@ const riderRegisterData = ref({
     reWalletPassword:'',
 })
 
+const clearLoginData = () => {
+    refForm.value.clearValidate('loginId');
+    refForm.value.clearValidate('loginPassword');
+    loginInfo.value.loginId = null;
+    loginInfo.value.loginPassword = '';
+}
+
 //定义函数，清空数据模型
 const clearRegisterData = () =>{
     // 除去验证结果
@@ -468,9 +475,9 @@ const login = () =>{  //登录
                 </el-form-item>  
                 <div>  
                     <el-radio-group v-model="roleType">  
-                        <el-radio label="user">用户注册</el-radio>  
-                        <el-radio label="merchant">商家注册</el-radio>  
-                        <el-radio label="rider">骑手注册</el-radio>  
+                        <el-radio value="user" @change="clearRegisterData();">用户注册</el-radio>  
+                        <el-radio value="merchant" @change="clearRegisterData();">商家注册</el-radio>  
+                        <el-radio value="rider" @change="clearRegisterData();">骑手注册</el-radio>  
                     </el-radio-group>
                     <div>&nbsp;</div>  
                 </div>
@@ -562,7 +569,7 @@ const login = () =>{  //登录
                     <h1>登录</h1>
                 </el-form-item>
                 <el-form-item prop="loginType">  
-                    <el-select v-model="loginInfo.loginType" placeholder="选择用户类型">  
+                    <el-select v-model="loginInfo.loginType" placeholder="选择用户类型" @change="clearLoginData();">  
                         <el-option label="用户" value="user"></el-option>  
                         <el-option label="商家" value="merchant"></el-option>  
                         <el-option label="骑手" value="rider"></el-option>  
@@ -623,4 +630,4 @@ const login = () =>{  //登录
         }
     }
 }
-</style>
+</style>Z
