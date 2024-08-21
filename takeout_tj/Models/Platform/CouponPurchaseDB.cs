@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.User;
 
 namespace takeout_tj.Models.Platform
 {
@@ -14,13 +15,15 @@ namespace takeout_tj.Models.Platform
 		[Required(ErrorMessage = "CouponId is required. ")]
 		public int CouponId { get; set; }
 
+        [Required(ErrorMessage = "UserId is required. ")]
+        public int UserId {  get; set; }
+
 		[Required(ErrorMessage = "Purchasing amount is required. ")]
 		[Range(1, int.MaxValue, ErrorMessage = "Purchasing amount must be at least 1. ")]
 		public int PurchasingAmount { get; set; } = 1;
 
-		[Required(ErrorMessage = "Payment state is required. ")]
-		public int PaymentState { get; set; } = 0;  // 支付状态, 0为未支付, 1为支付成功
+        public CouponDB CouponDB { get; set; }
 
-		public CouponDB CouponDB { get; set; }
+        public UserDB UserDB { get; set; }
 	}
 }

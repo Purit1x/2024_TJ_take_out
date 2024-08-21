@@ -7,6 +7,7 @@ using takeout_tj.Utility;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
+using takeout_tj.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 		builder.Configuration.GetConnectionString("WaiMaiDBCon"),
 		o => o.MigrationsAssembly("takeout_tj"));
 });
-
+//builder.Services.AddScoped<CouponService>(); // 合适的生命周期
 // 在Program.cs注册上下文并指定数据库连接字符串
 // builder.Services.AddDbContext<ModelContext>(option => option.UseOracle(builder.Configuration.GetConnectionString("WaiMaiDBCon")));
 

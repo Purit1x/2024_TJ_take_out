@@ -33,5 +33,6 @@ namespace takeout_tj.Models.User
         public ICollection<ShoppingCartDB> shoppingCartDBs { get; set; }
         public ICollection<UserCouponDB> UserCouponDBs { get; set; }
         public ICollection<OrderUserDB> OrderUserDBs { get; set; }
+		public ICollection<CouponPurchaseDB> CouponPurchaseDBs { get;  set; }
     }
 }

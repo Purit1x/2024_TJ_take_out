@@ -385,5 +385,86 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
             }
         }
+        [HttpGet("GetStations")]
+        public async Task<IActionResult> GetAllStationInfos()
+        {
+            var stations = await _context.Stations
+                .Select(m => new
+                {
+                    m.StationId,         
+                    m.StationName,       
+                    m.StationAddress     
+                                     
+                })
+                .ToListAsync(); // 异步获取列表  
+            return Ok(new { data = stations }); // 返回站点
+        }
+        [HttpPost]
+        [Route("assignStation")]  //为商家分配站点
+        public IActionResult AssignStation([FromBody] MerchantStationDBDto dto)
+        {
+            var tran = _context.Database.BeginTransaction();  //开启一个事务，确保出错可以回滚
+            try
+            {
+                MerchantStationDB merchantStation = new MerchantStationDB()
+                {
+                    MerchantId = dto.MerchantId,
+                    StationId = dto.StationId,
+                };
+                _context.MerchantStations.Add(merchantStation);
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = merchantStation.StationId, msg = "分配成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "分配失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+
+                return StatusCode(30000, new { errorCode = 20000, msg = $"分配异常: {ex.Message}" });
+            }
+        }
+        [HttpPut]
+        [Route("editMerchantStation")]
+        public IActionResult EditDish([FromBody] MerchantStationDBDto dto)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开启一个事务  
+            try
+            {
+                // 查找要更新的站点分配
+                var merchantStation = _context.MerchantStations.FirstOrDefault(d => d.MerchantId==dto.MerchantId);
+                if (merchantStation == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "站点分配未找到" });
+                }
+
+                // 更新站点分配  
+                merchantStation.StationId = dto.StationId;
+
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = merchantStation, msg = "站点分配更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "更新失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
+
     }
 }
