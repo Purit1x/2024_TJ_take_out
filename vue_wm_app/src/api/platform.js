@@ -91,4 +91,35 @@ export const editRiderStation=async(data) => {  //修改骑手站点
         throw error;   
     }
 }
-
+export const getCouponIds = async() => {  //获取优惠券id
+    try {  
+        const response = await axios.get(`${BASE_URL}/Platform/GetCouponIds`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getCouponsInfo = async(id) => {  //获取站点信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Platform/couponSearch?couponId=${id}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const editCouponsInfo = async(couponId,isOnShelves) => {  //修改优惠券信息
+    try {  
+        const response = await axios.put(`${BASE_URL}/Platform/couponEdit?couponId=${couponId}&isOnShelves=${isOnShelves}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    } 
+}
+export const createCoupon=async(data) => {  //新增优惠券
+    try {  
+        const response = await axios.post(`${BASE_URL}/Platform/couponCreate`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    } 
+}

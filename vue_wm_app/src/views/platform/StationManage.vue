@@ -4,6 +4,8 @@ import { ElMessage,ElMessageBox } from "element-plus";
 import { ref, onMounted, computed } from 'vue';  
 import { useRouter } from 'vue-router';
 import { getStationIds, getStationsInfo,stationDeleteService,updateStation,addStation} from '@/api/platform';
+import { getMerchantIds,getMerchantsInfo} from '@/api/user';
+import { EditMerchantStation, assignStationToMerchant,AssignStation } from '@/api/merchant';
 const router = useRouter();
 const stationIds = ref([]);  //获取所有站点id
 const stationsInfo = ref([]); // 存储所有站点信息 
@@ -42,6 +44,42 @@ onMounted(() => {
         ElMessage.error('获取站点id失败'); 
     }); 
 });
+const reassignAllMerchantStationIds = async () => {  
+    try {  
+        // 1. 获取所有商户 ID  
+        const merchantResponse = await getMerchantIds();
+        const merchantIds = merchantResponse ? merchantResponse.data : [];
+        console.log(merchantIds);
+        // 2. 遍历每个商户 ID  
+        for (const merchantId of merchantIds) {  
+            // 获取商户信息  
+            const merchantsResponse = await getMerchantsInfo(merchantId);  
+            const merchantInfo=merchantsResponse ? merchantsResponse.data : [];
+            const merchantAddress = merchantInfo.merchantAddress; // 假设商户信息中有 Address 字段  
+            // 确保地址有效  
+            if (!merchantAddress) {  
+                console.log(`No address found for Merchant ID ${merchantId}`);  
+                continue; // 跳过没有地址的商户  
+            }  
+            // 3. 获取新 Station ID  
+            const newStationId = await assignStationToMerchant(merchantAddress);  
+            if (newStationId) {  
+                // 4. 更新商户的 Station ID  
+                const updateData = {  
+                    MerchantId: merchantId,  
+                    StationId: newStationId  
+                };  
+                await AssignStation(updateData);  
+                await EditMerchantStation(updateData);  
+                console.log(`Merchant ID ${merchantId} reassigned to Station ID ${newStationId}`);  
+            } else {  
+                console.log(`No station found for Merchant ID ${merchantId} with address ${merchantAddress}`);  
+            }  
+        }  
+    } catch (error) {  
+        console.error('Error reassigning merchant station IDs:', error);  
+    }  
+};  
 const gobackHome = () => {
     router.push('/platform-home');
 
@@ -65,6 +103,7 @@ const deleteStation = async (stationId) => {
     }).then(() => {  
         stationDeleteService(stationId).then(res => {  
             ElMessage.success('删除成功');  
+            reassignAllMerchantStationIds();
             showStationsInfo.value = showStationsInfo.value.filter(station => station.stationId!== stationId); 
         }).catch(err => {  
             ElMessage.error('删除失败');  
@@ -98,6 +137,7 @@ const submitEdit = async() => {
     if (!isValid) return; 
     updateStation(currentStation.value).then(res => {  
         ElMessage.success('修改成功');  
+        reassignAllMerchantStationIds();
         isEdit.value = false;  
         showStationsInfo.value = showStationsInfo.value.map(station => {  
             if (station.stationId === currentStation.value.stationId) {  
@@ -107,7 +147,7 @@ const submitEdit = async() => {
         });  
         currentStation.value = null;  
     }).catch(err => {  
-        ElMessage.error('修改失败');  
+        ElMessage.error('站点未修改');  
     }); 
 };
 const submitCreate = async() => {  
@@ -121,6 +161,8 @@ const submitCreate = async() => {
     console.log(data.value);
     addStation(data.value).then(res => {  
         ElMessage.success('创建成功');  
+        reassignAllMerchantStationIds();
+        currentStation.value.stationId = res.data;  //更新站点id
         showStationsInfo.value.push(currentStation.value);  
         isCreate.value = false;  
         currentStation.value = null;  

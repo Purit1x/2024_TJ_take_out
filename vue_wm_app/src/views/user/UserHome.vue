@@ -17,7 +17,7 @@ const searchQuery = ref(''); // 搜索框内容
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 
 onMounted(() => {  
-  const userData = store.state.user;
+  const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
     isUserHome.value = false;
   else
@@ -45,7 +45,9 @@ watch(
         if (newPath.startsWith('/user-home') &&   
             newPath !== '/user-home/personal'&&
             (newPath !== '/user-home/cart')&&
-            (newPath !== '/user-home/address')) {  
+            (newPath !== '/user-home/address')&&
+            (newPath !== '/user-home/personal/coupon')&&
+            (newPath !== '/user-home/personal/coupon/couponPurchase')) {  
             isUserHome.value = !newPath.startsWith('/user-home/merchant/'); // 如果是商家菜单，设置为 false  
         } else {  
             isUserHome.value = false;   
@@ -136,4 +138,4 @@ provide('merchantsInfo', merchantsInfo);
         </div>  
         <router-view /> <!-- 确保这里可以渲染子路由 -->  
     </div>  
-</template>   
+</template>  

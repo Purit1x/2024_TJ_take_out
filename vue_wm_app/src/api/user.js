@@ -45,8 +45,8 @@ export const walletRecharge=async(id,addMoney) => {  //充值
     try {  
         const response = await axios.put(`${BASE_URL}/Users/recharge?userId=${id}&addMoney=${addMoney}`);  
         return response.data; // 返回后端返回的数据
-    } catch (error) {
-        throw error;
+    } catch (error) {  
+        throw error;   
     }
 }
 export const getMerchantIds = async() => {  //获取商户id
@@ -63,7 +63,7 @@ export const getMerchantsInfo = async(id) => {  //获取商户信息
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   
-    }  
+    }
 }
 export const createFavouriteMerchant=async(data) => {  //创建收藏商户
     try {  
@@ -71,7 +71,7 @@ export const createFavouriteMerchant=async(data) => {  //创建收藏商户
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   
-    }  
+    }
 }
 export const searchFavouriteMerchant=async(userId) => {  //搜索收藏商户
     try {  
@@ -87,9 +87,8 @@ export const deleteFavouriteMerchant=async(data) => {  //删除收藏商户
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   
-    }  
+    }
 }
-
 export const addToShoppingCart = async(shoppingCartItem) => {  //创建购物车项
     try {  
         const response = await axios.post(`${BASE_URL}/Users/addToShoppingCart`,shoppingCartItem);  
@@ -130,7 +129,7 @@ export const getShoppingCartItems=async(userId) => {  //获取用户购物车
 // 提交地址服务
 export const submitAddressService = async (addressData) => {
     try {
-        const response = await axios.post(`${BASE_URL}/Users/submitAddress`, addressData);
+        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
         return response.data; // 返回后端返回的数据
     } catch (error) {
         throw error;
@@ -140,7 +139,7 @@ export const submitAddressService = async (addressData) => {
 // 获取用户地址服务
 export const getAddressService = async (userId) => {
     try {
-        const response = await axios.get(`${BASE_URL}/Users/getAddress/${userId}`);
+        const response = await axios.get(`${BASE_URL}/Users/getAddress?userId=${userId}`);
         return response.data; // 返回后端返回的地址数据
     } catch (error) {
         throw error;
@@ -151,8 +150,48 @@ export const getAddressService = async (userId) => {
 export const deleteAddressService = async (addressId) => {
     try {
         const response = await axios.delete(`${BASE_URL}/Addresses?addressId=${addressId}`);
-        return response.data || {}; // 返回删除操作的结果
+        return response.data; // 返回删除操作的结果
     } catch (error) {
         throw error;
+    }
+}
+export const getAvailableCoupons=async() => {  //获取上架的优惠券
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/couponList`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const CreateCouponPurchase = async(data) => {  //创建优惠券购买
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/createCpPurchase`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getUserCoupons=async(userId) => {  //获取用户的优惠券
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getUserCoupons?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const GetCouponInfo=async(couponId) => {  //获取优惠券信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getCouponInfo?couponId=${couponId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getAllCouponPurchasesByUser=async(userId) => {  //获取用户的所有优惠券购买记录
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getAllCP?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
     }
 }

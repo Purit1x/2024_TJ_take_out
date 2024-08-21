@@ -3,7 +3,7 @@
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex"  
-import { onMounted, ref, } from 'vue';
+import { onMounted, ref,watch } from 'vue';
 import { userInfo,updateUser,walletRecharge,searchFavouriteMerchant,getMerchantsInfo,deleteFavouriteMerchant} from "@/api/user";
 const store = useStore();
 const router = useRouter();
@@ -17,12 +17,13 @@ const isChangeWP=ref(false);  //修改钱包密码弹窗状态
 const isFavouriteMerchants=ref(false);  //收藏商户弹窗状态
 const favouriteMerchantIds=ref([]);  //收藏的商户Id列表
 const favouriteMerchantsInfo=ref([]);  //收藏的商户信息列表
+const isUserPersonal=ref(true);  //是否是用户主页
 const userForm = ref({
     UserId: 0,
     UserName:'',
     PhoneNumber: '',
     Password: '',
-    rePassword:'',   
+    rePassword:'',  
     Wallet: 0,
     WalletPassword: '',
     reWalletPassword:'',
@@ -51,7 +52,22 @@ onMounted(() => {
         }).catch(err => {  
             ElMessage.error('获取商家id失败'); 
     }); 
+    if(router.currentRoute.value.path !== '/user-home/personal')
+        isUserPersonal.value = false;
+    else
+        isUserPersonal.value = true; 
 });
+watch(  
+    () => router.currentRoute.value.path,  
+    (newPath) => {  
+        if (newPath.startsWith('/user-home/personal')&& newPath !== '/user-home/personal/coupon'&&newPath !== '/user-home/personal/coupon/couponPurchase') {  
+            isUserPersonal.value = true; // 返回到商家主页时显示欢迎信息和按钮  
+        } else {  
+            isUserPersonal.value = false; // 进入子路由时隐藏  
+        } 
+        localStorage.setItem('isUserPersonal', isUserPersonal.value);  
+    }  
+);  
 const checkRePassword = (rule,value,callback) => {
     if(value == ''){
         callback(new Error('请再次确认密码'))
@@ -256,14 +272,20 @@ const SavedeleteFM=async(merchantId)=>{
     });     
     
 }
+const visitingCoupon=()=>{
+    isUserPersonal.value=false;
+    router.push('/user-home/personal/coupon');
+
+}
 </script>
 
 <template>
-    <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isChangeWP&!isFavouriteMerchants">
+    <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
         <h1>{{userForm.UserName}}的个人中心</h1>
         <div><button @click="gobackHome()">返回</button></div>
         <div><button @click="enterFavouriteMerchants()">收藏</button></div>
-        <div><button>会员与优惠</button></div>
+        <div><button @click="visitingCoupon()">优惠券</button></div>
+        <div><button>积分与会员</button></div>
         <div><button>我的订单</button></div>
         <div><button @click="enterWallet()">钱包</button></div>
         <div><button @click="showPersonalInfo()">个人信息</button></div>
@@ -328,4 +350,5 @@ const SavedeleteFM=async(merchantId)=>{
             </div>
 
         </el-form>
+    <router-view />
 </template>

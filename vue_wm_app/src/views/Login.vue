@@ -239,7 +239,7 @@ const loginRules = ref({
 })
 //调用后台接口完成注册
 import {userRegisterService, userLoginService} from '@/api/user.js'
-import {merchantRegisterService, merchantLoginService} from '@/api/merchant.js'
+import {merchantRegisterService, merchantLoginService,assignStationToMerchant,AssignStation} from '@/api/merchant.js'
 import {riderRegisterService, riderLoginService} from '@/api/rider.js'
 import {adminLoginService} from '@/api/platform.js'
 const register = ()=> {
@@ -273,6 +273,20 @@ const register = ()=> {
                 WalletPassword: merchantRegisterData.value.WalletPassword,
                 Wallet:0,  
             }).then(res => { 
+                assignStationToMerchant(merchantRegisterData.value.MerchantAddress).then(response=>{
+                const stationId=response;
+                const data={
+                    MerchantId:res.data,
+                    StationId:stationId,
+                }
+                AssignStation(data).then(data=>{
+                    console.log(data);
+                }).catch(error => {
+                    console.log(error);
+                });
+            }).catch(error => {
+                console.log(error);
+            });
                 router.push('/login')   
                 ElMessage.success({  
                     message: '商家注册成功，商家ID为 ' + res.data + '，请牢记该Id。',  
