@@ -12,7 +12,7 @@ using takeout_tj.Data;
 namespace takeout_tj.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240813072451_InitialCreate")]
+    [Migration("20240821025932_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -118,10 +118,7 @@ namespace takeout_tj.Migrations
                     b.Property<int>("StationId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.HasKey("MerchantId", "StationId");
-
-                    b.HasIndex("MerchantId")
-                        .IsUnique();
+                    b.HasKey("MerchantId");
 
                     b.HasIndex("StationId");
 
@@ -187,6 +184,9 @@ namespace takeout_tj.Migrations
                     b.Property<decimal>("CouponValue")
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<int>("IsOnShelves")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<decimal>("MinPrice")
                         .HasColumnType("numeric(10,2)");
 
@@ -212,18 +212,20 @@ namespace takeout_tj.Migrations
                     b.Property<int>("CouponId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("PaymentState")
-                        .HasColumnType("NUMBER(10)");
-
                     b.Property<int>("PurchasingAmount")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<DateTime>("PurchasingTimestamp")
                         .HasColumnType("TIMESTAMP(7)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.HasKey("CouponPurchaseId");
 
                     b.HasIndex("CouponId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("coupon_purchases", (string)null);
                 });
@@ -251,6 +253,9 @@ namespace takeout_tj.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
 
+                    b.Property<int>("AddressId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
@@ -263,11 +268,6 @@ namespace takeout_tj.Migrations
 
                     b.Property<int>("NeedUtensils")
                         .HasColumnType("NUMBER(10)");
-
-                    b.Property<string>("OrderAddress")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("NVARCHAR2(255)");
 
                     b.Property<DateTime>("OrderTimestamp")
                         .HasColumnType("TIMESTAMP(7)");
@@ -285,6 +285,8 @@ namespace takeout_tj.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("OrderId");
+
+                    b.HasIndex("AddressId");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -494,14 +496,38 @@ namespace takeout_tj.Migrations
 
             modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("AddressId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)");
 
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"), 1L, 1);
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("NVARCHAR2(100)");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("NVARCHAR2(50)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("NVARCHAR2(11)");
+
                     b.Property<string>("UserAddress")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("NVARCHAR2(255)");
 
-                    b.HasKey("UserId", "UserAddress");
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("AddressId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("user_address", (string)null);
                 });
@@ -611,7 +637,15 @@ namespace takeout_tj.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("takeout_tj.Models.User.UserDB", "UserDB")
+                        .WithMany("CouponPurchaseDBs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CouponDB");
+
+                    b.Navigation("UserDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderCouponDB", b =>
@@ -631,6 +665,17 @@ namespace takeout_tj.Migrations
                     b.Navigation("CouponDB");
 
                     b.Navigation("OrderDB");
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.Platform.OrderDB", b =>
+                {
+                    b.HasOne("takeout_tj.Models.User.UserAddressDB", "UserAddressDB")
+                        .WithMany("OrderDBs")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserAddressDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderDishDB", b =>
@@ -858,8 +903,15 @@ namespace takeout_tj.Migrations
                     b.Navigation("RiderStationDBs");
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
+                {
+                    b.Navigation("OrderDBs");
+                });
+
             modelBuilder.Entity("takeout_tj.Models.User.UserDB", b =>
                 {
+                    b.Navigation("CouponPurchaseDBs");
+
                     b.Navigation("FavoriteMerchantDBs");
 
                     b.Navigation("OrderUserDBs");

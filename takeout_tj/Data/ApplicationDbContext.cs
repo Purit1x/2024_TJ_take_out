@@ -45,7 +45,7 @@ namespace takeout_tj.Data
 			// modelBuilder.HasDefaultSchema("C##TAKEOUT");
 
 			modelBuilder.Entity<UserDB>().HasKey(u => u.UserId);
-			modelBuilder.Entity<UserAddressDB>().HasKey(u => new {u.AddressId});
+			modelBuilder.Entity<UserAddressDB>().HasKey(u => u.AddressId);
 			modelBuilder.Entity<MerchantDB>().HasKey(m => m.MerchantId);
 			modelBuilder.Entity<FavoriteMerchantDB>().HasKey(um => new {um.UserId, um.MerchantId});
 			modelBuilder.Entity<DishDB>().HasKey(d => new { d.MerchantId, d.DishId });
@@ -65,13 +65,14 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderCouponDB>().HasKey(oc => oc.OrderId);
 			modelBuilder.Entity<AdminDB>().HasKey(a => a.AdminId);
 			modelBuilder.Entity<MerchantStationDB>().HasKey(ms => ms.MerchantId);
+			modelBuilder.Entity<MembershipDB>().HasKey(m => m.UserId);
 
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
-				.HasOne(a => a.User)
+				.HasOne(a => a.UserDB)
 				.WithMany(u => u.UserAddressDBs)
 				.HasForeignKey(a => a.UserId);
-			modelBuilder.Entity<MembershipDB>().HasKey(m => m.UserId);
+			// 会员身份与用户的一对一关系
 			modelBuilder.Entity<MembershipDB>()
 				.HasOne(m => m.UserDB)
 				.WithOne()
@@ -156,6 +157,11 @@ namespace takeout_tj.Data
 				.HasOne(ou => ou.OrderDB)
 				.WithOne(o => o.OrderUserDB)
 				.HasForeignKey<OrderUserDB>(ou => ou.OrderId);
+			// 订单与收货地址的多对一联系
+			modelBuilder.Entity<OrderDB>()
+				.HasOne(o => o.UserAddressDB)
+				.WithMany(ua => ua.OrderDBs)
+				.HasForeignKey(o => o.AddressId);
 			// 订单到菜品的多对多联系集
 			modelBuilder.Entity<OrderDishDB>()
 				.HasOne(od => od.DishDB)

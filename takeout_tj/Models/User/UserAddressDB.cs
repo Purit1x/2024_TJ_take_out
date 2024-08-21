@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.Platform;
 
 namespace takeout_tj.Models.User
 {
@@ -26,6 +27,7 @@ namespace takeout_tj.Models.User
         [RegularExpression(@"^\d{11}$", ErrorMessage = "Phone number can only contain digits.")]
         public string PhoneNumber { get; set; } // 联系电话
 
-        public UserDB User { get; set; }  // 导航属性，用于直接找到外键引用的类
+        public UserDB UserDB { get; set; }  // 导航属性，用于直接找到外键引用的类
+        public ICollection<OrderDB> OrderDBs { get; set; }
     }
 }

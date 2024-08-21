@@ -251,6 +251,9 @@ namespace takeout_tj.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
 
+                    b.Property<int>("AddressId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
@@ -263,11 +266,6 @@ namespace takeout_tj.Migrations
 
                     b.Property<int>("NeedUtensils")
                         .HasColumnType("NUMBER(10)");
-
-                    b.Property<string>("OrderAddress")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("NVARCHAR2(255)");
 
                     b.Property<DateTime>("OrderTimestamp")
                         .HasColumnType("TIMESTAMP(7)");
@@ -285,6 +283,8 @@ namespace takeout_tj.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("OrderId");
+
+                    b.HasIndex("AddressId");
 
                     b.ToTable("orders", (string)null);
                 });
@@ -665,6 +665,17 @@ namespace takeout_tj.Migrations
                     b.Navigation("OrderDB");
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.Platform.OrderDB", b =>
+                {
+                    b.HasOne("takeout_tj.Models.User.UserAddressDB", "UserAddressDB")
+                        .WithMany("OrderDBs")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserAddressDB");
+                });
+
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderDishDB", b =>
                 {
                     b.HasOne("takeout_tj.Models.Platform.OrderDB", "OrderDB")
@@ -803,13 +814,13 @@ namespace takeout_tj.Migrations
 
             modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
                 {
-                    b.HasOne("takeout_tj.Models.User.UserDB", "User")
+                    b.HasOne("takeout_tj.Models.User.UserDB", "UserDB")
                         .WithMany("UserAddressDBs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.User.UserCouponDB", b =>
@@ -888,6 +899,11 @@ namespace takeout_tj.Migrations
                     b.Navigation("MerchantStationDBs");
 
                     b.Navigation("RiderStationDBs");
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
+                {
+                    b.Navigation("OrderDBs");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.User.UserDB", b =>

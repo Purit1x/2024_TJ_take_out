@@ -34,7 +34,8 @@ namespace takeout_tj.Migrations
                     CouponType = table.Column<int>(type: "NUMBER(10)", nullable: false),
                     MinPrice = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     PeriodOfValidity = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    QuantitySold = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    QuantitySold = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    IsOnShelves = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,28 +62,6 @@ namespace takeout_tj.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_merchants", x => x.MerchantId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "orders",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    OrderTimestamp = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    ExpectedTimeOfArrival = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    RealTimeOfArrival = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    State = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    NeedUtensils = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    OrderAddress = table.Column<string>(type: "NVARCHAR2(255)", maxLength: 255, nullable: false),
-                    MerchantRating = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    RiderRating = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    Comment = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric(10,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_orders", x => x.OrderId);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,28 +113,6 @@ namespace takeout_tj.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "coupon_purchases",
-                columns: table => new
-                {
-                    CouponPurchaseId = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    PurchasingTimestamp = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    CouponId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    PurchasingAmount = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    PaymentState = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_coupon_purchases", x => x.CouponPurchaseId);
-                    table.ForeignKey(
-                        name: "FK_coupon_purchases_coupons_CouponId",
-                        column: x => x.CouponId,
-                        principalTable: "coupons",
-                        principalColumn: "CouponId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "dishes",
                 columns: table => new
                 {
@@ -199,55 +156,6 @@ namespace takeout_tj.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "order_coupons",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    CouponId = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_order_coupons", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_order_coupons_coupons_CouponId",
-                        column: x => x.CouponId,
-                        principalTable: "coupons",
-                        principalColumn: "CouponId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_coupons_orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "order_riders",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    RiderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    RiderPrice = table.Column<decimal>(type: "numeric(10,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_order_riders", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_order_riders_orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_riders_riders_RiderId",
-                        column: x => x.RiderId,
-                        principalTable: "riders",
-                        principalColumn: "RiderId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "rider_wages",
                 columns: table => new
                 {
@@ -277,7 +185,7 @@ namespace takeout_tj.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_merchant_stations", x => new { x.MerchantId, x.StationId });
+                    table.PrimaryKey("PK_merchant_stations", x => x.MerchantId);
                     table.ForeignKey(
                         name: "FK_merchant_stations_merchants_MerchantId",
                         column: x => x.MerchantId,
@@ -313,6 +221,34 @@ namespace takeout_tj.Migrations
                         column: x => x.StationId,
                         principalTable: "stations",
                         principalColumn: "StationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "coupon_purchases",
+                columns: table => new
+                {
+                    CouponPurchaseId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    PurchasingTimestamp = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    CouponId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    UserId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    PurchasingAmount = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_coupon_purchases", x => x.CouponPurchaseId);
+                    table.ForeignKey(
+                        name: "FK_coupon_purchases_coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "coupons",
+                        principalColumn: "CouponId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_coupon_purchases_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -360,39 +296,20 @@ namespace takeout_tj.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "order_users",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    UserId = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_order_users", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_order_users_orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_users_users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "user_address",
                 columns: table => new
                 {
+                    AddressId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
                     UserId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    UserAddress = table.Column<string>(type: "NVARCHAR2(255)", maxLength: 255, nullable: false)
+                    UserAddress = table.Column<string>(type: "NVARCHAR2(255)", maxLength: 255, nullable: false),
+                    HouseNumber = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
+                    ContactName = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "NVARCHAR2(11)", maxLength: 11, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user_address", x => new { x.UserId, x.UserAddress });
+                    table.PrimaryKey("PK_user_address", x => x.AddressId);
                     table.ForeignKey(
                         name: "FK_user_address_users_UserId",
                         column: x => x.UserId,
@@ -428,31 +345,6 @@ namespace takeout_tj.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "order_dishes",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    MerchantId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    DishId = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_order_dishes", x => new { x.OrderId, x.MerchantId, x.DishId });
-                    table.ForeignKey(
-                        name: "FK_order_dishes_dishes_MerchantId_DishId",
-                        columns: x => new { x.MerchantId, x.DishId },
-                        principalTable: "dishes",
-                        principalColumns: new[] { "MerchantId", "DishId" },
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_dishes_orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "shoppingcarts",
                 columns: table => new
                 {
@@ -479,21 +371,146 @@ namespace takeout_tj.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "orders",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    OrderTimestamp = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    ExpectedTimeOfArrival = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    RealTimeOfArrival = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    State = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    NeedUtensils = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    AddressId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    MerchantRating = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    RiderRating = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    Comment = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orders", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_orders_user_address_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "user_address",
+                        principalColumn: "AddressId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "order_coupons",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    CouponId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order_coupons", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_order_coupons_coupons_CouponId",
+                        column: x => x.CouponId,
+                        principalTable: "coupons",
+                        principalColumn: "CouponId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_order_coupons_orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "order_dishes",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    MerchantId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    DishId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order_dishes", x => new { x.OrderId, x.MerchantId, x.DishId });
+                    table.ForeignKey(
+                        name: "FK_order_dishes_dishes_MerchantId_DishId",
+                        columns: x => new { x.MerchantId, x.DishId },
+                        principalTable: "dishes",
+                        principalColumns: new[] { "MerchantId", "DishId" },
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_order_dishes_orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "order_riders",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    RiderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    RiderPrice = table.Column<decimal>(type: "numeric(10,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order_riders", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_order_riders_orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_order_riders_riders_RiderId",
+                        column: x => x.RiderId,
+                        principalTable: "riders",
+                        principalColumn: "RiderId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "order_users",
+                columns: table => new
+                {
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    UserId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_order_users", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_order_users_orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_order_users_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_coupon_purchases_CouponId",
                 table: "coupon_purchases",
                 column: "CouponId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_coupon_purchases_UserId",
+                table: "coupon_purchases",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_favorite_merchants_MerchantId",
                 table: "favorite_merchants",
                 column: "MerchantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_merchant_stations_MerchantId",
-                table: "merchant_stations",
-                column: "MerchantId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_merchant_stations_StationId",
@@ -521,6 +538,11 @@ namespace takeout_tj.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_orders_AddressId",
+                table: "orders",
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_rider_stations_StationId",
                 table: "rider_stations",
                 column: "StationId");
@@ -534,6 +556,11 @@ namespace takeout_tj.Migrations
                 name: "IX_shoppingcarts_MerchantId_DishId",
                 table: "shoppingcarts",
                 columns: new[] { "MerchantId", "DishId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_address_UserId",
+                table: "user_address",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_coupons_CouponId",
@@ -583,9 +610,6 @@ namespace takeout_tj.Migrations
                 name: "special_offers");
 
             migrationBuilder.DropTable(
-                name: "user_address");
-
-            migrationBuilder.DropTable(
                 name: "user_coupons");
 
             migrationBuilder.DropTable(
@@ -604,10 +628,13 @@ namespace takeout_tj.Migrations
                 name: "coupons");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "user_address");
 
             migrationBuilder.DropTable(
                 name: "merchants");
+
+            migrationBuilder.DropTable(
+                name: "users");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using takeout_tj.Models.User;
 
 namespace takeout_tj.Models.Platform
 {
@@ -27,9 +28,8 @@ namespace takeout_tj.Models.Platform
 		[Required(ErrorMessage = "NeedUtensils is required. ")]
 		public int NeedUtensils { get; set; } = 1;  // 0为不需要餐具,1为需要餐具
 
-		[Required(ErrorMessage = "Order address is required. ")]
-		[StringLength(255,ErrorMessage = "Order address must be at most 255 characters long")]
-		public string OrderAddress { get; set; }  // 订单交付地址
+		[Required(ErrorMessage = "Address ID is required.")]
+		public int AddressId { get; set; }  // 使用的用户地址
 
 		public int MerchantRating { get; set; } = 5;
 
@@ -41,5 +41,6 @@ namespace takeout_tj.Models.Platform
 		public OrderUserDB OrderUserDB { get; set; }
 		public ICollection<OrderDishDB> OrderDishDBs { get;	set;}
 		public OrderCouponDB OrderCouponDB { get; set; }
+		public UserAddressDB UserAddressDB { get; set; }
 	}
 }
