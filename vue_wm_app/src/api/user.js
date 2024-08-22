@@ -126,6 +126,16 @@ export const getShoppingCartItems=async(userId) => {  //获取用户购物车
         throw error;   
     }
 }
+
+export const getShoppingCartinMerchant=async(userId, merchantId) => {  //获取用户在某个商家处的购物车
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getShoppingCartinMerchant?userId=${userId}&merchantId=${merchantId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
 // 提交地址服务
 export const submitAddressService = async (addressData) => {
     try {
