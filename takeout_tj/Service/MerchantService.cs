@@ -37,5 +37,19 @@ namespace takeout_tj.Service
             }
             return -1;
         }
+
+        public int AssignSpecialOfferId()
+        {
+            var offerIds = _context.SpecialOffers.Select(u => u.OfferId).ToList();
+
+            for (int id = 1; id <= offerIds.Count + 1; id++)
+            {
+                if (!offerIds.Contains(id))
+                {
+                    return id;
+                }
+            }
+            return -1;
+        }
     }
 }
