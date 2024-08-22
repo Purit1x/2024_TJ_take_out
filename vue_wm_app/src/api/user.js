@@ -139,7 +139,7 @@ export const getShoppingCartinMerchant=async(userId, merchantId) => {  //获取�
 // 提交地址服务
 export const submitAddressService = async (addressData) => {
     try {
-        const response = await axios.post(`${BASE_URL}/Users/submitAddresses`, addressData);
+        const response = await axios.post(`${BASE_URL}/Users/submitAddress`, addressData);
         return response.data; // 返回后端返回的数据
     } catch (error) {
         throw error;
@@ -159,10 +159,18 @@ export const getAddressService = async (userId) => {
 // 删除地址服务
 export const deleteAddressService = async (addressId) => {
     try {
-        const response = await axios.delete(`${BASE_URL}/Addresses?addressId=${addressId}`);
+        const response = await axios.delete(`${BASE_URL}/Users/deleteAddress?addressId=${addressId}`);
         return response.data; // 返回删除操作的结果
     } catch (error) {
         throw error;
+    }
+}
+export const EditUserAddress = async(data) => {  //编辑用户地址 
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/editAddress`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
     }
 }
 export const getAvailableCoupons=async() => {  //获取上架的优惠券
@@ -200,6 +208,38 @@ export const GetCouponInfo=async(couponId) => {  //获取优惠券信息
 export const getAllCouponPurchasesByUser=async(userId) => {  //获取用户的所有优惠券购买记录
     try {  
         const response = await axios.get(`${BASE_URL}/Users/getAllCP?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const GetDefaultAddress=async(userId) => {  //获取用户的默认地址
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/GetDefaultAddress?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const CreateDefaultAddress=async(data) => {  //设置用户的默认地址
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/createDefaultAddress`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const DeleteDefaultAddress=async(addressId) => {  //删除用户的默认地址
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/deleteDefaultAddress?addressId=${addressId}`, )
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const GetUserAddress=async(addressId)=> {  //获取用户的地址
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/GetUserAddress?addressId=${addressId}`);  
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   

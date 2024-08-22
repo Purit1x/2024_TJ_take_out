@@ -16,6 +16,7 @@ namespace takeout_tj.DTO
     public class AddressDto
     {
         public int UserId { get; set; }
+        public int AddressId { get; set; }
         public string Address { get; set; }
         public string HouseNumber { get; set; }
         public string ContactName { get; set; }

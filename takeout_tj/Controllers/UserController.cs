@@ -710,7 +710,42 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
             }
         }
+        [HttpPut]
+        [Route("editAddress")]
+        public IActionResult EditAddress([FromBody] AddressDto dto)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务  
+            try
+            {
+                // 查找用户地址
+                var address = _context.UserAddresses.FirstOrDefault(u => u.AddressId == dto.AddressId);
+                if (address == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "地址未找到" });
+                }
+                // 更新商家信息  
+                address.ContactName = dto.ContactName;
+                address.PhoneNumber = dto.PhoneNumber;
+                address.HouseNumber = dto.HouseNumber;
+                address.UserAddress = dto.Address;
 
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { msg = "用户地址信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "更新失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
         [HttpGet]
         [Route("getAddress")]
         public IActionResult GetAddress(int userId)
@@ -918,6 +953,120 @@ namespace takeout_tj.Controllers
                 }
 
                 return Ok(new { data = couponPurchases, msg = "查找成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查找异常: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("GetDefaultAddress")]
+        public IActionResult GetDefaultAddress(int userId)
+        {
+            try
+            {
+                var defaultAddress = _context.UserDefaultAddresses.FirstOrDefault(m => m.UserId == userId);
+                var user=_context.Users.FirstOrDefault(m => m.UserId == userId);
+                if (user == null)
+                {
+                    return StatusCode(404, new { errorCode = 404, msg = $"用户不存在" });
+                }
+                if (defaultAddress != null)
+                {
+                    return Ok(new { data=defaultAddress.AddressId,msg = "查找默认地址成功" });
+                }
+                else
+                {
+                    return Ok(new { code="error", msg = "尚未设置默认地址" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查找异常: {ex.Message}" });
+            }
+        }
+        [HttpPost]
+        [Route("createDefaultAddress")]
+        public IActionResult CreateDefaultAddress(UserDefaultAddressDBDto dto)
+        {
+            var tran = _context.Database.BeginTransaction();//多表添加才用到
+            try
+            {
+                UserDefaultAddressDB userDA = new UserDefaultAddressDB()
+                {
+                    UserId = dto.UserId,
+                    AddressId = dto.AddressId,
+                };
+
+                _context.UserDefaultAddresses.Add(userDA);
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit();//多表添加才用到
+                    return Ok(new { data = 200, msg = "设置默认成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "设置默认失败" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();    //多表添加才用到
+
+                return StatusCode(20000, new { errorCode = 30000, msg = $"设置默认异常: {ex.Message}" });
+            }
+        }
+        [HttpDelete]
+        [Route("deleteDefaultAddress")]
+        public IActionResult DeleteDefaultAddress(int addressId)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            try
+            {
+                // 查询要删除的地址  
+                var DA = _context.UserDefaultAddresses.FirstOrDefault(d => d.AddressId == addressId);
+                if (DA == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除未找到" });
+                }
+                // 删除地址  
+                _context.UserDefaultAddresses.Remove(DA);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "默认地址设置删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("GetUserAddress")]
+        public IActionResult GetUserAddress(int addressId)
+        {
+            try
+            {
+                var userAddress = _context.UserAddresses.FirstOrDefault(m => m.AddressId==addressId);
+               
+                if (userAddress != null)
+                {
+                    return Ok(new { data = userAddress.UserAddress, msg = "查找地址成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = $"查找失败" });
+                }
             }
             catch (Exception ex)
             {

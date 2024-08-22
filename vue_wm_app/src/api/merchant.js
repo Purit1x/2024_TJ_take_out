@@ -125,6 +125,39 @@ export const assignStationToMerchant=async(address) => {
         throw error; // 抛出错误  
     }  
 }
+export const getDistanceBetweenAddresses = async (address1, address2) => {  
+    try {  
+        // 对地址进行 URL 编码  
+        const encodedAddress1 = encodeURIComponent(address1);  
+        const encodedAddress2 = encodeURIComponent(address2);  
+
+        // 获取两个地址的经纬度  
+        const geoResponse1 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress1}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`);  
+        const geoResponse2 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress2}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`);  
+
+        const location1 = geoResponse1.data.geocodes && geoResponse1.data.geocodes.length > 0  
+            ? geoResponse1.data.geocodes[0].location.split(',')  
+            : [null, null]; // 如果没有获取到经纬度，返回 null  
+
+        const location2 = geoResponse2.data.geocodes && geoResponse2.data.geocodes.length > 0  
+            ? geoResponse2.data.geocodes[0].location.split(',')  
+            : [null, null]; // 如果没有获取到经纬度，返回 null  
+
+        // 如果任一地址的经纬度未找到，则返回 null  
+        if (location1[0] === null || location2[0] === null) return null;  
+
+        const lat1 = parseFloat(location1[1]); // 纬度  
+        const lon1 = parseFloat(location1[0]); // 经度  
+        const lat2 = parseFloat(location2[1]); // 纬度  
+        const lon2 = parseFloat(location2[0]); // 经度  
+
+        // 使用 Haversine 公式计算距离（单位：千米）  
+        const distanceInKm = haversineDistance(lat1, lon1, lat2, lon2);  
+        return distanceInKm.toFixed(1); // 转换为小数点后一位
+    } catch (error) {  
+        throw error; // 抛出错误  
+    }  
+};  
 // Haversine 公式计算两点距离（单位：千米）  
 const haversineDistance = (lat1, lon1, lat2, lon2) => {  
     const R = 6371; // 地球半径，单位：千米  
