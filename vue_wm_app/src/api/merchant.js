@@ -203,3 +203,17 @@ export const GetSpecialOffer=async(merchantId) => {    //获取商家提供的�
         throw error;   
     }
 }
+
+export const GetMultiSpecialOffer=async(merchantIds) => {    //获取商家提供的满减服务
+    try {
+        // Create query string for multiple merchant IDs
+        const queryString = merchantIds.map(id => `merchantIds=${id}`).join('&');
+        
+        // Make the GET request with the formatted query string
+        const response = await axios.get(`${BASE_URL}/Merchant/multiSpecialOfferGet?${queryString}`);
+        
+        return response.data; // Return the data from the response
+    } catch (error) {
+        throw error;
+    }
+}

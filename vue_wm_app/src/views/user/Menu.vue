@@ -19,6 +19,7 @@ const searchQuery = ref('');  // 搜索关键字
 const merchantsInfo=inject('merchantsInfo');
 const cartItems=ref([]);  //购物车物品列表
 const specialOffers=ref([]);  //商家满减活动
+const isOffersExpanded = ref(false); // 控制满减内容的展开和收起
 
 onMounted (async() => {
   //获取用户信息
@@ -62,13 +63,18 @@ onMounted (async() => {
   }  
 
   const offerData = await GetSpecialOffer(MerchantId.value); 
-    if (offerData) {  
-        specialOffers.value = offerData.data; // 假设后端返回的offer数据是一个数组
-    }  
+  if (offerData) {  
+      specialOffers.value = offerData.data; // 假设后端返回的offer数据是一个数组
+  }  
 });
 
 const gobackHome = () => {
   router.push('/user-home');
+}
+
+// 切换展开/收起状态
+const toggleOffersExpand = () => {
+  isOffersExpanded.value = !isOffersExpanded.value;
 }
 
 // 观察 merchantsInfo 的变化，并保存到本地存储  
@@ -263,7 +269,7 @@ const finalPrice = computed(() => {return totalPrice.value - discountAmount.valu
 function calculateDiscount(cartTotal, specialOffers) {
     // 过滤掉不满足条件的优惠
     const applicableOffers = specialOffers.value.filter(offer => cartTotal >= offer.minPrice);
-    console.log(applicableOffers);
+    //console.log(applicableOffers);
 
     // 如果没有适用的优惠，返回0
     if (applicableOffers.length === 0) {
@@ -281,19 +287,23 @@ function calculateDiscount(cartTotal, specialOffers) {
 <template>
     <div v-if="MerchantInfo && MerchantInfo.merchantName">
       {{MerchantInfo.merchantName}}的菜单
-      <button @click="gobackHome()">&nbsp;&nbsp;返回</button>
+      <button @click="gobackHome()">&nbsp;&nbsp;返回主页</button>
       <div>地址：{{MerchantInfo.merchantAddress}}</div>
       <div>营业时间：{{ MerchantInfo.timeforOpenBusiness }} - {{ MerchantInfo.timeforCloseBusiness }}</div>
       <div>联系电话：{{MerchantInfo.contact}}</div>
       <div>是否可以使用通用优惠券：{{MerchantInfo.couponType ? '否' : '是'}}</div>
 
       <div v-if="specialOffers.length">
-        <h3>当前满减活动</h3>
-        <ul>
-            <li v-for="offer in specialOffers" :key="offer.offerId">
-                满 {{ offer.minPrice }} 元&nbsp;&nbsp;减 {{ offer.amountRemission }} 元
-            </li>
-        </ul>
+        <button @click="toggleOffersExpand">
+          {{ isOffersExpanded ? '收起满减活动' : '正在进行满减活动' }}
+        </button>
+        <div v-if="isOffersExpanded">
+          <ul>
+              <li v-for="offer in specialOffers" :key="offer.offerId">
+                  满 {{ offer.minPrice }} 元&nbsp;&nbsp;减 {{ offer.amountRemission }} 元
+              </li>
+          </ul>
+        </div>
       </div>
       <div v-else>
         <p>暂无满减活动</p>

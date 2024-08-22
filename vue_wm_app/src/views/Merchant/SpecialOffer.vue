@@ -22,6 +22,15 @@ const newOffer = ref({
   amountRemission: ''
 });
 
+// 数字输入验证
+const validatePositiveInteger = (value) => {
+    if (!/^\d+$/.test(value)) {
+        ElMessage.error('请输入正整数');
+        return '';
+    }
+    return value;
+}
+
 onMounted(async() => {  
     //获取商铺用户信息
     const merchantData = store.state.merchant; 
@@ -41,6 +50,13 @@ onMounted(async() => {
 // 创建offer函数
 const addSpecialOffer = async(offer) => {
     const merchantId = merchant.value.MerchantId;
+    const minPrice = validatePositiveInteger(newOffer.value.minPrice);
+    const amountRemission = validatePositiveInteger(newOffer.value.amountRemission);
+
+    if (!minPrice || !amountRemission) {
+        // 如果验证失败，返回
+        return;
+    }
 
     // 调用API，将购物车项保存到数据库    
     try {
@@ -92,6 +108,13 @@ const cancelEditingOffer = () => {
 // 修改offer函数
 const updateSpecialOffer = async(offer) => {
     const merchantId = merchant.value.MerchantId;
+    const minPrice = validatePositiveInteger(newOffer.value.minPrice);
+    const amountRemission = validatePositiveInteger(newOffer.value.amountRemission);
+
+    if (!minPrice || !amountRemission) {
+        // 如果验证失败，返回
+        return;
+    }
 
     try {
         const offerData = {
@@ -158,8 +181,8 @@ const deleteSpecialOffer = async(offerId) => {
                     <button @click="deleteSpecialOffer(offer.offerId)">删除</button>
                 </div>
                 <div v-else>
-                    <el-input v-model="editedOffer.minPrice" placeholder="修改满多少元" />
-                    <el-input v-model="editedOffer.amountRemission" placeholder="修改减多少元" />
+                    <el-input v-model="editedOffer.minPrice" placeholder="修改满多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
+                    <el-input v-model="editedOffer.amountRemission" placeholder="修改减多少元" @input="editedOffer.amountRemission = validatePositiveInteger($event)" />
                     <el-button type="primary" @click="updateSpecialOffer(offer)">保存</el-button>
                     <el-button @click="cancelEditingOffer">取消</el-button>
                 </div>
@@ -169,8 +192,8 @@ const deleteSpecialOffer = async(offerId) => {
 
         <button @click="showInputFields = true">创建满减活动</button>
         <div v-if="showInputFields">
-            <el-input v-model="newOffer.minPrice" placeholder="请输入满多少元" />
-            <el-input v-model="newOffer.amountRemission" placeholder="请输入减多少元" />
+            <el-input v-model="newOffer.minPrice" placeholder="请输入满多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
+            <el-input v-model="newOffer.amountRemission" placeholder="请输入减多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
             <el-button type="primary" @click="addSpecialOffer({ minprice: newOffer.minPrice, remission: newOffer.amountRemission })">提交</el-button>
             <el-button @click="showInputFields = false">取消</el-button>
         </div>

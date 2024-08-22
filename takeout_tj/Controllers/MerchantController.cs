@@ -596,11 +596,39 @@ namespace takeout_tj.Controllers
 
         [HttpGet]
         [Route("specialOfferGet")]
-        public IActionResult GetCouponInfo(int merchantId)  //查询某商户的特殊服务
+        public IActionResult GetOffersInfo(int merchantId)  //查询某商户的特殊服务
         {
             try
             {
                 var offers = _context.SpecialOffers.Where(m => m.MerchantId == merchantId).ToList();
+
+                if (offers.Count == 0)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                }
+
+                return Ok(new { data = offers, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("multiSpecialOfferGet")]
+        public IActionResult GetMultiOffersInfo([FromQuery] List<int> merchantIds)  // 查询多个商户的特殊服务
+        {
+            try
+            {
+                if (merchantIds == null || !merchantIds.Any())
+                {
+                    return BadRequest(new { errorCode = 40000, msg = "商户ID列表为空" });
+                }
+
+                var offers = _context.SpecialOffers
+                    .Where(m => merchantIds.Contains(m.MerchantId))
+                    .ToList();
 
                 if (offers.Count == 0)
                 {

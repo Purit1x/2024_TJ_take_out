@@ -536,39 +536,38 @@ namespace takeout_tj.Controllers
                 var cartItems = _context.ShoppingCarts
                     .Where(cart => cart.UserId == userId)
                     .Include(cart => cart.DishDB)  // 通过 Include 方法加载 DishDB 相关数据
-                    .Select(cart => new
+                    .ToList();
+
+                // 获取所有相关商户信息
+                var merchantInfo = _context.Merchants
+                    .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
+                    .ToDictionary(m => m.MerchantId, m => m.MerchantName);
+
+                // 按商户分组
+                var groupedResult = cartItems
+                    .GroupBy(cart => cart.MerchantId)
+                    .Select(group => new
                     {
-                        cart.ShoppingCartId,
-                        cart.MerchantId,
-                        cart.DishId,
-                        cart.DishNum,
-                        DishName = cart.DishDB.DishName,  // 获取菜品名称
-                        DishPrice = cart.DishDB.DishPrice, // 获取菜品价格
-                        ImageUrl = cart.DishDB.ImageUrl,   // 获取菜品图片URL
+                        MerchantId = group.Key,
+                        MerchantName = merchantInfo[group.Key], // 从 merchantInfo 中获取商家名称
+                        Dishes = group.Select(cart => new
+                        {
+                            cart.ShoppingCartId,
+                            cart.DishId,
+                            cart.DishNum,
+                            DishName = cart.DishDB.DishName,  // 获取菜品名称
+                            DishPrice = cart.DishDB.DishPrice, // 获取菜品价格
+                            ImageUrl = cart.DishDB.ImageUrl   // 获取菜品图片URL
+                        }).ToList()
                     })
                     .ToList();
-                var merchantInfo = _context.Merchants
-                .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
-                .ToDictionary(m => m.MerchantId, m => m.MerchantName);
 
-                var result = cartItems.Select(cart => new
-                {
-                    cart.ShoppingCartId,
-                    cart.MerchantId,
-                    MerchantName = merchantInfo[cart.MerchantId], // 从 merchantInfo 中获取商家名称
-                    cart.DishId,
-                    cart.DishNum,
-                    cart.DishName,
-                    cart.DishPrice,
-                    cart.ImageUrl
-                }).ToList();
-
-                if (result.Count == 0)
+                if (groupedResult.Count == 0)
                 {
                     return Ok(new { data = new List<object>(), msg = "购物车为空" });
                 }
 
-                return Ok(new { data = result, msg = "获取成功" });
+                return Ok(new { data = groupedResult, msg = "获取成功" });
             }
             catch (Exception ex)
             {
@@ -577,7 +576,7 @@ namespace takeout_tj.Controllers
         }
 
         [HttpGet]
-        [Route("getShoppingCartinMerchant")]  // 获取购物车中的所有物品
+        [Route("getShoppingCartinMerchant")]  // 按商家获取购物车中的所有物品
         public IActionResult getShoppingCartinMerchant(int userId, int merchantId)
         {
             try

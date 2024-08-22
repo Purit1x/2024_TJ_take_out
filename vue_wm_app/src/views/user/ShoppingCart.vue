@@ -1,38 +1,106 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref,onMounted,computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import {addToShoppingCart,decrementDishInCart,removeFromShoppingCart,getShoppingCartItems} from '@/api/user';
+import { GetMultiSpecialOffer } from '@/api/merchant';
 import { useStore } from "vuex";
 import { ElMessage } from 'element-plus';
 
 const store = useStore();  
 const router = useRouter();
 const user = ref({}); // 初始化用户信息对象
-const items=ref([]);  //购物车物品列表
+const merchants = ref([]);  // 存储按商家分类后的购物车物品列表
+const specialOffers=ref([]);  //商家满减活动
 
-
-onMounted(async() => {  
-    //获取用户信息
-    const userData = store.state.user; 
-    if (userData) {  
-        user.value = userData;  
-    } else {  
+onMounted(async () => {
+    const userData = store.state.user;
+    if (userData) {
+        user.value = userData;
+    } else {
         router.push('/login');
-    }  
+    }
+
     const userId = user.value.userId;
+    const data = await getShoppingCartItems(userId);
+    if (data) {
+        merchants.value = data.data.map(merchant => ({
+            ...merchant,
+            checked: false, // 初始化商家复选框
+            dishes: merchant.dishes.map(dish => ({
+                ...dish,
+                checked: false, // 初始化菜品复选框
+            }))
+        }));
+        //console.log(merchants.value);
+    }
 
-    const data = await getShoppingCartItems(userId); 
-    if (data) {  
-        items.value = data.data; // 假设后端返回的菜品数据是一个数组
-        items.value.forEach(item => item.checked = false); // 初始化时将所有的商品设为未勾选状态
-    }  
+    // 获取所有商家的满减数据
+    const merchantIds = merchants.value.map(merchant => merchant.merchantId);
+    const offers = await GetMultiSpecialOffer(merchantIds);
+    if(offers){
+      specialOffers.value = offers.data;
+    }
+    
+    //console.log(specialOffers.value); 
+});
 
-})
+// 商家复选框函数
+const toggleMerchantSelection = (merchant) => {
+    const newCheckedStatus = !merchant.checked;
+    merchant.checked = newCheckedStatus;
+    merchant.dishes.forEach(item => item.checked = newCheckedStatus);
+};
+
+// 商品复选框函数
+const toggleItemSelection = (merchant, item) => {
+    item.checked = !item.checked;
+    merchant.checked = merchant.dishes.every(item => item.checked);// 商店的所有商品都被勾选就将商店勾选
+};
+
+// 计算商家总价
+const getMerchantTotalPrice = (merchant) => {
+    return merchant.dishes
+        .filter(item => item.checked) // 只计算勾选的商品
+        .reduce((total, item) => total + (item.dishPrice * item.dishNum), 0);
+};
+
+// 计算满减金额
+const calculateDiscount = (merchant) => {
+    const totalPrice = getMerchantTotalPrice(merchant);
+    const applicableOffers = specialOffers.value.filter(offer => offer.merchantId === merchant.merchantId && totalPrice >= offer.minPrice);
+
+    if (applicableOffers.length === 0) {
+        return 0;
+    }
+
+    // 找到最大的折扣金额
+    const maxDiscount = Math.max(...applicableOffers.map(offer => offer.amountRemission));
+    return maxDiscount;
+};
+
+// 计算勾选商品的总价和折扣
+const checkedItems = computed(() => {
+    return merchants.value.flatMap(merchant => merchant.dishes.filter(item => item.checked));
+});
+
+const totalPrice = computed(() => {
+    return merchants.value.reduce((total, merchant) => total + getMerchantTotalPrice(merchant), 0);
+});
+
+const totalDiscount = computed(() => {
+    return merchants.value.reduce((total, merchant) => total + calculateDiscount(merchant), 0);
+});
+
+const finalTotalPrice = computed(() => totalPrice.value - totalDiscount.value);
 
 
 const gobackHome = () => {
     router.push('/user-home');
 }
+
+const goToMerchantPage = (merchantId) => {
+    router.push('/user-home/merchant/' + merchantId);
+};
 
 // 加入购物车函数
 const addToCart = async(dish) => {
@@ -52,13 +120,12 @@ const addToCart = async(dish) => {
         ElMessage.success(response.msg); // 显示成功消息  
 
         // 更新前端数据中的商品数量
-        const foundIndex = items.value.findIndex(item => item.dishId === dish.dishId);
-        if (foundIndex !== -1) {
-            // 重新赋值以触发视图更新
-            items.value[foundIndex] = {
-                ...items.value[foundIndex],
-                dishNum: items.value[foundIndex].dishNum + 1
-            };
+        for (const merchant of merchants.value) {
+            const foundDish = merchant.dishes.find(item => item.dishId === dish.dishId);
+            if (foundDish) {
+                foundDish.dishNum += 1;
+                break;
+            }
         }
     } catch (error) {  
       if (error.response && error.response.data) {  
@@ -95,12 +162,18 @@ const decrementInCart = async(dish) => {
         ElMessage.success(response.msg); // 显示成功消息  
 
         // 更新前端数据中的商品数量
-        const foundItem = items.value.find(item => item.dishId === dish.dishId);
-        if (foundItem) {
-            foundItem.dishNum -= 1;
-            // 如果数量减至0，可以选择将其从购物车移除
-            if (foundItem.dishNum <= 0) {
-                items.value = items.value.filter(item => item.dishId !== dish.dishId);
+        for (const merchant of merchants.value) {
+            const foundDish = merchant.dishes.find(item => item.dishId === dish.dishId);
+            if (foundDish) {
+                foundDish.dishNum -= 1;
+                if (foundDish.dishNum <= 0) {
+                    merchant.dishes = merchant.dishes.filter(item => item.dishId !== dish.dishId);
+                }
+                // 如果商店中的所有商品都被移除，则移除商店
+                if (merchant.dishes.length === 0) {
+                    merchants.value = merchants.value.filter(m => m.merchantId !== merchant.merchantId);
+                }
+                break;
             }
         }
     } catch (error) {  
@@ -137,7 +210,16 @@ const removeInCart = async(dish) => {
         ElMessage.success(response.msg); // 显示成功消息  
 
         // 更新前端，删除菜品
-        items.value = items.value.filter(item => item.dishId !== dish.dishId);
+        for (const merchant of merchants.value) {
+            if (merchant.dishes.some(item => item.dishId === dish.dishId)) {
+                merchant.dishes = merchant.dishes.filter(item => item.dishId !== dish.dishId);
+                // 如果商店中的所有商品都被移除，则移除商店
+                if (merchant.dishes.length === 0) {
+                    merchants.value = merchants.value.filter(m => m.merchantId !== merchant.merchantId);
+                }
+                break;
+            }
+        }
     } catch (error) {  
       if (error.response && error.response.data) {  
         const errorCode = error.response.data.errorCode;  
@@ -155,36 +237,32 @@ const removeInCart = async(dish) => {
     }  
 };
 
-// 计算选中的商品
-const checkedItems = computed(() => items.value.filter(item => item.checked));
-
-// 计算选中商品的总价
-const totalPrice = computed(() => {
-    return checkedItems.value.reduce((total, item) => total + item.dishPrice * item.dishNum, 0);
-});
-
 </script>
 
-<template>
-    <div>购物车页面&nbsp;&nbsp;
-        <button @click="gobackHome()">返回</button>
-        <div>
-            <ul>
-            <li v-for="item in items" :key="item.dishId">
-                <input type="checkbox" v-model="item.checked"/>
-                <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-                {{item.dishName}}：{{item.dishPrice}}元 &nbsp;&nbsp;{{item.merchantName}}
-                <button @click="decrementInCart(item)">-</button>
-                {{item.dishNum}}  <!-- 显示商品数量 -->
-                <button @click="addToCart(item)">+</button>
-                <button @click="removeInCart(item)">x</button>
-            </li>
-            </ul>
-        </div>
 
-        <!-- 显示总价 -->
-        <div>
-            <strong>总价: {{ totalPrice }} 元</strong>
-        </div>
-    </div>
+<template>
+  <div>
+      <h3>购物车页面</h3>
+      <button @click="gobackHome">返回</button>
+      <div v-for="merchant in merchants" :key="merchant.merchantId">
+          <input type="checkbox" :checked="merchant.checked" @change="toggleMerchantSelection(merchant)" />
+          {{ merchant.merchantName }}
+          <button @click="goToMerchantPage(merchant.merchantId)">></button>
+          <ul>
+              <li v-for="item in merchant.dishes" :key="item.dishId">
+                  <input type="checkbox" :checked="item.checked" @change="toggleItemSelection(merchant, item)" />
+                  <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
+                  {{item.dishName}}：{{item.dishPrice}}元
+                  <button @click="decrementInCart(item)">-</button>
+                  {{item.dishNum}}
+                  <button @click="addToCart(item)">+</button>
+                  <button @click="removeInCart(item)">x</button>
+              </li>
+          </ul>
+      </div>
+
+      <div>
+        <div><strong>总价: {{ finalTotalPrice }} 元</strong><span v-if="totalDiscount != 0">({{ totalPrice }}-{{ totalDiscount }})</span></div>
+      </div>
+  </div>
 </template>
