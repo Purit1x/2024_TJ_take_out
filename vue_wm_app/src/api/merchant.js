@@ -160,3 +160,60 @@ export const AssignStation=async(data) => {
         throw error;   
     }
 }
+
+export const CreateSpecialOffer=async(offer) => {    //创建满减服务
+    try {  
+        const response = await axios.post(`${BASE_URL}/Merchant/specialOfferCreate`, offer);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {   
+        throw error;   
+    }
+}
+
+export const EditSpecialOffer=async(offer) => {    //修改满减服务
+    try {  
+        const response = await axios.put(`${BASE_URL}/Merchant/specialOfferEdit`, offer);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {   
+        throw error;   
+    }
+}
+
+export const DeleteSpecialOffer = async (Id) => {    // 删除满减服务
+    try {
+        const response = await axios.delete(`${BASE_URL}/Merchant/deleteSpecialOffer`, {
+            params: {   // 使用 params 来传递查询字符串参数
+                offerId: Id
+            },
+            headers: {
+                'Content-Type': 'application/json'  // 这个在 DELETE 请求中通常是不需要的，可以去掉
+            }
+        });
+        return response.data; // 返回后端返回的数据
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const GetSpecialOffer=async(merchantId) => {    //获取商家提供的满减服务
+    try {  
+        const response = await axios.get(`${BASE_URL}/Merchant/specialOfferGet?merchantId=${merchantId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
+export const GetMultiSpecialOffer=async(merchantIds) => {    //获取商家提供的满减服务
+    try {
+        // Create query string for multiple merchant IDs
+        const queryString = merchantIds.map(id => `merchantIds=${id}`).join('&');
+        
+        // Make the GET request with the formatted query string
+        const response = await axios.get(`${BASE_URL}/Merchant/multiSpecialOfferGet?${queryString}`);
+        
+        return response.data; // Return the data from the response
+    } catch (error) {
+        throw error;
+    }
+}
