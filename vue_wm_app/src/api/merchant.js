@@ -48,6 +48,14 @@ export const walletRecharge=async(id,addMoney) => {
         throw error;   
     }
 }
+export const walletWithdraw=async(id,withdrawMoney) => {
+    try {  
+        const response = await axios.put(`${BASE_URL}/Merchant/withdraw?merchantId=${id}&withdrawMoney=${withdrawMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
 export const searchDishes = async(id) => {
     try {  
         const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${id}`);

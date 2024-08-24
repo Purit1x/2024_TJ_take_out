@@ -7,9 +7,10 @@ import { inject } from 'vue';
 import store from '@/store';
 const router = useRouter();
 const merchant = inject('merchant');
-import { merchantInfo, updateMerchant, walletRecharge,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
+import { merchantInfo, updateMerchant, walletRecharge,walletWithdraw,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
 const isWallet=ref(false);  //是否是钱包界面
 const isRecharge=ref(false);  //是否是充值界面
+const isWithdraw=ref(false); //是否是提现页面
 const isChangeWP=ref(false);  //是否是修改钱包密码界面
 const refForm =ref(null);
 
@@ -80,6 +81,13 @@ const merchantRules = ref({
             trigger: 'blur', 
         },
     ], 
+    withdrawAmount:[
+    {required:true, message:'请输入提现金额', trigger:'blur'},
+        {pattern: /^[0-9]/, 
+            message: '提现金额必须是数字', 
+            trigger: 'blur', 
+        },
+    ], 
 });
 const validateField = (field) => {  //编辑规则的应用
     refForm.value.validateField(field, (valid) => {  
@@ -134,6 +142,7 @@ function editMerchant() {
     currentMerchant.value.WalletPassword=merchantForm.value.WalletPassword;
     currentMerchant.value.reWalletPassword=merchantForm.value.reWalletPassword;
     currentMerchant.value.recharge=0;
+    currentMerchant.value.withdrawAmount=0;
     if(refForm.value)
     {
         refForm.value.clearValidate();
@@ -254,6 +263,37 @@ const SaveRecharge=async()=>{
             }  
     });     
 }
+
+const SaveWithdraw=async()=>{
+    const isValid = await refForm.value.validate();   
+    if (!isValid) return; // 如果不合法，提前退出
+    if(currentMerchant.value.Wallet < currentMerchant.value.withdrawAmount) 
+    {
+        ElMessage.error('提现金额超出钱包金额')
+        return
+    }
+    walletWithdraw(currentMerchant.value.MerchantId,currentMerchant.value.withdrawAmount).then(data=>{
+        currentMerchant.value.Wallet=data.data;
+        merchantForm.value.Wallet=data.data;
+        ElMessage.success('提现成功');
+        isWithdraw.value=false;
+        isWallet.value=true;
+    }).catch(error => {
+        if (error.response && error.response.data) {  
+                const errorCode = error.response.data.errorCode;  
+                if (errorCode === 20000) {  
+                    ElMessage.error('没有更新数据');  
+                } else if (errorCode === 30000) {  
+                    ElMessage.error('连接失败' + error.response.data.msg);  
+                } else {  
+                    ElMessage.error('发生未知错误');  
+                }  
+            } else {  
+                    ElMessage.error('网络错误，请重试');  
+            }  
+    });     
+}
+
 function cancelEdit() {
     isOnlyShow.value = true;
 }
@@ -268,6 +308,7 @@ function enterWallet(){
 function leaveWallet(){
     isWallet.value=false;
     isRecharge.value=false;
+    isWithdraw.value=false;
     isChangeWP.value=false;
     isOnlyShow.value=true;
 }
@@ -277,6 +318,14 @@ function OpenRechargeWindow(){  //打开充值界面
 }
 function leaveRechargeWindow(){  //关闭充值界面
     isRecharge.value=false;
+}
+function OpenWithdrawWindow(){  //打开提现界面
+    editMerchant();
+    isWithdraw.value=true;
+}
+function leaveWithdrawWindow(){  //关闭提现界面
+    isWithdraw.value=false;
+    isWallet.value=true;
 }
 function OpenWPWindow(){  //打开修改支付密码界面
     editMerchant();
@@ -401,15 +450,21 @@ function gobackHome(){
             <button @click="leaveWallet">返回</button>
             <div>钱包金额：{{merchantForm.Wallet}}</div>
             <button @click="OpenRechargeWindow">充值</button>
+            <button @click="OpenWithdrawWindow">提现</button>
             <button @click="OpenWPWindow">修改支付密码</button>
         </div>
         <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm">
             <div class="recharge" v-if="isRecharge">  <!-- 充值 -->
-                <button @click="leaveRechargeWindow">返回</button>
                 <div>充值金额</div>
                 <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentMerchant.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
-                <button @click="SaveRecharge">充值</button>
-                <button>提现</button>
+                <button @click="SaveRecharge">充值</button>    
+                <button @click="leaveRechargeWindow">返回</button>
+            </div>
+            <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
+                <div>提现金额</div>
+                <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentMerchant.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
+                <button @click="SaveWithdraw">提现</button>
+                <button @click="leaveWithdrawWindow">返回</button>
             </div>
             <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
                 <button @click="leaveWPWindow">返回</button>
