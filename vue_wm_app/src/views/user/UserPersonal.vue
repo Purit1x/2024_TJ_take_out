@@ -280,8 +280,9 @@ const visitingCoupon=()=>{
 </script>
 
 <template>
+  <div class="content">
     <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
-        <h1>{{userForm.UserName}}的个人中心</h1>
+        <header>{{userForm.UserName}}的个人中心</header>
         <div><button @click="gobackHome()">返回</button></div>
         <div><button @click="enterFavouriteMerchants()">收藏</button></div>
         <div><button @click="visitingCoupon()">优惠券</button></div>
@@ -348,7 +349,7 @@ const visitingCoupon=()=>{
                     </li>
                 </ul>
             </div>
-
-        </el-form>
+    </el-form>
+  </div>
     <router-view />
 </template>

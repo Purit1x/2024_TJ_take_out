@@ -112,8 +112,8 @@ const addToCart = async(dish) => {
 </script>
 
 <template>
-    <div v-if="MerchantInfo && MerchantInfo.merchantName">
-      {{MerchantInfo.merchantName}}的菜单
+    <div v-if="MerchantInfo && MerchantInfo.merchantName" class="content">
+      <header>{{MerchantInfo.merchantName}}的菜单</header>
       <button @click="gobackHome()">&nbsp;&nbsp;返回</button>
       <div>地址：{{MerchantInfo.merchantAddress}}</div>
       <div>营业时间：{{ MerchantInfo.timeforOpenBusiness }} - {{ MerchantInfo.timeforCloseBusiness }}</div>

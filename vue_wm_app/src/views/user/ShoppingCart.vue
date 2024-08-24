@@ -166,18 +166,18 @@ const totalPrice = computed(() => {
 </script>
 
 <template>
-    <div>购物车页面&nbsp;&nbsp;
-        <button @click="gobackHome()">返回</button>
-        <div>
-            <ul>
-            <li v-for="item in items" :key="item.dishId">
+    <div class="content">
+      <header>我的购物车</header>
+        <div class="cart-item">
+            <ul> 
+            <li v-for="item in items" :key="item.dishId" class="cart_item-li">
                 <input type="checkbox" v-model="item.checked"/>
-                <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
+                <img :src="item.imageUrl" class="cart-item-img" alt="菜品图片">
                 {{item.dishName}}：{{item.dishPrice}}元 &nbsp;&nbsp;{{item.merchantName}}
                 <button @click="decrementInCart(item)">-</button>
                 {{item.dishNum}}  <!-- 显示商品数量 -->
                 <button @click="addToCart(item)">+</button>
-                <button @click="removeInCart(item)">x</button>
+                <button @click="removeInCart(item)">删除</button>
             </li>
             </ul>
         </div>
@@ -188,3 +188,26 @@ const totalPrice = computed(() => {
         </div>
     </div>
 </template>
+
+
+<style scoped>
+.cart-item ul{
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  gap: 15px;
+}
+
+.cart_item-li{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-item-img {
+    align-content: center;
+    width: 60px; 
+    height: 60px;
+}
+
+</style>

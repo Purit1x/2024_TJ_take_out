@@ -288,10 +288,26 @@ function leaveWPWindow(){  //关闭修改支付密码界面
 function gobackHome(){
     router.push('/merchant-home');
 }
+// 跳转到菜单  
+const goToMenu = () => { 
+    router.push('/merchant-home/dish');  
+    isMerchantHome.value = false; // 进入菜单页面时隐藏欢迎信息和按钮  
+};  
+
+// 跳转到个人信息  
+const goToPersonal = () => { 
+    router.push('/merchant-home/personal');  
+    isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
+};  
+// 跳转到满减活动  
+const goToSpecialOffer = () => { 
+    router.push('/merchant-home/specialOffer');  
+    isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
+};  
 </script>
 
 <template>
-    <div>
+    <div class="content">
         <div class="person_body" v-if="!isWallet">
             <el-descriptions class="margin-top" title="简介" :column="2" border v-if="isOnlyShow">
                 <template #extra>
@@ -532,11 +548,11 @@ function gobackHome(){
 
 /*下面部分样式*/
 .person_body {
-    width: 1200px;
-    position: absolute;
-    left: 15%;
+    width: 85vw;
+    position:relative;
+    left: 0%;
     border-radius: 5px;
-    top: 10%;
+    top: 10%;   
 }
 
 .person_body_left {

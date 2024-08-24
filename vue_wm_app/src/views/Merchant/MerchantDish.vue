@@ -239,15 +239,12 @@ const cancelCreate = () => {
     currentDish.value = null; // 清空当前菜品  
     selectedImage.value = null; // 清空选择的图片  
 };  
-const goBack = () => {  
-    router.go(-1); // 使用 router.go(-1) 返回上一页  
-};  
 </script>
 
 <template>  
-    <div>  
-        <h1>这里是菜单页面，{{ merchant.MerchantId }}</h1>  
-        <button @click="goBack">返回</button>  <!-- 添加返回按钮 -->  
+    <slot name="sidebar"></slot>
+    <div class="content"> 
+        <header>这里是菜单页面，{{ merchant.MerchantId }}</header>  
         <div class="search-container" v-if="!isEditing&!isCreating">  
             <input   
                 type="text"   
@@ -295,5 +292,9 @@ const goBack = () => {
             <button @click="submitCreate">提交</button>  
             <button @click="cancelCreate">取消</button>
         </div>
-    </div>  
+    </div>
 </template>  
+
+<style scoped>
+
+</style>

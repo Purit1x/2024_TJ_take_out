@@ -81,9 +81,8 @@ const deleteAddress = async (addressId) => {
 </script>
 
 <template>
-  <div>
-    <div>地址页面&nbsp;&nbsp;</div>
-    <h1>地址录入</h1>
+  <div class="content">
+    <header>我的地址</header>
 
     <!-- 显示已有地址的表格 -->
     <table border="1">

@@ -36,12 +36,11 @@
     justify-content: center;  //居中对齐
     height: 100%;  //高度为100%
   }
-  
   .cover {
-    width: 90%;
+    width: 90vw;
     height: auto;
     position: absolute;
-    top: 25%;
+    top: 20%;
   }
   
   .link-button{
@@ -51,7 +50,11 @@
     justify-content: center;
     align-items: center;
     top: 62%;
-    left: 18%;
+    left: 17%;
+    img{
+      width: 15vw;
+      height: auto;
+    }
   }
   
   </style>

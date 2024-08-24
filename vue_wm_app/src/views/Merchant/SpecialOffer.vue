@@ -11,8 +11,8 @@ const gobackHome = () => {
 </script>
 
 <template>
-    <div>
-        满减活动
+    <div class="content">
+        <header>满减活动</header>
         <button @click="gobackHome">返回</button>
     </div>
 </template>
