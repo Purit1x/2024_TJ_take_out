@@ -229,6 +229,43 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"充值异常: {ex.Message}" });
             }
         }
+
+        [HttpPut]
+        [Route("withdraw")]
+        public IActionResult WalletWithdraw(int userId, int withdrawMoney)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务 
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                if (withdrawMoney == 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = user.Wallet, msg = "用户信息更新成功" });
+                }
+                user.Wallet = user.Wallet - withdrawMoney;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data = user.Wallet, msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "提现失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"提现异常: {ex.Message}" });
+            }
+        }
+
         // 获取所有商家的 MerchantId  
         [HttpGet("GetMerchantIds")]
         public async Task<IActionResult> GetAllMerchantIds()
