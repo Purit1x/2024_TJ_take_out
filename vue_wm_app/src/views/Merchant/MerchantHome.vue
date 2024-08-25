@@ -35,6 +35,13 @@ watch(
         localStorage.setItem('isMerchantHome', isMerchantHome.value);  
     }  
 );  
+
+//跳转回主页
+const goBack = () => {  
+    router.push('/merchant-home');  
+    isMerchantHome.value = true;  
+};  
+
 // 跳转到菜单  
 const goToMenu = () => { 
     router.push('/merchant-home/dish');  
@@ -46,6 +53,7 @@ const goToPersonal = () => {
     router.push('/merchant-home/personal');  
     isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
 };  
+
 // 跳转到满减活动  
 const goToSpecialOffer = () => { 
     router.push('/merchant-home/specialOffer');  
@@ -57,14 +65,173 @@ provide('merchant', merchant);
 provide('isMerchantHome', isMerchantHome); 
 </script>  
 
-<template>  
-    <div>  
-        <h1 v-if="isMerchantHome">欢迎，{{merchant.MerchantId}}</h1>  
-        <!-- 渲染子路由 -->
-        <router-view /> 
-         <!-- 按钮 -->
-        <button v-if="isMerchantHome" @click="goToMenu">菜单</button>
-        <button v-if="isMerchantHome" @click="goToSpecialOffer">满减活动</button>  
-        <button v-if="isMerchantHome" @click="goToPersonal">我的</button>  
-    </div>  
-</template>  
+<template>
+  <div>
+    <!-- 左侧导航栏 在dish和personal界面下出现主页按钮的虚影，不知道是哪里的bug-->
+    <nav class="sidebar">
+      <slot class="sidebar-content">
+        <img class="sidebar-img" src="@\assets\my_logo.png" alt="logo"/>
+        
+        <button class="sidebar-button" @click="goBack">
+          <img src="@\assets\merchant_home.png" alt="主页"/>
+          <span>主页</span>
+        </button>
+        
+        <button class="sidebar-button" @click="goToMenu">
+          <img src="@\assets\merchant_menu.png" alt="菜单"/>
+          <span>本店菜单</span>
+        </button>
+        
+        <button class="sidebar-button" @click="goToPersonal">
+          <img src="@\assets\merchant_personal.png" alt="个人信息"/>
+          <span>个人信息</span>
+        </button>
+
+        <button class="sidebar-button" @click="goToSpecialOffer">
+          <img src="@\assets\merchant_specialOffer.png" alt="满减活动"/>
+          <span>满减活动</span>
+        </button>
+      </slot>
+      <router-view /> <!-- 渲染子路由 -->
+    </nav>
+
+    <!-- 页面内容区域 #Q# 营收尚不确定是否需要添加，根据后续进度调整-->
+    <div  v-if="isMerchantHome" class="content">
+      <header>
+        <!-- #Q# 考虑将MerchantId改为MerchantName -->
+        <span class="welcome-text">欢迎，{{ merchant.MerchantId }}!</span>
+        <span class="revenue-text">今日营收：{{ todayRevenue }}元    </span>
+      </header>
+      <!-- 当前订单 实际变量根据平台方订单结构调整 -->
+      <div class="orders">
+        <h2>当前订单</h2>
+        <div class="orders-scroll">
+          <div class="order-item" v-for="order in orders" :key="order.id">
+            <div>交易ID: {{ order.id }}</div>
+            <div>交易金额: {{ order.totalAmount }}元</div>
+            <div>下单时间: {{ order.orderTime }}</div>
+            <div>制作进度: {{ order.progress }}</div>
+            <div>骑手是否已送达: {{ order.delivered ? '是' : '否' }}</div>
+            <div>用户评价: {{ order.rating ? order.rating : '暂无评价' }}</div>
+         </div>
+        </div>
+      </div>
+      <!-- #Q# 菜单预览 还没做完-->
+      <div class="menu-preview">
+        <h2>菜单预览</h2>
+        <img src="@\assets\merchant_menu.png" alt="菜单"/>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  // #Q# 以下内容为网页排版中的测试用例，实际场景需要调用平台方订单数据动态获取
+  data() {
+      return {
+          username: '用户名', // 用户名
+          orders: [
+              { id: 1, totalAmount: 100, orderTime: '2023-10-01 10:00', progress: '制作中', delivered: false, rating: null },
+              { id: 2, totalAmount: 150, orderTime: '2023-10-01 11:00', progress: '已完成', delivered: true, rating: '好评' },
+              { id: 3, totalAmount: 150, orderTime: '2023-10-01 11:00', progress: '已完成', delivered: true, rating: '好评' },
+              { id: 4, totalAmount: 150, orderTime: '2023-10-01 11:00', progress: '已完成', delivered: true, rating: '好评' },
+              { id: 5, totalAmount: 150, orderTime: '2023-10-01 11:00', progress: '已完成', delivered: true, rating: '好评' },
+              { id: 6, totalAmount: 150, orderTime: '2023-10-01 11:00', progress: '已完成', delivered: true, rating: '好评' },
+          ], // 订单数据
+          todayRevenue: 250 // 今日营收数据
+      };
+  },
+};
+</script>
+
+<style scoped>
+.sidebar {
+  width: 50px;
+  background: linear-gradient(to bottom, #b1d3f4, #69b1f848);
+  padding: 20px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar-img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.sidebar-button {
+  display: block;
+  width: 50px;
+  height: auto;
+  margin-bottom: 20px;
+  padding: 0;
+  text-align: center;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.sidebar-button span {
+  display: block;
+  font-size: 12px;
+  text-align: center;
+}
+
+.sidebar-button.active {
+  color: #0f628b;
+}
+
+.sidebar-content button:hover {
+  background-color: #3686d748;
+}
+
+.orders{
+  margin-bottom: 30px;
+}
+
+.orders-scroll {
+  max-height: 600px; /* 设置订单区域的最大高度 */
+  display: flex;
+  flex-direction: column;
+  border:1px solid #ccc;
+  overflow-y: auto; /* 使订单区域可以滚动 */
+  margin-left: 20px;
+}
+
+.order-item {
+    padding: 10px 0;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+.order-item div{
+  margin-left: 20px;
+  font-size: 16px;
+  flex:1 1 50%;
+  box-sizing: border-box;
+}
+
+.welcome-text {
+  font-size: 35px;
+  margin-left: 15px;
+}
+
+.revenue-text {
+  font-size: 30px;
+  color: #666;
+  margin-right: 40px;
+  font-weight: bold;
+}
+
+.menu-preview { 
+  margin-bottom: 20px;
+}
+</style>

@@ -5,6 +5,7 @@ using takeout_tj.DTO;
 using takeout_tj.Models.User;
 using takeout_tj.Models.Merchant;
 using takeout_tj.Service;
+using takeout_tj.Models.Platform;
 
 namespace takeout_tj.Controllers
 {
@@ -510,5 +511,171 @@ namespace takeout_tj.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("specialOfferCreate")]
+        public IActionResult AddSpecialOffer([FromBody] SpecialOfferDBDto dto)  //创建满减服务
+        {
+            var tran = _context.Database.BeginTransaction();//多表添加才用到
+            try
+            {
+                if(dto.MinPrice < dto.AmountRemission)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "创建失败，满减金额不可大于满减门槛！" });
+                }
+
+                SpecialOfferDB specialOffer = new SpecialOfferDB()
+                {
+                    MerchantId = dto.MerchantId,
+                    OfferId = _merchantService.AssignSpecialOfferId(),
+                    MinPrice = dto.MinPrice,
+                    AmountRemission = dto.AmountRemission
+                };
+
+                _context.SpecialOffers.Add(specialOffer);
+
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit();//多表添加才用到
+                    return Ok(new { data = specialOffer, msg = "创建成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "创建失败" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();    //多表添加才用到
+
+                return StatusCode(20000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
+            }
+        }
+
+        [HttpPut]
+        [Route("specialOfferEdit")]  //编辑满减服务
+        public IActionResult EditSpecialOffer([FromBody] SpecialOfferDBDto dto)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务  
+            try
+            {
+                var offer = _context.SpecialOffers.FirstOrDefault(u => u.OfferId == dto.OfferId);
+                if (offer == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "特殊服务未找到" });
+                }
+
+                if (dto.MinPrice < dto.AmountRemission)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "修改失败，满减金额不可大于满减门槛！" });
+                }
+
+                offer.MerchantId = dto.MerchantId;
+                offer.MinPrice = dto.MinPrice;
+                offer.AmountRemission = dto.AmountRemission;
+
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data = offer, msg = "服务信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "更新失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
+
+        [HttpDelete]
+        [Route("deleteSpecialOffer")]
+        public IActionResult DeleteOffer([FromQuery] int offerId)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            try
+            {
+                // 查询要删除的服务
+                var offer = _context.SpecialOffers.FirstOrDefault(d => d.OfferId == offerId);
+                if (offer == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "服务未找到" });
+                }
+      
+                // 删除服务 
+                _context.SpecialOffers.Remove(offer);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        [Route("specialOfferGet")]
+        public IActionResult GetOffersInfo(int merchantId)  //查询某商户的特殊服务
+        {
+            try
+            {
+                var offers = _context.SpecialOffers.Where(m => m.MerchantId == merchantId).ToList();
+
+                if (offers.Count == 0)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                }
+
+                return Ok(new { data = offers, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("multiSpecialOfferGet")]
+        public IActionResult GetMultiOffersInfo([FromQuery] List<int> merchantIds)  // 查询多个商户的特殊服务
+        {
+            try
+            {
+                if (merchantIds == null || !merchantIds.Any())
+                {
+                    return BadRequest(new { errorCode = 40000, msg = "商户ID列表为空" });
+                }
+
+                var offers = _context.SpecialOffers
+                    .Where(m => merchantIds.Contains(m.MerchantId))
+                    .ToList();
+
+                if (offers.Count == 0)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                }
+
+                return Ok(new { data = offers, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
     }
 }

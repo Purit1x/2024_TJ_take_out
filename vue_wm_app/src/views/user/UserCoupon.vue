@@ -125,12 +125,12 @@ const leavePurchaseInfo = () => {
 </script>
 
 <template>
+  <div class="content">
     <div v-if="isUserCoupon&&!isShowCouponInfo&&!isPurchaseList&&!isPurchaseInfo">
-        <h2>我的优惠券
-            <button @click="enterCouponPurchase">购买优惠券</button>&nbsp;&nbsp;
-            <button @click="enterPurchaseList">购买记录</button>&nbsp;&nbsp;
-            <button @click="gobackHome">返回</button>
-        </h2>
+        <header>我的优惠券</header>
+        <button @click="enterCouponPurchase">购买优惠券</button>&nbsp;&nbsp;
+        <button @click="enterPurchaseList">购买记录</button>&nbsp;&nbsp;
+        <button @click="gobackHome">返回</button>
         <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
             <button @click="handleSearch()">搜索</button>
@@ -186,6 +186,6 @@ const leavePurchaseInfo = () => {
         <div><button @click="leavePurchaseInfo()">返回</button></div>
 
     </div>
-    
+  </div>
     <router-view />
 </template>

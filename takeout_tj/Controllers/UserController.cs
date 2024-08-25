@@ -449,7 +449,7 @@ namespace takeout_tj.Controllers
                 if (result > 0)
                 {
                     tran.Commit();//多表添加才用到
-                    return Ok(new { msg = existingCartRecord != null ? "更新成功" : "创建成功" });
+                    return Ok(new { data = CartRecord, msg = existingCartRecord != null ? "更新成功" : "创建成功" });
                 }
                 else
                 {
@@ -573,6 +573,64 @@ namespace takeout_tj.Controllers
                 var cartItems = _context.ShoppingCarts
                     .Where(cart => cart.UserId == userId)
                     .Include(cart => cart.DishDB)  // 通过 Include 方法加载 DishDB 相关数据
+                    .ToList();
+
+                // 获取所有相关商户信息
+                var merchantInfo = _context.Merchants
+                    .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
+                    .ToDictionary(m => m.MerchantId, m => m.MerchantName);
+
+                // 按商户分组
+                var groupedResult = cartItems
+                    .GroupBy(cart => cart.MerchantId)
+                    .Select(group => new
+                    {
+                        MerchantId = group.Key,
+                        MerchantName = merchantInfo[group.Key], // 从 merchantInfo 中获取商家名称
+                        Dishes = group.Select(cart => new
+                        {
+                            cart.ShoppingCartId,
+                            cart.DishId,
+                            cart.DishNum,
+                            DishName = cart.DishDB.DishName,  // 获取菜品名称
+                            DishPrice = cart.DishDB.DishPrice, // 获取菜品价格
+                            ImageUrl = cart.DishDB.ImageUrl   // 获取菜品图片URL
+                        }).ToList()
+                    })
+                    .ToList();
+
+                if (groupedResult.Count == 0)
+                {
+                    return Ok(new { data = new List<object>(), msg = "购物车为空" });
+                }
+
+                return Ok(new { data = groupedResult, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("getShoppingCartinMerchant")]  // 按商家获取购物车中的所有物品
+        public IActionResult getShoppingCartinMerchant(int userId, int merchantId)
+        {
+            try
+            {
+                // 检查用户是否存在
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                var merchant = _context.Merchants.FirstOrDefault(m => m.MerchantId == merchantId);
+
+                if (user == null || merchant == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "用户或商家未找到" });
+                }
+
+                // 查询用户购物车中的所有物品，并关联菜品信息
+                var cartItems = _context.ShoppingCarts
+                    .Where(cart => cart.UserId == userId && cart.MerchantId == merchantId)
+                    .Include(cart => cart.DishDB)  // 通过 Include 方法加载 DishDB 相关数据
                     .Select(cart => new
                     {
                         cart.ShoppingCartId,
@@ -612,6 +670,7 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+
         [HttpPost]
         [Route("submitAddress")]
         public IActionResult SubmitAddress(AddressDto addressDto)
