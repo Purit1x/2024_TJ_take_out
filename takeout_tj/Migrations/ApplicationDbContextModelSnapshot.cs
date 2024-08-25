@@ -586,6 +586,22 @@ namespace takeout_tj.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.User.UserDefaultAddressDB", b =>
+                {
+                    b.Property<int>("AddressId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("AddressId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("user_default_addresses", (string)null);
+                });
+
             modelBuilder.Entity("takeout_tj.Models.Merchant.DishDB", b =>
                 {
                     b.HasOne("takeout_tj.Models.Merchant.MerchantDB", "MerchantDB")
@@ -842,6 +858,25 @@ namespace takeout_tj.Migrations
                     b.Navigation("UserDB");
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.User.UserDefaultAddressDB", b =>
+                {
+                    b.HasOne("takeout_tj.Models.User.UserAddressDB", "UserAddressDB")
+                        .WithOne("UserDefaultAddressDB")
+                        .HasForeignKey("takeout_tj.Models.User.UserDefaultAddressDB", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("takeout_tj.Models.User.UserDB", "UserDB")
+                        .WithOne("UserDefaultAddressDB")
+                        .HasForeignKey("takeout_tj.Models.User.UserDefaultAddressDB", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserAddressDB");
+
+                    b.Navigation("UserDB");
+                });
+
             modelBuilder.Entity("takeout_tj.Models.Merchant.DishDB", b =>
                 {
                     b.Navigation("OrderDishDBs");
@@ -904,6 +939,9 @@ namespace takeout_tj.Migrations
             modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
                 {
                     b.Navigation("OrderDBs");
+
+                    b.Navigation("UserDefaultAddressDB")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("takeout_tj.Models.User.UserDB", b =>
@@ -917,6 +955,9 @@ namespace takeout_tj.Migrations
                     b.Navigation("UserAddressDBs");
 
                     b.Navigation("UserCouponDBs");
+
+                    b.Navigation("UserDefaultAddressDB")
+                        .IsRequired();
 
                     b.Navigation("shoppingCartDBs");
                 });

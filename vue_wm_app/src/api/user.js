@@ -49,6 +49,15 @@ export const walletRecharge=async(id,addMoney) => {  //充值
         throw error;   
     }
 }
+export const walletWithdraw=async(id,withdrawMoney) => {  //提现
+    try {  
+        const response = await axios.put(`${BASE_URL}/Users/withdraw?userId=${id}&withdrawMoney=${withdrawMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+
 export const getMerchantIds = async() => {  //获取商户id
     try {  
         const response = await axios.get(`${BASE_URL}/Users/GetMerchantIds`);  

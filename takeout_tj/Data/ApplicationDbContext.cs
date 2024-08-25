@@ -31,6 +31,7 @@ namespace takeout_tj.Data
 		public DbSet<OrderCouponDB> OrderCoupons { get; set; }
 		public DbSet<AdminDB> Admins { get; set; }
 		public DbSet<MerchantStationDB> MerchantStations { get; set; }
+		public DbSet<UserDefaultAddressDB> UserDefaultAddresses { get; set; }
 		
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) 
 		{
@@ -66,6 +67,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<AdminDB>().HasKey(a => a.AdminId);
 			modelBuilder.Entity<MerchantStationDB>().HasKey(ms => ms.MerchantId);
 			modelBuilder.Entity<MembershipDB>().HasKey(m => m.UserId);
+			modelBuilder.Entity<UserDefaultAddressDB>().HasKey(uda => uda.AddressId);
 
 			// 定义地址到用户的多对一关系
 			modelBuilder.Entity<UserAddressDB>()
@@ -189,6 +191,21 @@ namespace takeout_tj.Data
 				.HasOne(ms => ms.StationDB)
 				.WithMany(s => s.MerchantStationDBs)
 				.HasForeignKey(ms => ms.StationId);
+			// 用户地址到默认地址的一对一联系
+			modelBuilder.Entity<UserDefaultAddressDB>()
+				.HasOne(uda => uda.UserAddressDB)
+				.WithOne(ua => ua.UserDefaultAddressDB)
+				.HasForeignKey<UserDefaultAddressDB>(uda => uda.AddressId);
+			// 用户地址与用户的一对一关系
+			modelBuilder.Entity<UserDefaultAddressDB>()
+				.HasOne(uda => uda.UserDB)
+				.WithOne(u => u.UserDefaultAddressDB)
+				.HasForeignKey<UserDefaultAddressDB>(uda => uda.UserId);
+
+			// 每个用户只能有一个默认地址
+			modelBuilder.Entity<UserDefaultAddressDB>()
+				.HasIndex(uda => uda.UserId)
+				.IsUnique();
 
 			modelBuilder.Entity<DishDB>()
 				.Property(d => d.DishPrice)
@@ -249,6 +266,7 @@ namespace takeout_tj.Data
 			modelBuilder.Entity<OrderCouponDB>().ToTable("order_coupons");
 			modelBuilder.Entity<AdminDB>().ToTable("admins");
 			modelBuilder.Entity<MerchantStationDB>().ToTable("merchant_stations");
+			modelBuilder.Entity<UserDefaultAddressDB>().ToTable("user_default_addresses");
 		}
 	}
 }
