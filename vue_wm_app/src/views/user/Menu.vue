@@ -1,6 +1,6 @@
 <script setup>
-import { ref,onMounted, inject,watch,computed } from 'vue';
-import { useRouter } from 'vue-router'
+import { ref,onMounted, inject,watch,computed,provide} from 'vue';
+import { useRouter,onBeforeRouteLeave } from 'vue-router'
 import { searchDishes, GetSpecialOffer } from '@/api/merchant';
 import {addToShoppingCart, getMerchantIds, getMerchantsInfo, getShoppingCartinMerchant,decrementDishInCart,removeFromShoppingCart } from '@/api/user';
 import { useStore } from "vuex";
@@ -19,21 +19,25 @@ const searchQuery = ref('');  // 搜索关键字
 const merchantsInfo=inject('merchantsInfo');
 const cartItems=ref([]);  //购物车物品列表
 const specialOffers=ref([]);  //商家满减活动
+const isMenu=ref(true);  //是否是菜单页面
 
 onMounted (async() => {
   //获取用户信息
+  if(router.currentRoute.value.path.includes('/order'))
+    isMenu.value = false;
+  else
+    isMenu.value = true; 
   const userData = store.state.user; 
   if (userData) {  
     user.value = userData;  
   } else {  
     router.push('/login');
   }  
-
   const storedMerchantsInfo = localStorage.getItem('MerchantInfo');  //长效保存
   if (storedMerchantsInfo) {  
     merchantsInfo.value = JSON.parse(storedMerchantsInfo);  
   }
-
+  
   getMerchantIds().then(res => {  // 获取所有商家id
     merchantIds.value = res.data;  
     return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
@@ -66,7 +70,6 @@ onMounted (async() => {
         specialOffers.value = offerData.data; // 假设后端返回的offer数据是一个数组
     }  
 });
-
 const gobackHome = () => {
   router.push('/user-home');
 }
@@ -103,7 +106,7 @@ const handleSearch = () => {
 // 加入购物车函数
 const addToCart = async(dish) => {
     const userId = user.value.userId;
-
+    
     // 调用API，将购物车项保存到数据库    
     try {
       const shoppingCartItem = {
@@ -275,11 +278,29 @@ function calculateDiscount(cartTotal, specialOffers) {
 
     return maxDiscount;
 }
+const gotoOrder = () => {  
+  if(cartItems.value.length === 0){
+    ElMessage.error('购物车为空，请先添加商品');
+    return;
+  }
+  console.log('跳转到订单页面');  
+  console.log(MerchantId.value);  
+  isMenu.value = false; // 确保菜单不显示  
+  router.push({   
+    path: `/user-home/merchant/${MerchantId.value}/order`,   
+  });  
+};  
+watch(  
+  () => router.currentRoute.value.path,  
+  (newPath) => {  
+    isMenu.value = !newPath.includes('/order');  
+  }  
+);  
 </script>
 
 
 <template>
-    <div v-if="MerchantInfo && MerchantInfo.merchantName">
+    <div v-if="MerchantInfo && MerchantInfo.merchantName&&isMenu">
       {{MerchantInfo.merchantName}}的菜单
       <button @click="gobackHome()">&nbsp;&nbsp;返回</button>
       <div>地址：{{MerchantInfo.merchantAddress}}</div>
@@ -307,8 +328,7 @@ function calculateDiscount(cartTotal, specialOffers) {
         <ul>
           <li v-for="dish in showDishes" :key="dish.dishId">
             <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-            {{dish.dishName}}：{{dish.dishPrice}}元 &nbsp;&nbsp;{{dish.dishCategory}}
-            <button>下单</button>
+            {{dish.dishName}}：{{dish.dishPrice}}元 &nbsp;&nbsp;{{dish.dishCategory}} &nbsp;&nbsp;库存：{{dish.dishInventory}}
             <button @click="addToCart(dish)">加入购物车</button>
           </li>
         </ul>
@@ -331,7 +351,12 @@ function calculateDiscount(cartTotal, specialOffers) {
       </div>
       <div v-else>购物车为空</div>
 
-      <div><strong>总价: {{ finalPrice }} 元</strong><span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span></div>
-
+      <div>
+        <strong>总价: {{ finalPrice }} 元</strong><span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
+        <button @click="gotoOrder()">结算</button>
+      </div>
+      <router-view />
     </div>
+    <router-view />
+    <ChildComponent /> 
 </template>

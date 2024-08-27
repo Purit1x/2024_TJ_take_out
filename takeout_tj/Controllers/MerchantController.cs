@@ -154,8 +154,8 @@ namespace takeout_tj.Controllers
                 merchant.Contact=dto.Contact;
                 merchant.DishType=dto.DishType;
                 merchant.CouponType = dto.CouponType;
-                merchant.TimeforOpenBusiness=dto.TimeforCloseBusiness;
-                merchant.TimeforCloseBusiness=dto.TimeforOpenBusiness;
+                merchant.TimeforOpenBusiness=dto.TimeforOpenBusiness;
+                merchant.TimeforCloseBusiness=dto.TimeforCloseBusiness;
                 merchant.WalletPassword=dto.WalletPassword;
 
                 var result = _context.SaveChanges();
@@ -612,6 +612,27 @@ namespace takeout_tj.Controllers
             catch (Exception ex)
             {
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("getDishInfo")]
+        public IActionResult getDishInfo(int merchantId, int dishId)
+        {
+            try
+            {
+                var dish = _context.Dishes.FirstOrDefault(ou => ou.DishId == dishId && ou.MerchantId == merchantId);
+                if (dish != null)
+                {
+                    return Ok(new { data = dish, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return NotFound(new { msg = "未找到相关菜品" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
             }
         }
     }

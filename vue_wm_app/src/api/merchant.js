@@ -236,3 +236,11 @@ export const GetSpecialOffer=async(merchantId) => {    //获取商家提供的�
         throw error;   
     }
 }
+export const getDishInfo = async(merchantId,dishId) => {
+    try {  
+        const response = await axios.get(`${BASE_URL}/Merchant/getDishInfo?merchantId=${merchantId}&dishId=${dishId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}

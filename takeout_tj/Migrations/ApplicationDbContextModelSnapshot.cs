@@ -236,9 +236,15 @@ namespace takeout_tj.Migrations
                     b.Property<int>("CouponId")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.HasKey("OrderId");
 
-                    b.HasIndex("CouponId");
+                    b.HasIndex("UserId", "CouponId", "ExpirationDate");
 
                     b.ToTable("order_coupons", (string)null);
                 });
@@ -255,13 +261,12 @@ namespace takeout_tj.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<DateTime>("ExpectedTimeOfArrival")
+                    b.Property<DateTime?>("ExpectedTimeOfArrival")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<int>("MerchantRating")
+                    b.Property<int?>("MerchantRating")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("NeedUtensils")
@@ -273,10 +278,10 @@ namespace takeout_tj.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric(10,2)");
 
-                    b.Property<DateTime>("RealTimeOfArrival")
+                    b.Property<DateTime?>("RealTimeOfArrival")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<int>("RiderRating")
+                    b.Property<int?>("RiderRating")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("State")
@@ -298,6 +303,9 @@ namespace takeout_tj.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("DishId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("DishNum")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("OrderId", "MerchantId", "DishId");
@@ -664,21 +672,21 @@ namespace takeout_tj.Migrations
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderCouponDB", b =>
                 {
-                    b.HasOne("takeout_tj.Models.Platform.CouponDB", "CouponDB")
-                        .WithMany("OrderCouponDBs")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("takeout_tj.Models.Platform.OrderDB", "OrderDB")
                         .WithOne("OrderCouponDB")
                         .HasForeignKey("takeout_tj.Models.Platform.OrderCouponDB", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CouponDB");
+                    b.HasOne("takeout_tj.Models.User.UserCouponDB", "UserCouponDB")
+                        .WithMany("OrderCouponDB")
+                        .HasForeignKey("UserId", "CouponId", "ExpirationDate")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("OrderDB");
+
+                    b.Navigation("UserCouponDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderDB", b =>
@@ -900,8 +908,6 @@ namespace takeout_tj.Migrations
                 {
                     b.Navigation("CouponPurchaseDBs");
 
-                    b.Navigation("OrderCouponDBs");
-
                     b.Navigation("UserCouponDBs");
                 });
 
@@ -942,6 +948,11 @@ namespace takeout_tj.Migrations
 
                     b.Navigation("UserDefaultAddressDB")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.User.UserCouponDB", b =>
+                {
+                    b.Navigation("OrderCouponDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.User.UserDB", b =>

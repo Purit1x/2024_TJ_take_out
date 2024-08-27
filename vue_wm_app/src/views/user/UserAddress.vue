@@ -29,7 +29,7 @@ onMounted(async () => {
     userId.value = userid;
     userAddresses.value = await getAddressService(userid);
     const response = await GetDefaultAddress(userid);
-    if(response.data===undefined)
+    if(response.data==='none')
     {
       hasDefaultAddress.value=false;
     }
@@ -128,6 +128,7 @@ const createAddress = async() => {  // 新建地址信息
         const response = await submitAddressService(data);  
         if(response.msg='用户地址信息创建成功'){
             ElMessage.success('创建成功');
+            if(userAddresses.length==1)hasDefaultAddress.value=false;
             isCreating.value = false;
             isEditing.value = false;
             currentAddress.value = {};
@@ -142,14 +143,10 @@ const createAddress = async() => {  // 新建地址信息
 const deleteAddress = async(addressId) => {  // 删除地址信息
   try {  
     const response = await deleteAddressService(addressId);  
-    if(response.msg='用户地址信息删除成功'){
         ElMessage.success('删除成功');
         userAddresses.value = await getAddressService(userId.value);
-    } else {
-        ElMessage.error('尚未删除信息');
-    }
   } catch (error) {  
-    ElMessage.error('尚未删除信息');
+    userAddresses.value=[];
   }  
 }
 const deleteDA = async(addressId) => {  // 删除默认地址信息

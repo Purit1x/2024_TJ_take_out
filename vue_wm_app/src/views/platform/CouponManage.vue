@@ -36,11 +36,17 @@ onMounted(() => {
         notOnShelvesCouponsInfo.value = couponsInfo.value.filter(coupon => coupon.isOnShelves === 0);  // 筛选未上架优惠券信息
         isOnShelvesCouponsInfo.value = couponsInfo.value.filter(coupon => coupon.isOnShelves === 1);  // 筛选上架优惠券信息
         showCouponsInfo.value = isOnShelvesCouponsInfo.value;  // 显示上架优惠券信息
+        sortCouponsBySales();  // 按销量排序
         console.log(showCouponsInfo.value);
     }).catch(err => {  
         ElMessage.error('获取优惠券id失败'); 
     }); 
 });
+const sortCouponsBySales = () => {  
+    showCouponsInfo.value.sort((a, b) => {  
+        return b.quantitySold - a.quantitySold; // 降序排列  
+    });  
+};  
 const couponRules = computed(() => {  
     const rules = {  
         CouponName: [  

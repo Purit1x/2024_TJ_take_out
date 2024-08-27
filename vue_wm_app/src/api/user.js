@@ -245,3 +245,67 @@ export const GetUserAddress=async(addressId)=> {  //获取用户的地址
         throw error;   
     }
 }
+export const GetAddressByAddressId=async(addressId) => {  //根据地址id获取地址信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/GetAddByAddId?addressId=${addressId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const CreateOrder=async(data) => {  //创建订单
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/CreateOrder`, data);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const deleteShoppingCart=async(userId,merchantId) => {  //删除购物车
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/deleteShoppingCart?userId=${userId}&merchantId=${merchantId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const PurchaseOrder=async(orderId) => {  //购买订单
+    try {  
+        const response = await axios.post(`${BASE_URL}/Users/PurchaseOrder?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getOrders=async(userId) => {  //获取用户的订单
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getOrders?userId=${userId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getOrderCoupon=async(orderId) => {  //获取订单的优惠券
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getOrderCoupon?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const getOrderDishes=async(orderId) => {  //获取订单的菜品
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/getOrderDishes?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const deleteOrder=async(orderId) => {  //删除订单
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Users/deleteOrder?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}

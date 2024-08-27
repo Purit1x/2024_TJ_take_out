@@ -14,6 +14,10 @@ namespace takeout_tj.Models.Platform
 		[Required(ErrorMessage = "Dish ID is required. ")]
 		public int DishId { get; set; }
 
+        [Required(ErrorMessage = "Dish num is required. ")]
+        [Range(1, int.MaxValue)]
+        public int DishNum { get; set; }
+
 		public OrderDB OrderDB { get; set; }
 		public DishDB DishDB { get; set; }
 	}

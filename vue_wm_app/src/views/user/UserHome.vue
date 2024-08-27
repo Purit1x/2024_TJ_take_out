@@ -44,7 +44,7 @@ onMounted(() => {
 const fetchDefaultAddress = async () => {  
     try {  
         const res = await GetDefaultAddress(user.value.userId); // 获取用户默认地址  
-        if (res.data !== undefined) {  
+        if (res.data !== 'none') {  
             hasDefaultAddress.value = true;  
             DefaultAddressId.value = res.data;  
 
@@ -59,7 +59,7 @@ const fetchDefaultAddress = async () => {
                     // 假设商家的地址为 merchant.merchantAddress  
                     const distance = await getDistanceBetweenAddresses(merchant.merchantAddress, DefaultAddress.value)/1000;  
                     // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
-                    merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : null;  
+                    merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;  
                 }  
                 merchantsInfo.value.sort((a, b) => {  //升序排列
                     const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
@@ -88,7 +88,8 @@ watch(
             (newPath !== '/user-home/cart')&&
             (newPath !== '/user-home/address')&&
             (newPath !== '/user-home/personal/coupon')&&
-            (newPath !== '/user-home/personal/coupon/couponPurchase')) {  
+            (newPath !== '/user-home/personal/coupon/couponPurchase')&&
+            (newPath !== '/user-home/personal/myOrder')) {  
             isUserHome.value = !newPath.startsWith('/user-home/merchant/'); // 如果是商家菜单，设置为 false  
         } else {  
             isUserHome.value = false;   

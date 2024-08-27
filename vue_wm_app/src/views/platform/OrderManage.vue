@@ -12,7 +12,9 @@ const gobackHome = () => {
 
 <template>
     <div>
-        订单管理
-        <button @click="gobackHome">返回</button>
+        <h2>
+            订单管理
+            <button @click="gobackHome">返回</button>
+        </h2>
     </div>
 </template>

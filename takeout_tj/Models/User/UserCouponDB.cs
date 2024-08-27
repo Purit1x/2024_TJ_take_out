@@ -21,5 +21,6 @@ namespace takeout_tj.Models.User
         public UserDB UserDB { get; set; }
         [JsonIgnore]
         public CouponDB CouponDB { get; set; }
-	}
+        public ICollection<OrderCouponDB> OrderCouponDB { get; set; }
+    }
 }
