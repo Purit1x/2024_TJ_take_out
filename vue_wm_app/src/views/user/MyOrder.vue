@@ -40,6 +40,16 @@ onBeforeUnmount(() => {
 const renewOrders = async() => {  //更新order信息
     try{
         const ordersData = await getOrders(userId.value);
+        if(ordersData.data===40000)
+        {
+            ElMessage.success('无订单');
+            orders.value = [];
+            nopayedOrders.value = [];
+            pendingOrders.value = [];
+            deliveringOrders.value = [];
+            completedOrders.value = [];
+            return;
+        }
         orders.value = ordersData.data;
         
         for(let i=0;i<orders.value.length;i++){
@@ -69,7 +79,23 @@ const renewOrders = async() => {  //更新order信息
                 };  
             })  
             .filter(order => order !== null); // 过滤掉null  
-        pendingOrders.value = orders.value.filter(order => order.state === 1);
+        pendingOrders.value = orders.value
+            .filter(order => order.state === 1)
+            .map(order => {  
+                // 计算离过期时间  
+                const orderCreationTime = new Date(order.orderTimestamp).getTime();
+                const currentTime = new Date().getTime();  
+                const timeDiff = (currentTime - orderCreationTime-8*60*60*1000);  
+                // 如果超过30分钟，返回null，后面会通过filter删除  
+                if (timeDiff > 30 * 60 * 1000){
+                    return null;}
+                // 添加倒计时属性  
+                return {   
+                    ...order,   
+                    countdown: Math.max(0, (30 * 60 * 1000 - timeDiff) / 1000)  // 剩余秒数  
+                };  
+            })  
+            .filter(order => order!== null); // 过滤掉null  
         deliveringOrders.value = orders.value.filter(order => order.state === 2);
         completedOrders.value = orders.value.filter(order => order.state === 3);
         console.log('订单',orders.value);
@@ -93,8 +119,14 @@ const updateCountdowns = () => {
             order.countdown -= 1; // 每秒减少1  
         }  
     }  
+    for(const order of pendingOrders.value) {  
+        if (order.countdown > 0) {  
+            order.countdown -= 1; // 每秒减少1  
+        }  
+    }
     // 刷新未支付订单列表，删除已经过期的订单  
     nopayedOrders.value = nopayedOrders.value.filter(order => order.countdown > 0);  
+    pendingOrders.value = pendingOrders.value.filter(order => order.countdown > 0);  
 };  
 
 setInterval(updateCountdowns, 1000); // 每秒更新倒计时  
@@ -177,6 +209,7 @@ const cancelOrder = async() => {
 </script>
 
 <template>
+    <div class="content">
     <div v-if="!isOrderInfo">
         <h2>
             我的订单
@@ -206,6 +239,7 @@ const cancelOrder = async() => {
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{order.price}}元</p>
                     <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                    <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
                     <button @click="enterOrderInfo(order)">></button>
                 </li>
             </ul>
@@ -258,4 +292,5 @@ const cancelOrder = async() => {
             <el-button type="primary" @click="confirmPurchase()">确认</el-button>  
         </template>  
     </el-dialog>  
+    </div>
 </template>

@@ -22,7 +22,7 @@ const updateDishStock = async () => {
         const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${merchant.value.MerchantId}`);  
         dishes.value = response.data.data;  // 更新菜品列表  
         displayedDishes.value = dishes.value;  // 更新过滤后的菜品列表  
-        ElMessage.success("菜品库存更新成功");
+        ElMessage.success("菜品库存更新成功")
     } catch (error) {  
         ElMessage.error("Error fetching dishes:", error);  
     }  
@@ -30,11 +30,6 @@ const updateDishStock = async () => {
 onMounted(async () => {  
     merchant.value=store.state.merchant;
     await updateDishStock(); // 首次调用以获取菜品   
-    // 组件卸载时清除定时器  
-    const interval = setInterval(updateDishStock, 10000);   // 每10秒更新一次库存 
-    onBeforeUnmount(() => {  
-        clearInterval(interval);  
-});  
 });  
  
 const editRules = computed(() => {  
@@ -251,15 +246,12 @@ const cancelCreate = () => {
     currentDish.value = null; // 清空当前菜品  
     selectedImage.value = null; // 清空选择的图片  
 };  
-const goBack = () => {  
-    router.go(-1); // 使用 router.go(-1) 返回上一页  
-};  
 </script>
 
 <template>  
-    <div>  
-        <h1>这里是菜单页面，{{ merchant.MerchantId }}</h1>  
-        <button @click="goBack">返回</button>  <!-- 添加返回按钮 -->  
+    <slot name="sidebar"></slot>
+    <div class="content"> 
+        <header>这里是菜单页面，{{ merchant.MerchantId }}</header>  
         <div class="search-container" v-if="!isEditing&!isCreating">  
             <input   
                 type="text"   
@@ -307,5 +299,9 @@ const goBack = () => {
             <button @click="submitCreate">提交</button>  
             <button @click="cancelCreate">取消</button>
         </div>
-    </div>  
+    </div>
 </template>  
+
+<style scoped>
+
+</style>

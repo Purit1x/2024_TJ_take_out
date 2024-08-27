@@ -77,3 +77,21 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+.content {
+  width:91vw;
+  position: absolute;
+  top: 5%;
+  margin-left: 8vw;
+  /* border: 1px solid #ccc; */
+}
+  
+.content header {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  height: 50px;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}

@@ -210,6 +210,41 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"充值异常: {ex.Message}" });
             }
         }
+        [HttpPut]
+        [Route("withdraw")]
+        public IActionResult WalletWithdraw(int merchantId, int withdrawMoney)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务 
+            try
+            {
+                var merchant = _context.Merchants.FirstOrDefault(u => u.MerchantId == merchantId);
+                if (merchant == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                if (withdrawMoney == 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = merchant.Wallet, msg = "用户信息更新成功" });
+                }
+                merchant.Wallet = merchant.Wallet - withdrawMoney;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data = merchant.Wallet, msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "提现失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"提现异常: {ex.Message}" });
+            }
+        }
         [HttpGet]
         [Route("dishSearch")]
         public IActionResult GetDishesByMerchantId(int merchantId)
@@ -596,7 +631,7 @@ namespace takeout_tj.Controllers
 
         [HttpGet]
         [Route("specialOfferGet")]
-        public IActionResult GetCouponInfo(int merchantId)  //查询某商户的特殊服务
+        public IActionResult GetOffersInfo(int merchantId)  //查询某商户的特殊服务
         {
             try
             {
@@ -612,27 +647,6 @@ namespace takeout_tj.Controllers
             catch (Exception ex)
             {
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
-            }
-        }
-        [HttpGet]
-        [Route("getDishInfo")]
-        public IActionResult getDishInfo(int merchantId, int dishId)
-        {
-            try
-            {
-                var dish = _context.Dishes.FirstOrDefault(ou => ou.DishId == dishId && ou.MerchantId == merchantId);
-                if (dish != null)
-                {
-                    return Ok(new { data = dish, msg = "查找成功" }); // 返回找到的订单  
-                }
-                else
-                {
-                    return NotFound(new { msg = "未找到相关菜品" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
             }
         }
     }

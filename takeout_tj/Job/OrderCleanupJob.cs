@@ -14,16 +14,17 @@ namespace takeout_tj.Job
 
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation("OrderCleanupJob started executing.");
+            //_logger.LogInformation("OrderCleanupJob started executing.");
 
             try
             {
                 await _orderCleanupService.RemoveExpiredOrders();
-                _logger.LogInformation("OrderCleanupJob finished executing.");
+                await _orderCleanupService.RemovePaidOrders();
+                //_logger.LogInformation("OrderCleanupJob finished executing.");
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while executing OrderCleanupJob: {Message}", ex.Message);
+                //_logger.LogError("An error occurred while executing OrderCleanupJob: {Message}", ex.Message);
             }
         }
     }

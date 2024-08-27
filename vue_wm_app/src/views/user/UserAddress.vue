@@ -184,7 +184,8 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 </script>
 
 <template>
-  <div v-if="!isEditing&&!isCreating">
+
+  <div v-if="!isEditing&&!isCreating" class="content">
     <h2>我的地址
       <button @click="enterCreate">新建</button>
       <button @click="gobackHome">返回</button>

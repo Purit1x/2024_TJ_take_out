@@ -48,6 +48,14 @@ export const walletRecharge=async(id,addMoney) => {
         throw error;   
     }
 }
+export const walletWithdraw=async(id,withdrawMoney) => {
+    try {  
+        const response = await axios.put(`${BASE_URL}/Merchant/withdraw?merchantId=${id}&withdrawMoney=${withdrawMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
 export const searchDishes = async(id) => {
     try {  
         const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${id}`);
@@ -239,6 +247,35 @@ export const GetSpecialOffer=async(merchantId) => {    //获取商家提供的�
 export const getDishInfo = async(merchantId,dishId) => {
     try {  
         const response = await axios.get(`${BASE_URL}/Merchant/getDishInfo?merchantId=${merchantId}&dishId=${dishId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const GetMultiSpecialOffer=async(merchantIds) => {    //获取商家提供的满减服务
+    try {
+        // Create query string for multiple merchant IDs
+        const queryString = merchantIds.map(id => `merchantIds=${id}`).join('&');
+        
+        // Make the GET request with the formatted query string
+        const response = await axios.get(`${BASE_URL}/Merchant/multiSpecialOfferGet?${queryString}`);
+        
+        return response.data; // Return the data from the response
+    } catch (error) {
+        throw error;
+    }
+}
+export const getOrdersToHandle = async(merchantId) => {
+    try {  
+        const response = await axios.get(`${BASE_URL}/Merchant/getOrdersToHandle?merchantId=${merchantId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+export const deletePaidOrder=async(orderId) => {
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Merchant/deletePaidOrder?orderId=${orderId}`);  
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   

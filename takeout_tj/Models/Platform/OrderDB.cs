@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using takeout_tj.Models.User;
+using Newtonsoft.Json;
 
 namespace takeout_tj.Models.Platform
 {
@@ -38,7 +39,9 @@ namespace takeout_tj.Models.Platform
 		
 		public OrderRiderDB OrderRiderDB { get; set; }
 		public OrderUserDB OrderUserDB { get; set; }
-		public ICollection<OrderDishDB> OrderDishDBs { get;	set;}
+
+        [JsonIgnore]
+        public ICollection<OrderDishDB> OrderDishDBs { get;	set;}
 		public OrderCouponDB OrderCouponDB { get; set; }
 		public UserAddressDB UserAddressDB { get; set; }
 	}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.Rider;
@@ -202,6 +203,125 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("getPaidOrders")]
+        public IActionResult getPaidOrders(int riderId)
+        {
+            try
+            {
+                // 获取rider对应的StationId  
+                var riderStation = _context.RiderStations
+                    .FirstOrDefault(rs => rs.RiderId == riderId);
+                if (riderStation == null)
+                {
+                    return NotFound(new { errorCode = 40001, msg = "未找到与该骑手相关的站点" });
+                }
 
+                var riderStationId = riderStation.StationId;
+
+                // 查询状态为1的订单，并且与Merchant的StationId相同的订单  
+                var orders = _context.Orders
+                    .Where(o => o.State == 1)
+                    .ToList();
+
+                var results = new List<object>();
+
+                foreach (var order in orders)
+                {
+                    var orderDishes=_context.OrderDishes.Where(od=>od.OrderId== order.OrderId).ToList();
+                        // 查找Dish对应的Merchant  
+                    var merchantStation = _context.MerchantStations
+                        .FirstOrDefault(m => m.MerchantId == orderDishes[0].MerchantId);
+
+                    if (merchantStation != null)
+                    {
+                            // 将 Merchant 的 StationId 和 order 相关的信息保存  
+                        var stationId = merchantStation.StationId;
+
+                            // 检查 StationId 是否与骑手的 StationId 相同  
+                        if (stationId == riderStationId)
+                        {
+                            results.Add(new
+                            {
+                                order
+                            });
+                        }
+                    }
+                }
+
+                if (results.Count > 0)
+                {
+                    return Ok(new { data = results, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return NotFound(new { errorCode = 40000, msg = "未找到相关订单" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+        [HttpPut]
+        [Route("receiveOrder")]
+        public IActionResult receiveOrder(int riderId,int orderId)
+        {
+            try
+            {
+                // 获取rider对应的StationId  
+                var riderStation = _context.RiderStations
+                    .FirstOrDefault(rs => rs.RiderId == riderId);
+                if (riderStation == null)
+                {
+                    return NotFound(new { errorCode = 40001, msg = "未找到与该骑手相关的站点" });
+                }
+
+                var riderStationId = riderStation.StationId;
+
+                // 查询状态为1的订单，并且与Merchant的StationId相同的订单  
+                var orders = _context.Orders
+                    .Where(o => o.State == 1)
+                    .ToList();
+
+                var results = new List<object>();
+
+                foreach (var order in orders)
+                {
+                    var orderDishes = _context.OrderDishes.Where(od => od.OrderId == order.OrderId).ToList();
+                    // 查找Dish对应的Merchant  
+                    var merchantStation = _context.MerchantStations
+                        .FirstOrDefault(m => m.MerchantId == orderDishes[0].MerchantId);
+
+                    if (merchantStation != null)
+                    {
+                        // 将 Merchant 的 StationId 和 order 相关的信息保存  
+                        var stationId = merchantStation.StationId;
+
+                        // 检查 StationId 是否与骑手的 StationId 相同  
+                        if (stationId == riderStationId)
+                        {
+                            results.Add(new
+                            {
+                                order
+                            });
+                        }
+                    }
+                }
+
+                if (results.Count > 0)
+                {
+                    return Ok(new { data = results, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return NotFound(new { errorCode = 40000, msg = "未找到相关订单" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
     }
 }

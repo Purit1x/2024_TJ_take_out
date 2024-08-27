@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.Merchant;
@@ -15,11 +17,13 @@ namespace takeout_tj.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserService _userService;
+        private readonly ILogger<UsersController> _logger; // 声明日志记录器  
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, ILogger<UsersController> logger)
         {
             _context = context;
             _userService = new UserService(_context);
+            _logger = logger;
         }
 
         // <summary>
@@ -229,6 +233,43 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"充值异常: {ex.Message}" });
             }
         }
+
+        [HttpPut]
+        [Route("withdraw")]
+        public IActionResult WalletWithdraw(int userId, int withdrawMoney)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务 
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                if (withdrawMoney == 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = user.Wallet, msg = "用户信息更新成功" });
+                }
+                user.Wallet = user.Wallet - withdrawMoney;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data = user.Wallet, msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "提现失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"提现异常: {ex.Message}" });
+            }
+        }
+
         // 获取所有商家的 MerchantId  
         [HttpGet("GetMerchantIds")]
         public async Task<IActionResult> GetAllMerchantIds()
@@ -536,39 +577,38 @@ namespace takeout_tj.Controllers
                 var cartItems = _context.ShoppingCarts
                     .Where(cart => cart.UserId == userId)
                     .Include(cart => cart.DishDB)  // 通过 Include 方法加载 DishDB 相关数据
-                    .Select(cart => new
+                    .ToList();
+
+                // 获取所有相关商户信息
+                var merchantInfo = _context.Merchants
+                    .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
+                    .ToDictionary(m => m.MerchantId, m => m.MerchantName);
+
+                // 按商户分组
+                var groupedResult = cartItems
+                    .GroupBy(cart => cart.MerchantId)
+                    .Select(group => new
                     {
-                        cart.ShoppingCartId,
-                        cart.MerchantId,
-                        cart.DishId,
-                        cart.DishNum,
-                        DishName = cart.DishDB.DishName,  // 获取菜品名称
-                        DishPrice = cart.DishDB.DishPrice, // 获取菜品价格
-                        ImageUrl = cart.DishDB.ImageUrl,   // 获取菜品图片URL
+                        MerchantId = group.Key,
+                        MerchantName = merchantInfo[group.Key], // 从 merchantInfo 中获取商家名称
+                        Dishes = group.Select(cart => new
+                        {
+                            cart.ShoppingCartId,
+                            cart.DishId,
+                            cart.DishNum,
+                            DishName = cart.DishDB.DishName,  // 获取菜品名称
+                            DishPrice = cart.DishDB.DishPrice, // 获取菜品价格
+                            ImageUrl = cart.DishDB.ImageUrl   // 获取菜品图片URL
+                        }).ToList()
                     })
                     .ToList();
-                var merchantInfo = _context.Merchants
-                .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
-                .ToDictionary(m => m.MerchantId, m => m.MerchantName);
 
-                var result = cartItems.Select(cart => new
-                {
-                    cart.ShoppingCartId,
-                    cart.MerchantId,
-                    MerchantName = merchantInfo[cart.MerchantId], // 从 merchantInfo 中获取商家名称
-                    cart.DishId,
-                    cart.DishNum,
-                    cart.DishName,
-                    cart.DishPrice,
-                    cart.ImageUrl
-                }).ToList();
-
-                if (result.Count == 0)
+                if (groupedResult.Count == 0)
                 {
                     return Ok(new { data = new List<object>(), msg = "购物车为空" });
                 }
 
-                return Ok(new { data = result, msg = "获取成功" });
+                return Ok(new { data = groupedResult, msg = "获取成功" });
             }
             catch (Exception ex)
             {
@@ -577,7 +617,7 @@ namespace takeout_tj.Controllers
         }
 
         [HttpGet]
-        [Route("getShoppingCartinMerchant")]  // 获取购物车中的所有物品
+        [Route("getShoppingCartinMerchant")]  // 按商家获取购物车中的所有物品
         public IActionResult getShoppingCartinMerchant(int userId, int merchantId)
         {
             try
@@ -1204,20 +1244,20 @@ namespace takeout_tj.Controllers
             }
         }
         [HttpPost]
-        [Route("PurchaseOrder")]  //支付订单
-        public IActionResult PurchaseOrder(int orderId)  //支付订单
+        [Route("PurchaseOrder")]  //支付订单  
+        public async Task<IActionResult> PurchaseOrder(int orderId)  //支付订单  
         {
-            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            await using var tran = await _context.Database.BeginTransactionAsync();  // 异步开启一个事务  
             try
             {
-                var order = _context.Orders.FirstOrDefault(m => m.OrderId == orderId);
-                var orderUser = _context.OrderUsers.FirstOrDefault(m => m.OrderId == orderId);
+                var order = await _context.Orders.FindAsync(orderId);
+                var orderUser = await _context.OrderUsers.FirstOrDefaultAsync(m => m.OrderId == orderId);
                 if (orderUser == null)
                 {
                     return StatusCode(20003, new { errorCode = 20003, msg = $"查找订单所属用户失败:" });
                 }
-                var user = _context.Users.FirstOrDefault(m => m.UserId == orderUser.UserId);
-                var orderCoupon = _context.OrderCoupons.FirstOrDefault(m => m.OrderId == orderId);
+                var user = await _context.Users.FindAsync(orderUser.UserId);
+                var orderCoupon = await _context.OrderCoupons.FirstOrDefaultAsync(m => m.OrderId == orderId);
                 if (order == null || orderUser == null || user == null)
                 {
                     return StatusCode(20002, new { errorCode = 20002, msg = $"查找失败:" });
@@ -1228,16 +1268,12 @@ namespace takeout_tj.Controllers
                     return StatusCode(20000, new { errorCode = 20000, msg = $"余额不足:" });
                 }
 
-                if (orderCoupon == null)
+                if (orderCoupon != null)
                 {
-                    //允许优惠券为空，若找不到优惠券，则不删除任何优惠券
-                }
-                else
-                {
-                    var userCoupon = _context.UserCoupons.FirstOrDefault(m => m.UserId == orderCoupon.UserId && m.CouponId == orderCoupon.CouponId && m.ExpirationDate == orderCoupon.ExpirationDate);
+                    var userCoupon = await _context.UserCoupons.FirstOrDefaultAsync(m => m.UserId == orderCoupon.UserId && m.CouponId == orderCoupon.CouponId && m.ExpirationDate == orderCoupon.ExpirationDate);
                     if (userCoupon == null)
                     {
-
+                        // 没有找到用户优惠券  
                     }
                     else if (userCoupon.AmountOwned == 1)
                     {
@@ -1245,22 +1281,24 @@ namespace takeout_tj.Controllers
                     }
                     else if (userCoupon.AmountOwned > 0)
                     {
-                        userCoupon.AmountOwned = userCoupon.AmountOwned - 1;
+                        userCoupon.AmountOwned -= 1;
                     }
                     else
                     {
                         return StatusCode(20001, new { errorCode = 20001, msg = "优惠券不足" });
                     }
                 }
+
+                // 更新订单状态和用户钱包  
                 order.State = 1;
                 user.Wallet = wallet;
-                var result = _context.SaveChanges();
-                tran.Commit();
+                await _context.SaveChangesAsync();
+                await tran.CommitAsync(); // 提交事务  
                 return Ok(new { data = order.State, msg = "支付成功" });
             }
             catch (Exception ex)
             {
-                tran.Rollback();
+                await tran.RollbackAsync();
                 return StatusCode(30000, new { errorCode = 30000, msg = $"创建异常: {ex.Message}" });
             }
         }
@@ -1281,7 +1319,7 @@ namespace takeout_tj.Controllers
                 }
                 else
                 {
-                    return NotFound(new {  errorCode=40000,msg = "未找到相关订单" });
+                    return Ok(new {  data=40000,msg = "未找到相关订单" });
                 }
 
 

@@ -289,6 +289,7 @@ const confirmPurchase = async () => {
 </script>
 
 <template>
+    <div class="content">
     <div>
         <h2>
             下单
@@ -385,4 +386,5 @@ const confirmPurchase = async () => {
             <el-button type="primary" @click="confirmPurchase()">确认</el-button>  
         </template>  
     </el-dialog>  
+    </div>
 </template>

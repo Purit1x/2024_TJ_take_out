@@ -135,8 +135,10 @@ const cancelPurchase = () => {
 </script>
 
 <template>
+    <div class="content">
     <div v-if="!isCouponInfo">
-        <h2>购买优惠券&nbsp;&nbsp;<button @click="gobackHome()">返回</button></h2>
+        <header>购买优惠券</header>
+        <button @click="gobackHome()">返回</button>
 
         <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
@@ -208,5 +210,5 @@ const cancelPurchase = () => {
             </template>  
         </el-dialog>  
     </div>
-    
+</div>
 </template>
