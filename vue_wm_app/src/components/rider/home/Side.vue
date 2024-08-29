@@ -19,5 +19,9 @@
 </template>
 
 <style scoped>
+.side {
+    width: 200px;
+    background: #545c64;
+}
 
 </style>

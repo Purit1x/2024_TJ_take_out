@@ -10,6 +10,7 @@
     const currentRiderInfo = ref({})
     const personalInfo = ref(false);  // 个人信息弹窗状态
     const editPI=ref(false)  //编辑个人信息弹窗状态
+    const editPIDialogue = ref(false) //编辑个人信息弹窗状态
     const isWallet=ref(false);  //是否是钱包界面
     const isRecharge=ref(false);  //是否是充值界面
     const isChangeWP=ref(false);  //是否是修改支付密码界面
@@ -208,7 +209,74 @@
 
 <template>
     骑手信息页
-    <div v-if="!personalInfo && !isWallet&&!editPI&&!isRecharge&&!isChangeWP">
+    <div class="personTop">
+        <el-avatar class="user-avator" :size="100" :src="imgurl" />
+    </div>
+    <div class="personDown">
+        <div class="personside">
+            工资钱包
+        </div>
+        <div class="personInfo">
+            个人信息
+            <div>骑手Id：{{currentRiderInfo.RiderId}}</div>
+            <div>姓名：{{currentRiderInfo.RiderName}}</div>
+            <div>手机号：{{currentRiderInfo.PhoneNumber}}</div>
+            <div>密码：{{currentRiderInfo.Password}}</div>
+        </div>
+    </div>
+
+</template>
+
+<style scoped>
+.personTop {
+    display: flex;
+    align-items: center;
+    background-color: gray;
+    margin-bottom: 20px;
+    margin-left:10px;
+    margin-right:10px;
+    height: 20%;
+    border-radius: 15px; /* 圆角 */
+}
+
+.user-avator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left:15px;
+}
+
+.personDown {
+    display:flex;
+    color:white;
+    height: 65%;
+}
+
+.personside {
+    flex: 1; 
+    text-align: center; 
+    margin-left: 10px;
+    margin-right: 10px;    
+    background-color: gray;
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
+.personInfo {
+    flex: 2; 
+    text-align: center; 
+    margin-left: 10px;
+    margin-right: 10px;    
+    background-color: gray;
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+
+}
+
+</style>    
+
+<!-- <div v-if="!personalInfo && !isWallet&&!editPI&&!isRecharge&&!isChangeWP">
         <div><button @click="enterPersonalInfo">个人信息</button></div>
         <div><button @click="enterWallet">钱包</button></div>
     </div>
@@ -239,15 +307,16 @@
         <button @click="leaveWallet">返回</button>
     </div>
     <el-form :model="currentRiderInfo" :rules="riderRules" ref="refForm">
-        <div class="recharge" v-if="isRecharge">  <!-- 充值 -->
+   
+        <div class="recharge" v-if="isRecharge">  
             <div>充值金额</div>
             <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentRiderInfo.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
             <button @click="SaveRecharge">充值</button>
             <button>提现</button>
             <button @click="leaveRechargeWindow">返回</button>
         </div>
-
-        <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
+    
+        <div class="changewp" v-if="isChangeWP"> 
             <div>支付密码</div>
             <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentRiderInfo.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
             <div>确认支付密码</div>
@@ -255,10 +324,4 @@
             <button @click="SaveWalletPassword">修改</button>
             <button @click="leaveWPWindow">返回</button>
         </div>
-    </el-form>
-
-</template>
-
-<style scoped>
-
-</style>
+    </el-form> -->
