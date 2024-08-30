@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.Rider;
+using takeout_tj.Models.Platform;
 using takeout_tj.Service;
+using Microsoft.VisualBasic;
 
 namespace takeout_tj.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class RiderController:Controller
+    public class RiderController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly RiderService _riderService;
@@ -195,13 +198,164 @@ namespace takeout_tj.Controllers
                 {
                     return NotFound(new { errorCode = 404, msg = "未分配" });
                 }
-                return Ok(new { data=riderStation.StationId, msg = "获取成功" });
+                return Ok(new { data = riderStation.StationId, msg = "获取成功" });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("getReceivedOrders")]
+        public async Task<IActionResult> getReceivedOrders(int riderId)
+        {
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var orderIds = await _context.OrderRiders  // 指定骑手的所有订单
+                        .Where(or => or.RiderId == riderId)
+                        .Select(or => or.OrderId).ToListAsync();
+                    var orderIdsWithStateOne = await _context.Orders  // 指定骑手的订单中正在派送的
+                        .Where(o => orderIds.Contains(o.OrderId) && o.State == 2)
+                        .ToListAsync();
+                    if (orderIdsWithStateOne == null)
+                        return Ok(new { data = 20000, msg = "该骑手尚未接单" });
 
+                    return Ok(new { data = orderIdsWithStateOne, msg = "获取成功" });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, MsgBoxResult = ex.Message });
+                }
+            }
+        }
+        [HttpGet]
+        [Route("getPaidOrders")]
+        public IActionResult getPaidOrders(int riderId)
+        {
+            try
+            {
+                // 获取rider对应的StationId  
+                var riderStation = _context.RiderStations
+                    .FirstOrDefault(rs => rs.RiderId == riderId);
+                if (riderStation == null)
+                {
+                    return NotFound(new { errorCode = 40001, msg = "未找到与该骑手相关的站点" });
+                }
+
+                var riderStationId = riderStation.StationId;
+
+                // 查询状态为1的订单，并且与Merchant的StationId相同的订单  
+                var orders = _context.Orders
+                    .Where(o => o.State == 1)
+                    .ToList();
+
+                var results = new List<object>();
+
+                foreach (var order in orders)
+                {
+                    var orderDishes = _context.OrderDishes.Where(od => od.OrderId == order.OrderId).ToList();
+                    // 查找Dish对应的Merchant  
+                    var merchantStation = _context.MerchantStations
+                        .FirstOrDefault(m => m.MerchantId == orderDishes[0].MerchantId);
+
+                    if (merchantStation != null)
+                    {
+                        // 将 Merchant 的 StationId 和 order 相关的信息保存  
+                        var stationId = merchantStation.StationId;
+
+                        // 检查 StationId 是否与骑手的 StationId 相同  
+                        if (stationId == riderStationId)
+                        {
+                            results.Add(new
+                            {
+                                order
+                            });
+                        }
+                    }
+                }
+
+                if (results.Count > 0)
+                {
+                    return Ok(new { data = results, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return Ok(new { data = 40000, msg = "未找到相关订单" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+        [HttpPut]
+        [Route("receiveOrder")]  // 骑手接单
+        public async Task<IActionResult> ReceiveOrder([FromBody] RiderReceiveOrder riderReceiveOrderDto)
+        {
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var orderRiderToUpdate = await _context.OrderRiders
+                        .FirstOrDefaultAsync(or => or.OrderId == riderReceiveOrderDto.OrderId);  // 获取指定元组，将RiderId填入
+                    if (orderRiderToUpdate == null)
+                    {
+                        tran.Rollback();
+                        return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+                    }
+                    orderRiderToUpdate.RiderId = riderReceiveOrderDto.RiderId;
+
+                    /*var result1 = _context.SaveChanges();
+                    if (result1 <= 0)
+                    {
+                        tran.Rollback();
+                        return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "更新订单骑手失败" });
+                    }*/
+
+                    var orderToUpdate = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == riderReceiveOrderDto.OrderId);
+                    if (orderToUpdate == null)
+                    {
+                        tran.Rollback();
+                        return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+                    }
+                    orderToUpdate.State = 2;
+                    var result2 = _context.SaveChanges();
+                    if (result2 <= 0)
+                    {
+                        tran.Rollback();
+                        return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "更新订单状态失败" });
+                    }
+
+                    tran.Commit();
+                    return Ok(new { data = orderToUpdate });  // 返回更新的订单
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    return BadRequest(new { errorCode = 400, msg = $"接单异常：{ex.Message}" });
+                }
+            }
+        }
+        [HttpGet]
+        [Route("getRiderPrice")]
+        public async Task<IActionResult> GetRiderPrice(int orderId)
+        {
+            try
+            {
+                var orderRider = await _context.OrderRiders.FirstOrDefaultAsync(or => or.OrderId == orderId);
+                if (orderRider == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+                }
+                return Ok(new { data = orderRider.RiderPrice, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
+            }
+        }
+        
     }
 }

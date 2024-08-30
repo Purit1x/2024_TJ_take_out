@@ -62,7 +62,19 @@ onMounted(() => {
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
-        if (newPath.startsWith('/user-home/personal')&& newPath !== '/user-home/personal/coupon'&&newPath !== '/user-home/personal/coupon/couponPurchase') {  
+        userInfo(userForm.value.UserId)
+            .then((res) => {
+                userForm.value.Wallet=res.data.wallet;
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+);  
+watch(  
+    () => router.currentRoute.value.path,  
+    (newPath) => {  
+        if (newPath.startsWith('/user-home/personal')&& newPath !== '/user-home/personal/coupon'&&newPath !== '/user-home/personal/coupon/couponPurchase'&&newPath !=='/user-home/personal/myOrder') {  
             isUserPersonal.value = true; // 返回到商家主页时显示欢迎信息和按钮  
         } else {  
             isUserPersonal.value = false; // 进入子路由时隐藏  
@@ -326,6 +338,10 @@ const visitingCoupon=()=>{
     router.push('/user-home/personal/coupon');
 
 }
+const visitingMyOrder=()=>{
+    isUserPersonal.value=false;
+    router.push('/user-home/personal/myOrder');
+}
 </script>
 
 <template>
@@ -337,7 +353,7 @@ const visitingCoupon=()=>{
         <div><button @click="enterFavouriteMerchants()">收藏</button></div>
         <div><button @click="visitingCoupon()">优惠券</button></div>
         <div><button>积分与会员</button></div>
-        <div><button>我的订单</button></div>
+        <div><button @click="visitingMyOrder()">我的订单</button></div>
         <div><button @click="enterWallet()">钱包</button></div>
         <div><button @click="showPersonalInfo()">个人信息</button></div>
         <div><button @click="logout()">退出登录</button></div>

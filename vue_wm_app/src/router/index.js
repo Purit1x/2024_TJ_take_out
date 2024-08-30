@@ -29,6 +29,8 @@ import StationManage from '@/views/platform/StationManage.vue'
 import UserCoupon from '@/views/user/UserCoupon.vue'
 import CouponPurchase from '@/views/user/CouponPurchase.vue'
 import SpecialOffer from '@/views/Merchant/SpecialOffer.vue'
+import UserOrder from '@/views/user/UserOrder.vue'
+import MyOrder from '@/views/user/MyOrder.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -51,10 +53,6 @@ const routers = [
     }, 
     { path: "/user-home", component: UserHome, meta: { requiresAuth: true },children: [  
         {  
-          path: 'order', //订单
-          component: UserHome, 
-        },
-        {  
             path: 'personal', //个人主页
             component: UserPersonal, 
             children: [  
@@ -70,12 +68,24 @@ const routers = [
                         },
                     ],
                 },
+                {
+                    path:'myOrder',
+                    component: MyOrder,
+                    props: true,
+                },
             ],
         },
         {  
             path: 'merchant/:id',  
             component: Menu, // 显示商家菜单的组件  
             props: true, // 允许将路由参数作为 props 传递  
+            children: [  
+                {  
+                    path: 'order', // 显示商家订单的组件  
+                    component: UserOrder, 
+                    props: true,  
+                },  
+            ],  
         },  
         {
             path:'cart',

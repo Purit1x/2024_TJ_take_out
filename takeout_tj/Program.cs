@@ -8,6 +8,12 @@ using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using takeout_tj.Service;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi; // 确保引入这个命名空间以使用 IJobFactory  
+using takeout_tj.Job;
+using Quartz.AspNetCore;
+//using Quartz.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,6 +84,30 @@ builder.Services.AddCors(c =>
         .AllowAnyHeader();
     });
 });
+// 添加Quartz服务  
+builder.Services.AddQuartz(q =>
+{
+    q.UseSimpleTypeLoader();
+    q.UseInMemoryStore(); // 使用内存存储或其他持久存储  
+    q.ScheduleJob<OrderCleanupJob>(trigger => trigger
+        .WithIdentity("OrderCleanupJobTrigger")
+        .StartNow()
+        .WithSimpleSchedule(x => x
+            .WithInterval(TimeSpan.FromSeconds(60)) // 每60秒执行一次  
+            .RepeatForever()));
+});
+
+// 添加 Quartz 服务  
+builder.Services.AddQuartzServer(options =>
+{
+    options.WaitForJobsToComplete = true; // 可选, 等待作业完成  
+});
+
+builder.Services.AddTransient<OrderCleanupService>();
+builder.Services.AddLogging();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); // 输出到控制台  
+builder.Logging.AddDebug(); // 输出调试信息 
 
 var app = builder.Build();
 
@@ -105,7 +135,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapControllers();
-
 
 app.Run();
 

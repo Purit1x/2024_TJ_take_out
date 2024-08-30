@@ -154,8 +154,8 @@ namespace takeout_tj.Controllers
                 merchant.Contact=dto.Contact;
                 merchant.DishType=dto.DishType;
                 merchant.CouponType = dto.CouponType;
-                merchant.TimeforOpenBusiness=dto.TimeforCloseBusiness;
-                merchant.TimeforCloseBusiness=dto.TimeforOpenBusiness;
+                merchant.TimeforOpenBusiness=dto.TimeforOpenBusiness;
+                merchant.TimeforCloseBusiness=dto.TimeforCloseBusiness;
                 merchant.WalletPassword=dto.WalletPassword;
 
                 var result = _context.SaveChanges();
@@ -639,7 +639,7 @@ namespace takeout_tj.Controllers
 
                 if (offers.Count == 0)
                 {
-                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                    return Ok(new { data = offers, msg = "无满减活动" });
                 }
 
                 return Ok(new { data = offers, msg = "获取成功" });
@@ -649,7 +649,27 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
-
+        [HttpGet]
+        [Route("getDishInfo")]
+        public IActionResult getDishInfo(int merchantId, int dishId)
+        {
+            try
+            {
+                var dish = _context.Dishes.FirstOrDefault(ou => ou.DishId == dishId && ou.MerchantId == merchantId);
+                if (dish != null)
+                {
+                    return Ok(new { data = dish, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return NotFound(new { msg = "未找到相关菜品" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
         [HttpGet]
         [Route("multiSpecialOfferGet")]
         public IActionResult GetMultiOffersInfo([FromQuery] List<int> merchantIds)  // 查询多个商户的特殊服务
@@ -667,7 +687,7 @@ namespace takeout_tj.Controllers
 
                 if (offers.Count == 0)
                 {
-                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                    return Ok(new { data = offers, msg = "无满减活动" });
                 }
 
                 return Ok(new { data = offers, msg = "获取成功" });
@@ -677,5 +697,135 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
-    }
+        [HttpGet]
+        [Route("getOrdersToHandle")]
+        public IActionResult getOrdersToHandle(int merchantId)
+        {
+            try
+            {
+                var orders = _context.OrderDishes
+                    .Include(ou => ou.OrderDB) // 包含订单信息  
+                    .Where(ou => ou.MerchantId == merchantId)
+                    .Select(ou => ou.OrderDB)
+                    .Where(ou=>ou.State==1||ou.State==2||ou.State==3)
+                    .Distinct() // 确保唯一性
+                    .ToList();
+                if (orders.Count > 0)
+                {
+                    return Ok(new { data = orders, msg = "查找成功" }); // 返回找到的订单  
+                }
+                else
+                {
+                    return Ok(new { data = 40000, msg = "未找到相关订单" });
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+        [HttpDelete]
+        [Route("deletePaidOrder")]
+        public IActionResult deletePaidOrder(int orderId)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            try
+            {
+                var order=_context.Orders.FirstOrDefault(o => o.OrderId == orderId);
+                if (order == null)
+                {
+                    return StatusCode(40000,new { errorCode = 40000, msg = "未找到要删除的订单" });
+                }
+                var orderDishes = _context.OrderDishes.Where(od => od.OrderId == order.OrderId).ToList();
+                foreach (var orderDish in orderDishes)
+                {
+                    // 根据 DishId 查询菜品  
+                    var dish =  _context.Dishes.FirstOrDefault(d => d.DishId == orderDish.DishId);
+                    if (dish != null)
+                    {
+                        // 恢复库存  
+                        dish.DishInventory += orderDish.DishNum; // 增加菜品库存  
+                        _context.Dishes.Update(dish); // 确保将更新的菜品存回上下文  
+                    }
+                }
+    
+                var orderCoupon = _context.OrderCoupons.FirstOrDefault(m => m.OrderId == order.OrderId);
+                if (orderCoupon != null)
+                {
+                    var userCoupon = _context.UserCoupons.FirstOrDefault(m => m.UserId == orderCoupon.UserId && m.CouponId == orderCoupon.CouponId && m.ExpirationDate == orderCoupon.ExpirationDate);
+                    if (userCoupon != null)
+                    {
+                        userCoupon.AmountOwned++;
+
+                    }
+                    else
+                    {
+                        UserCouponDB newCoupon = new UserCouponDB
+                        {
+                            CouponId = orderCoupon.CouponId,
+                            UserId = orderCoupon.UserId,
+                            ExpirationDate = orderCoupon.ExpirationDate,
+                            AmountOwned = 1
+                        };
+                        _context.UserCoupons.Add(newCoupon);
+
+                    }
+                }
+                var orderUser = _context.OrderUsers.FirstOrDefault(ou => ou.OrderId == order.OrderId);
+                if (orderUser != null)
+                {
+                    var user = _context.Users.FirstOrDefault(u => u.UserId == orderUser.UserId);
+                    if (user != null)
+                    {
+                        user.Wallet += order.Price;
+                    }
+                }
+                // 删除订单
+                _context.Orders.Remove(order);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "订单删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+		[HttpGet]
+		[Route("getMerAddrByOrderId")]
+		public async Task<IActionResult> GetMerAddrByOrderId(int orderId)
+		{
+			try
+			{
+				var orderDish = await _context.OrderDishes.FirstOrDefaultAsync(od => od.OrderId == orderId);
+				if (orderDish == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+				}
+				var merchantId = orderDish.MerchantId;
+				var merchant = await _context.Merchants
+					.FirstOrDefaultAsync(m => m.MerchantId == merchantId);
+				if (merchant == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "商户未找到" });
+				}
+				return Ok(new { data = merchant.MerchantAddress, msg = "获取成功" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = ex.Message });
+			}
+		}
+	}
 }

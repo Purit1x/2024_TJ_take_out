@@ -110,6 +110,7 @@ li {
     padding: 5px;
     flex: 1;
     overflow-y: auto;
+    margin-left: 200px;
 }
 
 /* color */

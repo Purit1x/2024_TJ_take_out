@@ -3,7 +3,8 @@ import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
-import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant } from "@/api/user";
+import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress } from "@/api/user";
+import {getDistanceBetweenAddresses} from "@/api/merchant";
 import { ElMessage } from 'element-plus';
 
 const store = useStore();    
@@ -15,7 +16,9 @@ const merchantsInfo = ref([]); // 存储所有商家信息
 const isMenu= ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
 const showMerchantsInfo = ref([]); // 显示商家信息列表
-
+const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
+const DefaultAddress=ref(null); // 用于跟踪默认地址
+const DefaultAddressId=ref(null); // 用于跟踪默认地址id
 onMounted(() => {  
   const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
@@ -32,22 +35,61 @@ onMounted(() => {
     return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
   }).then(responses => {  
     merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
+    fetchDefaultAddress();  // 获取用户默认地址
     showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
   }).catch(err => {  
     ElMessage.error('获取商家id失败'); 
-  }); 
+  });  
 }); 
+const fetchDefaultAddress = async () => {  
+    try {  
+        const res = await GetDefaultAddress(user.value.userId); // 获取用户默认地址  
+        if (res.data !== 'none') {  
+            hasDefaultAddress.value = true;  
+            DefaultAddressId.value = res.data;  
 
+            // 获取默认地址  
+            const addressRes = await GetUserAddress(DefaultAddressId.value);  
+            DefaultAddress.value = addressRes.data;  
+            console.log(DefaultAddress.value);  
+
+            if (hasDefaultAddress.value && DefaultAddress.value) {  
+                // 计算每个商家与默认地址之间的距离  
+                for (const merchant of merchantsInfo.value) {  
+                    // 假设商家的地址为 merchant.merchantAddress  
+                    const distance = await getDistanceBetweenAddresses(merchant.merchantAddress, DefaultAddress.value)/1000;  
+                    // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
+                    merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;  
+                }  
+                merchantsInfo.value.sort((a, b) => {  //升序排列
+                    const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
+                    const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
+                    return distanceA - distanceB;  
+                });  
+            }  
+            console.log(merchantsInfo.value);  
+            showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
+        } else {  
+            hasDefaultAddress.value = false;  
+            ElMessage.error('请设置默认地址');  
+        }  
+    } catch (err) {  
+        ElMessage.error('请设置默认地址'); // 处理获取默认地址以及其他潜在错误  
+        console.error(err); // 可选：记录错误以便调试  
+    }  
+};  
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
         // 检查当前路由是否是用户主页或商家菜单  
+        fetchDefaultAddress();
         if (newPath.startsWith('/user-home') &&   
             newPath !== '/user-home/personal'&&
             (newPath !== '/user-home/cart')&&
             (newPath !== '/user-home/address')&&
             (newPath !== '/user-home/personal/coupon')&&
-            (newPath !== '/user-home/personal/coupon/couponPurchase')) {  
+            (newPath !== '/user-home/personal/coupon/couponPurchase')&&
+            (newPath !== '/user-home/personal/myOrder')) {  
             isUserHome.value = !newPath.startsWith('/user-home/merchant/'); // 如果是商家菜单，设置为 false  
         } else {  
             isUserHome.value = false;   
@@ -160,6 +202,7 @@ provide('merchantsInfo', merchantsInfo);
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
+                  <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
                 </tr>
@@ -227,12 +270,11 @@ th {
   border: none;
   background-color: transparent;
   cursor: pointer;
-  img {
-    width: 100%;
-    height: auto;
-  }
 }
-
+.sidebar-button img {
+  width: 100%;
+  height: auto;
+}
 .sidebar-button span {
   display: block;
   font-size: 12px;

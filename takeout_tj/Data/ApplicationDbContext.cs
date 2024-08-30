@@ -175,15 +175,15 @@ namespace takeout_tj.Data
 				.HasForeignKey(od => od.OrderId);
 			// 订单到优惠券的多对一联系集
 			modelBuilder.Entity<OrderCouponDB>()
-				.HasOne(oc => oc.CouponDB)
-				.WithMany(c => c.OrderCouponDBs)
-				.HasForeignKey(oc => oc.CouponId);
-			modelBuilder.Entity<OrderCouponDB>()
 				.HasOne(oc => oc.OrderDB)
 				.WithOne(o => o.OrderCouponDB)
 				.HasForeignKey<OrderCouponDB>(oc => oc.OrderId);
-			// 商家到站点的多对一联系集
-			modelBuilder.Entity<MerchantStationDB>()
+			modelBuilder.Entity<OrderCouponDB>()
+				.HasOne(oc => oc.UserCouponDB)
+				.WithMany(uc => uc.OrderCouponDB)
+				.HasForeignKey(oc => new { oc.UserId,oc.CouponId,oc.ExpirationDate});
+            // 商家到站点的多对一联系集
+            modelBuilder.Entity<MerchantStationDB>()
 				.HasOne(ms => ms.MerchantDB)
 				.WithOne(m => m.MerchantStationDB)
 				.HasForeignKey<MerchantStationDB>(ms => ms.MerchantId);
