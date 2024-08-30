@@ -120,7 +120,7 @@ watch(choosedAddress, async(newAddress, oldAddress) => {
     if (newAddress && newAddress.userAddress) {  
         const distance = await getDistanceBetweenAddresses(merchantAddress.value, newAddress.userAddress);  
         console.log("距离", distance);  
-        riderPrice.value = distance * 0.5;  // 骑手配送费按距离的千米数计算  
+        riderPrice.value = 2 + distance * 0.5;  // 骑手配送费按距离的千米数计算，底价为2  
         FinalPrice.value = MerchantPrice.value + packetPrice.value + riderPrice.value;  
     } else {  
         riderPrice.value = 0;  
@@ -227,7 +227,8 @@ const submitOrder = async () => {
         ExpirationDate:choosedCoupon.value ? choosedCoupon.value.expirationDate : new Date().toISOString(),  
         MerchantId:MerchantId.value,
         shoppingCart:shoppingCart.value,  
-        UserId:UserId.value
+        UserId: UserId.value,
+        RiderPrice: riderPrice.value
     };  
     console.log("提交订单数据",orderData);
     try {  

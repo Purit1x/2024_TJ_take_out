@@ -1209,6 +1209,13 @@ namespace takeout_tj.Controllers
                     OrderId = order.OrderId,
                     UserId = dto.UserId,
                 };
+                var orderRider = new OrderRiderDB()
+                {
+                    OrderId = order.OrderId,
+                    RiderPrice = dto.RiderPrice
+                };
+
+                
                 foreach (var dish in dto.shoppingCart)
                 {
                     OrderDishDB orderDish = new OrderDishDB
@@ -1232,6 +1239,7 @@ namespace takeout_tj.Controllers
                 }
                 _context.OrderUsers.Add(orderUser);
                 _context.Orders.Add(order);
+                _context.OrderRiders.Add(orderRider);
 
                 var result = _context.SaveChanges();
                 tran.Commit();

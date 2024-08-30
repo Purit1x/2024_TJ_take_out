@@ -1,5 +1,6 @@
 //导入request.js请求工具
 import request from '@/utils/request.js'
+import { tryOnScopeDispose } from '@vueuse/core';
 import axios from 'axios'  
 // 设置基本URL，这里使用你后端的地址  
 const BASE_URL = 'http://localhost:5079/api'; 
@@ -38,7 +39,7 @@ export const updateRider = async(data) => {  //更新用户信息
         throw error;   
     } 
 }
-export const walletRecharge=async(id,addMoney) => {  //充值
+export const walletRecharge=async(id,addMoney) => {  //提现
     try {  
         const response = await axios.put(`${BASE_URL}/Rider/recharge?riderId=${id}&addMoney=${addMoney}`);  
         return response.data; // 返回后端返回的数据
@@ -52,6 +53,43 @@ export const stIdSearch=async(id) => {  //通过id查询站点
         return response.data; // 返回后端返回的数据
     } catch (error) {  
         throw error;   
+    }
+}
+export const getPaidOrders = async (id) => {  // 通过骑手ID获取本站点所有可接订单
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getPaidOrders?riderId=${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getReceivedOrders = async (id) => {  // 获取指定骑手已接订单
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getReceivedOrders?riderId=${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const receiveOrder = async (data) => {  // 骑手接单
+    try {
+        const response = await axios.put(`${BASE_URL}/Rider/receiveOrder`, data);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+} 
+export const getRiderPrice = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getRiderPrice?orderId=${id}`);
+        console.log('配送费',response.data.data);
+        return response.data.data;  // 返回配送费的数值（单位：元）
+    }
+    catch (error) {
+        throw error;
     }
 }
 

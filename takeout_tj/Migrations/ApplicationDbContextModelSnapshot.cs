@@ -320,7 +320,7 @@ namespace takeout_tj.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("RiderId")
+                    b.Property<int?>("RiderId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<decimal>("RiderPrice")
@@ -729,9 +729,7 @@ namespace takeout_tj.Migrations
 
                     b.HasOne("takeout_tj.Models.Rider.RiderDB", "RiderDB")
                         .WithMany("OrderRiderDBs")
-                        .HasForeignKey("RiderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RiderId");
 
                     b.Navigation("OrderDB");
 

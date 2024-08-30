@@ -12,5 +12,6 @@
         public DateTime ExpirationDate { get; set; }  // 优惠券到期时间
         public int MerchantId { get; set; }
         public ShoppingCartDto[] shoppingCart { get; set; }
-    }
+		public decimal RiderPrice { get; set; }  // 骑手该单可获得多少报酬
+	}
 }

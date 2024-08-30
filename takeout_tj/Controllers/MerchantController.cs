@@ -639,7 +639,7 @@ namespace takeout_tj.Controllers
 
                 if (offers.Count == 0)
                 {
-                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                    return Ok(new { data = offers, msg = "无满减活动" });
                 }
 
                 return Ok(new { data = offers, msg = "获取成功" });
@@ -687,7 +687,7 @@ namespace takeout_tj.Controllers
 
                 if (offers.Count == 0)
                 {
-                    return StatusCode(20000, new { errorCode = 20000, msg = "无特殊服务" });
+                    return Ok(new { data = offers, msg = "无满减活动" });
                 }
 
                 return Ok(new { data = offers, msg = "获取成功" });
@@ -802,5 +802,30 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"查询异常: {ex.Message}" });
             }
         }
-    }
+		[HttpGet]
+		[Route("getMerAddrByOrderId")]
+		public async Task<IActionResult> GetMerAddrByOrderId(int orderId)
+		{
+			try
+			{
+				var orderDish = await _context.OrderDishes.FirstOrDefaultAsync(od => od.OrderId == orderId);
+				if (orderDish == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+				}
+				var merchantId = orderDish.MerchantId;
+				var merchant = await _context.Merchants
+					.FirstOrDefaultAsync(m => m.MerchantId == merchantId);
+				if (merchant == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "商户未找到" });
+				}
+				return Ok(new { data = merchant.MerchantAddress, msg = "获取成功" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = ex.Message });
+			}
+		}
+	}
 }

@@ -216,10 +216,11 @@ const cancelOrder = async() => {
             <button @click="gobackHome">返回</button>
         </h2>
         <div>
-            <label @click="showState=0">未支付</label>&nbsp;&nbsp;
-            <label @click="showState=1">待处理</label>&nbsp;&nbsp;
-            <label @click="showState=2">派送中</label>&nbsp;&nbsp;
-            <label @click="showState=3">已完成</label>&nbsp;&nbsp;
+            <br />
+            <button @click="showState=0">未支付</button>&nbsp;&nbsp;
+            <button @click="showState=1">待处理</button>&nbsp;&nbsp;
+            <button @click="showState=2">派送中</button>&nbsp;&nbsp;
+            <button @click="showState=3">已完成</button>&nbsp;&nbsp;
         </div>
         <div v-if="showState===0">
             <ul>

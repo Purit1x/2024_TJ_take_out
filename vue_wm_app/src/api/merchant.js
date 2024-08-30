@@ -281,3 +281,11 @@ export const deletePaidOrder=async(orderId) => {
         throw error;   
     }
 }
+export const getMerAddrByOrderId = async (orderId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Merchant/getMerAddrByOrderId?orderId=${orderId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
