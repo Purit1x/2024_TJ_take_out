@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
@@ -205,8 +205,7 @@ async function handleReceiveOrder(data) {
                     <div>交付地址：{{ displayTargetAddr(orderItem.orderId) }}</div>
                     <div>收货人：{{ displayTargetName(orderItem.orderId) }}</div>
                     <div>客户电话：{{ displayTargetPhone(orderItem.orderId) }}</div>
-                    <div><button
-                        @click="deliverOrder({OrderId: orderItem.orderId})">已送达</button>
+                    <div><button @click="deliverOrder({ OrderId: orderItem.orderId })">已送达</button>
                     </div>
                 </div>
             </div>
@@ -240,4 +239,3 @@ async function handleReceiveOrder(data) {
     box-sizing: border-box;
 }
 </style>
-

@@ -407,5 +407,27 @@ namespace takeout_tj.Controllers
 				.ToList();
 			return Ok(result); // 返回结果
 		}
+        [HttpGet]
+        [Route("getOrdersWithinThisMonth")]  // 获得指定骑手本月内所有订单列表
+        public async Task<IActionResult> getOrdersWithinThisMonth(int riderId)
+        {
+            try
+            {
+                var currentDate = DateTime.Now;
+                var orders = await _context.Orders
+                    .Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month)
+                    .Select(o => o.OrderId)
+                    .ToListAsync();
+                if (!orders.Any())
+                {
+                    return Ok(new { data = 0, msg = "无指定骑手本月内送达订单信息" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 	}
 }

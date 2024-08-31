@@ -92,4 +92,13 @@ export const getRiderPrice = async (id) => {
         throw error;
     }
 }
+export const getOrdersWithinThisMonth = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getOrdersWithinThisMonth?riderId=${id}`);
+        return response.data.data;  // 返回本月内订单列表, 若为空则返回0
+    }
+    catch (error) {
+        throw error;
+    }
+}
 
