@@ -1,15 +1,17 @@
 <script setup>
     import { useRouter } from 'vue-router';
     import { useStore } from "vuex" 
-    import { ref,onMounted} from 'vue'
+    import { ref,onMounted, provide} from 'vue'
     import { riderInfo, updateRider,walletRecharge } from '@/api/rider'
     import { ElMessage } from 'element-plus';
+    import PersonInfo from '@/components/rider/home/PersonInfo.vue';
+
     const refForm =ref(null);
     const router = useRouter()
     const store = useStore()    
     const currentRiderInfo = ref({})
     const personalInfo = ref(false);  // 个人信息弹窗状态
-    const editPI=ref(false)  //编辑个人信息弹窗状态
+    // const editPI=ref(false)  //编辑个人信息弹窗状态
     const editPIDialogue = ref(false) //编辑个人信息弹窗状态
     const isWallet=ref(false);  //是否是钱包界面
     const isRecharge=ref(false);  //是否是充值界面
@@ -25,6 +27,8 @@
         reWalletPassword:'',
         recharge:0,
     })
+
+
     onMounted(() => {  
         // 从 cookie 中读取用户信息  
         const riderData = store.state.rider; 
@@ -42,6 +46,9 @@
             console.log(err);
         });
     });
+
+    provide("provideRiderInfo",riderForm);
+
     const checkRePassword = (rule,value,callback) => {
         if(value == ''){
             callback(new Error('请再次确认密码'))
@@ -121,30 +128,7 @@
             }  
         });     
     }
-    const SaveRecharge=async()=>{
-        const isValid = await refForm.value.validate();   
-        if (!isValid) return; // 如果不合法，提前退出
-        walletRecharge(currentRiderInfo.value.RiderId,currentRiderInfo.value.recharge).then(data=>{
-            currentRiderInfo.value.Wallet=data.data;
-            riderForm.value.Wallet=data.data;
-            ElMessage.success('充值成功');
-            isRecharge.value=false;
-            isWallet.value=true;
-        }).catch(error => {
-            if (error.response && error.response.data) {  
-                const errorCode = error.response.data.errorCode;  
-                if (errorCode === 20000) {  
-                    ElMessage.error('没有更新数据');  
-                } else if (errorCode === 30000) {  
-                    ElMessage.error('连接失败' + error.response.data.msg);  
-                } else {  
-                    ElMessage.error('发生未知错误');  
-                }  
-            } else {  
-                    ElMessage.error('网络错误，请重试');  
-            }  
-        });     
-    }
+
     const SaveWalletPassword=async()=>{
         const isValid = await refForm.value.validate();   
         if (!isValid) return; // 如果不合法，提前退出
@@ -167,84 +151,24 @@
             }  
         });     
     }
-    const enterPersonalInfo = () => {
-        personalInfo.value = true;
-    }
-    const leavePersonalInfo = () => {
-        personalInfo.value = false;
-    }
-    const editPersonalInfo = () => {
-        editPI.value = true;
-        personalInfo.value=false;
-    }
-    const leaveEdit = () => {    
-        editPI.value = false;
-        personalInfo.value=true;
-    }
-    const enterWallet = () => {
-        isWallet.value = true;
-    }
 
-    const leaveWallet = () => {
-       isWallet.value = false;
-    }
-    const leaveRechargeWindow = () => {
-        isRecharge.value = false;
-        isWallet.value = true;
-    }
-    const OpenRechargeWindow = () => {
-        isRecharge.value = true;
-        isWallet.value = false;
-    }
-    const OpenWPWindow = () => {
-        isChangeWP.value = true;
-        isWallet.value = false;
-    }
-    const leaveWPWindow = () => {
-        isChangeWP.value = false;
-        isWallet.value = true;
-    }
-   
 </script>
 
 <template>
     骑手信息页
-    <div class="personTop">
-        <el-avatar class="user-avator" :size="100" :src="imgurl" />
-    </div>
+    <PersonInfo />
     <div class="personDown">
         <div class="personside">
             工资钱包
         </div>
         <div class="personInfo">
-            个人信息
-            <div>骑手Id：{{currentRiderInfo.RiderId}}</div>
-            <div>姓名：{{currentRiderInfo.RiderName}}</div>
-            <div>手机号：{{currentRiderInfo.PhoneNumber}}</div>
-            <div>密码：{{currentRiderInfo.Password}}</div>
+
         </div>
     </div>
-
 </template>
 
 <style scoped>
-.personTop {
-    display: flex;
-    align-items: center;
-    background-color: gray;
-    margin-bottom: 20px;
-    margin-left:10px;
-    margin-right:10px;
-    height: 20%;
-    border-radius: 15px; /* 圆角 */
-}
 
-.user-avator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left:15px;
-}
 
 .personDown {
     display:flex;

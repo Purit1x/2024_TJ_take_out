@@ -4,6 +4,7 @@
     import { ref,onMounted} from 'vue'
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
+    import imgurl from '@/assets/logo2.png';
 
     const router = useRouter()
     const store = useStore()    
@@ -12,7 +13,6 @@
     const riderStation = ref({}); // 用于存储站点信息  
     const ifStation = ref(true); // 用于判断是否有站点信息   
     
-    const imgurl = '@/assets/logo2.png'
     const username  = store.state.rider.RiderId
     const message = 2
 
@@ -29,8 +29,7 @@
         if (document.fullscreenElement) {
             document.exitFullscreen();
         } else {
-            document.body.requestFullscreen.call(document.body);
-         
+            document.body.requestFullscreen.call(document.body);   
         }
     }
 
@@ -92,7 +91,7 @@
                     </el-tooltip>
                 </div>
                 <!-- 用户头像 -->
-                <el-avatar class="user-avator" :size="30" :src="imgurl" />
+                <el-avatar class="user-avator" :size="30" :src="imgurl"  />
 
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -102,12 +101,6 @@
                     </span>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                                <el-dropdown-item>项目仓库</el-dropdown-item>
-                            </a>
-                            <a href="https://lin-xin.gitee.io/example/vuems-doc/" target="_blank">
-                                <el-dropdown-item>官方文档</el-dropdown-item>
-                            </a>
                             <el-dropdown-item command="user">个人中心</el-dropdown-item>
                             <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
