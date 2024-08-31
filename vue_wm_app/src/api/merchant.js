@@ -289,3 +289,11 @@ export const getMerAddrByOrderId = async (orderId) => {
         throw error;
     }
 }
+export const deliverOrder = async (data) => {
+    try{
+        const response = await axios.put(`${BASE_URL}/Merchant/deliverOrder`, data);
+        return response.data;
+    }catch(error){
+        throw error;
+    }
+}

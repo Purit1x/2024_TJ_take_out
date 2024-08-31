@@ -5,6 +5,7 @@
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
     import imgurl from '@/assets/logo2.png';
+
     const router = useRouter()
     const store = useStore()    
     const rider = ref({})
