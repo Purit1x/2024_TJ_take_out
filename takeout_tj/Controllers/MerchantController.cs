@@ -914,30 +914,8 @@ namespace takeout_tj.Controllers
 				}
 			}
 		}
-		[HttpGet("orders")]
-		public IActionResult GetOrders()
-		{
-			var orders = _context.Set<OrderDB>().ToList();
-
-			return Ok(orders);
-		}
-		[HttpPut("orders/{id}")]
-		public IActionResult UpdateOrder(int id, int rating, string comment)
-		{
-			var order = _context.Set<OrderDB>().FirstOrDefault(o => o.OrderId == id);
-
-			if (order == null)
-			{
-
-				return NotFound(new { errorCode = 404, msg = "订单未找到" });
-			}
-			order.RiderRating = rating;//更新评价
-			order.Comment = comment;
-
-			_context.SaveChanges();
-
-			return Ok(order);
-		}
+		
+		
 		[HttpGet("ordersByRegion")]
 		public IActionResult GetOrdersByRegion()
 		{
@@ -948,18 +926,7 @@ namespace takeout_tj.Controllers
 
 			return Ok(ordersByRegion);
 		}
-		[HttpGet]
-		[Route("getEcoOrder")]//查找不需要餐具的订单比例
-		public IActionResult GetEcoOrder()
-		{
-			int totalOrders = _context.Set<OrderDB>().Count();
-
-			int ecoFriendlyOrders = _context.Set<OrderDB>()
-		   .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
-
-			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
-			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
-		}
+		
 
 		/*[HttpGet]
         [Route("getSortedMerchaants")]

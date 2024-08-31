@@ -3,8 +3,9 @@ import { useStore } from "vuex";
 import { ElMessage } from "element-plus";
 import { ref, onMounted, watch,onBeforeUnmount } from 'vue';  
 import { useRouter } from 'vue-router';
-import { getOrders,getOrderCoupon,getOrderDishes,GetAddressByAddressId,getMerchantsInfo,GetCouponInfo,userInfo,PurchaseOrder,deleteOrder } from '@/api/user'
+import { getOrders,getOrderCoupon,getOrderDishes,GetAddressByAddressId,getMerchantsInfo,GetCouponInfo,userInfo,PurchaseOrder,deleteOrder, updateOrderComment } from '@/api/user'
 import { getDishInfo } from '@/api/merchant'
+const refForm = ref(null);
 const store = useStore();
 const router = useRouter();
 const userId = ref(store.state.user.userId);
@@ -21,9 +22,51 @@ const showPayDialog = ref(false);  //支付弹窗
 const paymentPassword = ref('');  //支付密码
 const paymentError = ref('');  //支付密码错误提示
 const correctPassword = ref('');  //正确的支付密码
+const newOrderComment = ref({
+    merchantRating: [
+        {required:true,message:'请输入给商家的评分(0-5)',trigger:'blur'},
+        {
+            pattern:/^[0-5]{1}$/,
+            message:'必须为一位数字',
+            trigger:'blur',
+        },
+    ],
+    riderRating: [
+        {required:true,message:'请输入给骑手的评分(0-5)',trigger:'blur'},
+        {
+            pattern:/^[0-5]{1}$/,
+            message:'必须为一位数字',
+            trigger:'blur',
+        },
+    ],
+    comment: [{ required: false, message: '请输入评价', trigger: 'blur' }], 
+});
+const submitComment=async(orderId)=>{//保存评价
+    const data = {
+        Id:orderId,
+        MerchantRating: currentOrder.value.merchantRating,
+        RiderRating: currentOrder.value.riderRating,
+        Comment:currentOrder.value.comment,
+    }
+    console.log('评价为：',data);
+    try{
+        const response =await updateOrderComment(data);
+        // console.log('提交评价后端返回为：',response.msg);
+        if(response.msg==='订单评价更新成功'){
+            ElMessage.success('更新成功');
+            
+        }else {
+            ElMessage.error('尚未更改信息1');
+        }
+    }catch (error) {  
+        ElMessage.error('尚未更改信息2');
+    }  
+}
 const gobackHome = () => {
     router.push('/user-home/personal');
+
 }
+
 // 定时器ID  
 let updateInterval = null;
 onMounted(async() => {
@@ -131,6 +174,7 @@ const updateCountdowns = () => {
 
 setInterval(updateCountdowns, 1000); // 每秒更新倒计时  
 const enterOrderInfo = async(order) => {
+    // console.log('新订单默认评价：',newOrderComment.value);
     currentOrder.value = order;
     const merchantData = await getMerchantsInfo(order.dishes[0].merchantId);
     currentMerchant.value = merchantData.data;
@@ -192,6 +236,14 @@ const confirmPurchase = async() => {
         }  
     }  
 }
+
+const validateField = (field) => {
+  if (refForm.value) {
+    refForm.value.validateField(field).catch(() => {
+      console.log(`${field} 验证失败`);
+    });
+  }
+};
 const cancelOrder = async() => {
     try {  
         const response = await deleteOrder(currentOrder.value.orderId);  
@@ -247,11 +299,25 @@ const cancelOrder = async() => {
         </div>
         
         <div v-if="showState===2">
-
+            <ul>
+                <li v-for="(order,index) in deliveringOrders":key ="inkey">
+                    <p>订单号：{{order.orderId}}</p>
+                    <p>订单总价：{{ order.price }}元</p>
+                    <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                    <button @click="enterOrderInfo(order)">></button>
+                </li>
+            </ul>
         </div>
         
         <div v-if="showState===3">
-
+            <ul>
+                <li v-for="(order,index) in completedOrders":key ="inkey">
+                    <p>订单号：{{order.orderId}}</p>
+                    <p>订单总价：{{ order.price }}元</p>
+                    <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                    <button @click="enterOrderInfo(order)">></button>
+                </li>
+            </ul>
         </div>
 
     </div>
@@ -278,6 +344,18 @@ const cancelOrder = async() => {
         <button @click="leaveOrderInfo()">返回</button>
         <button v-if="currentOrder.state===0" @click="enterPayOrder()">支付</button>
         <button v-if="currentOrder.state===0" @click="cancelOrder()">取消订单</button>
+
+        <!--添加评价表单-->
+        <div v-if="currentOrder.state===3">
+            <h3>添加评价</h3>
+            <el-form :rules="newOrderComment" ref="refForm" :model="currentOrder">
+                <el-form-item label="商家评分" prop="merchantRating"><input v-model="currentOrder.merchantRating" placeholder="商家评分" @blur="validateField('merchantRating')"/></el-form-item> 
+                <el-form-item label="骑手评分" prop="riderRating"><input v-model="currentOrder.riderRating" placeholder="骑手评分" @blur="validateField('riderRating')"/></el-form-item>   
+                <el-form-item label="评价" prop="comment"><input v-model="currentOrder.comment" placeholder="评价" /></el-form-item>   
+            </el-form>
+            <button @click="submitComment(currentOrder.orderId)">提交评价</button>
+        </div>
+
     </div>
      <!-- 弹窗 -->  
      <el-dialog title="输入支付密码" :model-value="showPayDialog" @close="cancelPurchase()">  

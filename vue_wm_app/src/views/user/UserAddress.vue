@@ -84,7 +84,7 @@ const submitAddress = async() => {  // 保存地址信息
     }
     try {  
         const response = await EditUserAddress(data);  
-        if(response.msg='用户地址信息更新成功'){
+        if(response.msg==='用户地址信息更新成功'){
             ElMessage.success('更新成功');
             isEditing.value = false;
             currentAddress.value = {};
@@ -140,6 +140,7 @@ const createAddress = async() => {  // 新建地址信息
         console.error('创建失败：',error);  
     }  
 }
+
 const deleteAddress = async(addressId) => {  // 删除地址信息
   try {  
     const response = await deleteAddressService(addressId);  

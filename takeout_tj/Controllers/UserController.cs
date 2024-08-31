@@ -1424,5 +1424,41 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
             }
         }
-    }
+		[HttpPut("updateOrderComment")]
+		public IActionResult UpdateOrderComment([FromBody] UpdateOrderComment request)
+		{
+            using(var tran = _context.Database.BeginTransaction())
+            {
+				try
+				{
+					var order = _context.Set<OrderDB>().FirstOrDefault(o => o.OrderId == request.Id);
+
+					if (order == null)
+					{
+						return NotFound(new { errorCode = 404, msg = "订单未找到" });
+					}
+
+					order.RiderRating = request.RiderRating;
+					order.Comment = request.Comment;
+					order.MerchantRating = request.MerchantRating;
+
+                    var result = _context.SaveChanges();
+                    if(result <= 0)
+                    {
+                        tran.Rollback();
+                        return BadRequest(new { data = 0, msg = "订单评价更新失败" });
+                    }
+                    tran.Commit();
+                    return Ok(new { data = order, msg = "订单评价更新成功" });
+				}
+                catch(Exception ex)
+                {
+                    tran.Rollback();
+                    return BadRequest(new {data = -1, msg = $"后端异常：{ex.Message}" });
+                }
+
+			}
+		}
+	}
 }
+

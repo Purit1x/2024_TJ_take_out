@@ -474,6 +474,20 @@ namespace takeout_tj.Controllers
 
             return Ok(new { data = riders });
         }
+		[HttpGet]
+		[Route("getEcoOrder")]//查找不需要餐具的订单比例
+		public IActionResult GetEcoOrder()
+		{
+			int totalOrders = _context.Set<OrderDB>().Count();
 
-    }
+			int ecoFriendlyOrders = _context.Set<OrderDB>()
+		   .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
+
+			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
+			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
+		}
+		
+		
+
+	}
 }
