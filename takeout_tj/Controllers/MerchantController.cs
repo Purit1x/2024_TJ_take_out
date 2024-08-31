@@ -827,5 +827,151 @@ namespace takeout_tj.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = ex.Message });
 			}
 		}
+
+		[HttpPut]
+		[Route("deliverOrder")]
+		public async Task<IActionResult> DeliverOrder([FromBody] DeliverOrderDto deliverDto)
+		{
+			using (var transaction = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					// 查找订单和骑手信息
+					var orderRider = await _context.OrderRiders
+						.Include(or => or.OrderDB)
+						.Include(or => or.RiderDB)
+						.FirstOrDefaultAsync(or => or.OrderId == deliverDto.OrderId);
+
+					if (orderRider == null)
+					{
+						transaction.Rollback(); // 回滚事务
+						return NotFound(new { errorCode = 404, msg = "订单未找到" });
+					}
+
+					// 确认订单状态是骑手派送中
+					if (orderRider.OrderDB.State != 2)
+					{
+						transaction.Rollback(); // 回滚事务
+						return BadRequest(new { errorCode = 400, msg = "订单状态无效，无法标记" });
+					}
+
+					// 更新订单状态
+					orderRider.OrderDB.State = 3; // 已送达
+					orderRider.OrderDB.RealTimeOfArrival = DateTime.Now;
+
+					// 更新骑手钱包余额
+					orderRider.RiderDB.Wallet += orderRider.RiderPrice;
+
+					// 获取订单中的所有菜品信息
+					var orderDishes = await _context.OrderDishes
+						.Where(od => od.OrderId == deliverDto.OrderId)
+						.ToListAsync();
+
+					if (!orderDishes.Any())
+					{
+						transaction.Rollback(); // 回滚事务
+						return BadRequest(new { errorCode = 400, msg = "订单中没有菜品信息" });
+					}
+
+					// 获取第一个菜品的MerchantId，假设所有菜品来自同一个商家
+					var merchantId = orderDishes.FirstOrDefault()?.MerchantId;
+
+					if (merchantId == null)
+					{
+						transaction.Rollback(); // 回滚事务
+						return BadRequest(new { errorCode = 400, msg = "无法获取商家ID" });
+					}
+
+					// 获取商家信息
+					var merchant = await _context.Merchants.FirstOrDefaultAsync(m => m.MerchantId == merchantId);
+
+					if (merchant == null)
+					{
+						transaction.Rollback(); // 回滚事务
+						return BadRequest(new { errorCode = 400, msg = "商家不存在" });
+					}
+
+					// 更新商家钱包余额
+					merchant.Wallet += orderRider.OrderDB.Price - orderRider.RiderPrice;
+
+					// 提交更改
+					await _context.SaveChangesAsync();
+
+					// 提交事务
+					transaction.Commit();
+
+					return Ok(new { msg = "订单已成功标记为已送达" });
+				}
+				catch (DbUpdateException ex)
+				{
+					transaction.Rollback(); // 回滚事务
+					return StatusCode(500, new { errorCode = 500, msg = "数据库更新失败" });
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback(); // 回滚事务
+					return StatusCode(500, new { errorCode = 500, msg = "服务器内部错误" });
+				}
+			}
+		}
+		[HttpGet("orders")]
+		public IActionResult GetOrders()
+		{
+			var orders = _context.Set<OrderDB>().ToList();
+
+			return Ok(orders);
+		}
+		[HttpPut("orders/{id}")]
+		public IActionResult UpdateOrder(int id, int rating, string comment)
+		{
+			var order = _context.Set<OrderDB>().FirstOrDefault(o => o.OrderId == id);
+
+			if (order == null)
+			{
+
+				return NotFound(new { errorCode = 404, msg = "订单未找到" });
+			}
+			order.RiderRating = rating;//更新评价
+			order.Comment = comment;
+
+			_context.SaveChanges();
+
+			return Ok(order);
+		}
+		[HttpGet("ordersByRegion")]
+		public IActionResult GetOrdersByRegion()
+		{
+			var ordersByRegion = _context.Set<OrderDB>()
+				.GroupBy(o => o.AddressId)
+				.Select(g => new { Region = g.Key, Count = g.Count() })
+				.ToList();
+
+			return Ok(ordersByRegion);
+		}
+		[HttpGet]
+		[Route("getEcoOrder")]//查找不需要餐具的订单比例
+		public IActionResult GetEcoOrder()
+		{
+			int totalOrders = _context.Set<OrderDB>().Count();
+
+			int ecoFriendlyOrders = _context.Set<OrderDB>()
+		   .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
+
+			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
+			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
+		}
+
+		/*[HttpGet]
+        [Route("getSortedMerchaants")]
+        public IActionResult GetSortedMerchants()
+        {
+			// 获取所有商家的信息，并按评分降序，销售额降序排序
+			var sortedMerchants = _context.Set<MerchantDB>()
+				.OrderByDescending(m => m.MerchantRating)  // 按评分降序
+				.ThenByDescending(m => m.TotalSalesAmount) // 按销售额降序
+				.ToList();
+
+			return Ok(sortedMerchants);
+		}*/
 	}
 }
