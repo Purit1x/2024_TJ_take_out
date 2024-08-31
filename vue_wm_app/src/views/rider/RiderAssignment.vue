@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { getMerchantIds, getMerchantsInfo, GetAddressByAddressId, getOrderDishes } from '@/api/user';
 import { getPaidOrders, getReceivedOrders, receiveOrder, riderInfo, getRiderPrice } from '@/api/rider';
-import { getMerAddrByOrderId } from '@/api/merchant';
+import { getMerAddrByOrderId, deliverOrder } from '@/api/merchant';
 
 const store = useStore();
 const router = useRouter();
@@ -205,6 +205,9 @@ async function handleReceiveOrder(data) {
                     <div>交付地址：{{ displayTargetAddr(orderItem.orderId) }}</div>
                     <div>收货人：{{ displayTargetName(orderItem.orderId) }}</div>
                     <div>客户电话：{{ displayTargetPhone(orderItem.orderId) }}</div>
+                    <div><button
+                        @click="deliverOrder({OrderId: orderItem.orderId})">已送达</button>
+                    </div>
                 </div>
             </div>
         </div>

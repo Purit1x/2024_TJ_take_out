@@ -4,7 +4,6 @@
     import { ref,onMounted} from 'vue'
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
-import { FullScreen } from '@element-plus/icons-vue/dist/types';
 
     const router = useRouter()
     const store = useStore()    
