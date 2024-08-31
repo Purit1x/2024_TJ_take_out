@@ -318,3 +318,12 @@ export const deleteOrder=async(orderId) => {  //删除订单
         throw error;   
     }
 }
+export const updateOrderComment=async(data)=>{//更新订单评价
+    try{
+        const response =await axios.put(`${BASE_URL}/Users/updateOrderComment`,data);
+        return response.data;
+
+    }catch(error){
+        throw error;
+    }
+}

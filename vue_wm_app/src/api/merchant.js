@@ -1,6 +1,7 @@
 //导入request.js请求工具
 import request from '@/utils/request.js'
 import axios from 'axios'  
+import { ElMessage } from 'element-plus';
 // 设置基本URL，这里使用你后端的地址  
 const BASE_URL = 'http://localhost:5079/api'; 
 
@@ -292,6 +293,7 @@ export const getMerAddrByOrderId = async (orderId) => {
 export const deliverOrder = async (data) => {
     try{
         const response = await axios.put(`${BASE_URL}/Merchant/deliverOrder`, data);
+        ElMessage.success('订单已送达');
         return response.data;
     }catch(error){
         throw error;
