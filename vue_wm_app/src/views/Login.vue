@@ -538,12 +538,14 @@ const mySwitch = () => {
                     <el-form-item v-if="roleType === 'merchant'" prop="DishType">  
                         <el-input :prefix-icon="User" placeholder="请输入菜品类型" v-model="merchantRegisterData.DishType"></el-input>  
                     </el-form-item>
-                    <el-form-item v-if="roleType === 'merchant'" prop="TimeforOpenBusiness">  
-                        <el-time-picker placeholder="请选择营业开始时间" v-model="merchantRegisterData.TimeforOpenBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
-                    </el-form-item>  
-                    <el-form-item v-if="roleType === 'merchant'" prop="TimeForCloseBusiness">  
-                        <el-time-picker placeholder="请选择营业结束时间" v-model="merchantRegisterData.TimeforCloseBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
-                    </el-form-item>  
+                    <div class="startandend">
+                        <el-form-item class="starttime"v-if="roleType === 'merchant'" prop="TimeforOpenBusiness">  
+                            <el-time-picker placeholder="请选择营业开始时间" v-model="merchantRegisterData.TimeforOpenBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
+                        </el-form-item>  
+                        <el-form-item class="endtime" v-if="roleType === 'merchant'" prop="TimeForCloseBusiness">  
+                            <el-time-picker placeholder="请选择营业结束时间" v-model="merchantRegisterData.TimeforCloseBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
+                        </el-form-item>  
+                    </div>
                     <el-form-item v-if="roleType === 'merchant'" prop="Password">
                         <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="merchantRegisterData.Password"></el-input>
                     </el-form-item>
@@ -645,10 +647,6 @@ input {
     outline: none;
 }
 
-body {
-  display:unset;
-}
-
 .background {
     margin:0;
     height: 100vh;
@@ -661,7 +659,7 @@ body {
 
 .loginAndRegister {
     width: 1200px;
-    height: 900px;
+    height: 95vh;
     display: flex;
     /* 相对定位 */
     position: relative;
@@ -756,7 +754,7 @@ body {
 /* 标题盒子 */
 .title {
   height: 100px;
-  line-height: 100px;
+  line-height: 50px;
 }
 
 /* 标题 */
@@ -779,6 +777,7 @@ body {
 }
 .el-form-item {
   width: 65%;
+  height: 40px;
 }
 
 /* 输入框 */
@@ -813,9 +812,9 @@ input:focus::placeholder {
 /* 按钮 */
 button {
   width: 100px;
-  height: 50px;
+  height: 40px;
   margin: 0 7px;
-  line-height: 30px;
+  text-align: center;
   border: none;
   border-radius: 4px;
   background-color: #69b3f0;
@@ -844,4 +843,20 @@ button:hover {
   cursor: pointer;
   border-bottom: 1px solid white;
 }
+
+.startandend {
+    width: 65%;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.starttime {
+    width: 175px;
+}
+
+.endtime {
+    width: 175px;
+}
+
 </style>

@@ -9,7 +9,7 @@
         <RiderHomeHeader />
         <div class="main">
             <RiderHomeSide />
-            <div class="content">
+            <div class="ridercontent">
                 <router-view />
             </div>
         </div>        
@@ -22,7 +22,7 @@
     height: calc(100vh - 70px); /* 减去 header 高度 */
 }
 
-.content {
+.ridercontent {
     padding: 5px;
     flex: 1;
     overflow-y: auto;
