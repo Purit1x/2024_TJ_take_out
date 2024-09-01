@@ -113,3 +113,13 @@ export const getOrdersWithinThisMonth = async (id) => {
     }
 }
 
+export const walletWithdraw= async(id,withdrawMoney) => {  //提现
+    try {  
+        const response = await axios.put(`${BASE_URL}/Rider/withdraw?riderId=${id}&withdrawMoney=${withdrawMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
+    }
+}
+
+
