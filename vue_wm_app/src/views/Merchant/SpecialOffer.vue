@@ -170,7 +170,8 @@ const deleteSpecialOffer = async(offerId) => {
 </script>
 
 <template>
-    <div>满减活动&nbsp;&nbsp;
+    <div class="content">
+        <header>满减活动</header>
         <button @click="gobackHome()">返回</button>
         <div>
             <ul>

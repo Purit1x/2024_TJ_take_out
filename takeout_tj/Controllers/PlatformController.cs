@@ -119,7 +119,7 @@ namespace takeout_tj.Controllers
         {
             try
             {
-                var station = _context.Stations.FirstOrDefault(m => m.StationId ==stationId);
+                var station = _context.Stations.FirstOrDefault(m => m.StationId == stationId);
 
                 if (station == null)
                 {
@@ -210,7 +210,7 @@ namespace takeout_tj.Controllers
         public async Task<IActionResult> GetAllStationIds()
         {
             var stationIds = await _context.Stations
-                .Select(m => m.StationId) 
+                .Select(m => m.StationId)
                 .ToListAsync(); // 异步获取列表  
 
             return Ok(new { data = stationIds }); // 返回商家 ID 列表  
@@ -259,7 +259,7 @@ namespace takeout_tj.Controllers
                 if (result > 0)
                 {
                     tran.Commit();//多表添加才用到
-                    return Ok(new {  msg = "分配成功" });
+                    return Ok(new { msg = "分配成功" });
                 }
                 else
                 {
@@ -346,14 +346,14 @@ namespace takeout_tj.Controllers
                 CouponDB coupon = new CouponDB()
                 {
                     CouponId = _platformService.AssignCouponId(),
-                    CouponName=dto.CouponName,
-                    CouponValue=dto.CouponValue,
-                    CouponPrice=dto.CouponPrice,
-                    CouponType=dto.CouponType,
-                    MinPrice=dto.MinPrice,
+                    CouponName = dto.CouponName,
+                    CouponValue = dto.CouponValue,
+                    CouponPrice = dto.CouponPrice,
+                    CouponType = dto.CouponType,
+                    MinPrice = dto.MinPrice,
                     PeriodOfValidity = dto.PeriodOfValidity,
-                    QuantitySold=0,
-                    IsOnShelves=1,
+                    QuantitySold = 0,
+                    IsOnShelves = 1,
                 };
                 _context.Coupons.Add(coupon);
                 var result = _context.SaveChanges();
@@ -411,7 +411,7 @@ namespace takeout_tj.Controllers
         }
         [HttpPut]
         [Route("couponEdit")]  //编辑优惠券
-        public IActionResult EditCoupon(int couponId,int isOnShelves)
+        public IActionResult EditCoupon(int couponId, int isOnShelves)
         {
             var tran = _context.Database.BeginTransaction(); // 开始事务  
             try
@@ -448,5 +448,46 @@ namespace takeout_tj.Controllers
                 .ToListAsync(); // 异步获取列表  
             return Ok(new { data = couponIds }); // 返回商家 ID 列表  
         }
-    }
+        [HttpGet]
+        [Route("GetMerchantStation")]  // 获取商家对应站点
+        public async Task<IActionResult> GetMerchantStation(int merchantId)
+        {
+            var stationId = await _context.MerchantStations
+                .FirstOrDefaultAsync(ms => ms.MerchantId == merchantId);
+
+            if (stationId == null)
+                return NotFound(new { errorCode = 404, msg = "指定ID商家不存在或无对应站点" });
+
+            return Ok(new { data = stationId.StationId });
+        }
+        [HttpGet]
+        [Route("GetStationRiders")]  // 获取指定站点所有骑手
+        public async Task<IActionResult> GetStationRiders(int stationId)
+        {
+            var riders = await _context.RiderStations
+                .Where(rs => rs.StationId ==  stationId)
+                .Select(rs => rs.RiderId)
+                .ToListAsync();
+
+            if (!riders.Any())
+                return NotFound(new { errorCode = 404, msg = "指定站点无骑手" });
+
+            return Ok(new { data = riders });
+        }
+		[HttpGet]
+		[Route("getEcoOrder")]//查找不需要餐具的订单比例
+		public IActionResult GetEcoOrder()
+		{
+			int totalOrders = _context.Set<OrderDB>().Count();
+
+			int ecoFriendlyOrders = _context.Set<OrderDB>()
+		   .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
+
+			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
+			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
+		}
+		
+		
+
+	}
 }

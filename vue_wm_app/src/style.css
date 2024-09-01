@@ -24,7 +24,7 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
+  /* display: flex; */
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -76,4 +76,22 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+.content {
+  width:91vw;
+  position: absolute;
+  top: 5%;
+  margin-left: 8vw;
+  /* border: 1px solid #ccc; */
+}
+  
+.content header {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  height: 50px;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }

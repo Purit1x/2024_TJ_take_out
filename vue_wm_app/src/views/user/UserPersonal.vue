@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex"  
 import { onMounted, ref,watch } from 'vue';
-import { userInfo,updateUser,walletRecharge,searchFavouriteMerchant,getMerchantsInfo,deleteFavouriteMerchant} from "@/api/user";
+import { userInfo,updateUser,walletRecharge,walletWithdraw,searchFavouriteMerchant,getMerchantsInfo,deleteFavouriteMerchant} from "@/api/user";
 const store = useStore();
 const router = useRouter();
 const refForm =ref(null);
@@ -13,6 +13,7 @@ const editPI=ref(false)  //编辑个人信息弹窗状态
 const isWallet=ref(false);  //是否是钱包界面
 const currentUser=ref({})  //编辑用户信息时需要用到
 const isRecharge=ref(false);  //充值弹窗状态
+const isWithdraw=ref(false); //提现弹窗状态
 const isChangeWP=ref(false);  //修改钱包密码弹窗状态
 const isFavouriteMerchants=ref(false);  //收藏商户弹窗状态
 const favouriteMerchantIds=ref([]);  //收藏的商户Id列表
@@ -28,6 +29,7 @@ const userForm = ref({
     WalletPassword: '',
     reWalletPassword:'',
     recharge:0,
+    withdrawAmount:0,
 });
 onMounted(() => {
     const user = store.state.user;
@@ -60,7 +62,19 @@ onMounted(() => {
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
-        if (newPath.startsWith('/user-home/personal')&& newPath !== '/user-home/personal/coupon'&&newPath !== '/user-home/personal/coupon/couponPurchase') {  
+        userInfo(userForm.value.UserId)
+            .then((res) => {
+                userForm.value.Wallet=res.data.wallet;
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+);  
+watch(  
+    () => router.currentRoute.value.path,  
+    (newPath) => {  
+        if (newPath.startsWith('/user-home/personal')&& newPath !== '/user-home/personal/coupon'&&newPath !== '/user-home/personal/coupon/couponPurchase'&&newPath !=='/user-home/personal/myOrder') {  
             isUserPersonal.value = true; // 返回到商家主页时显示欢迎信息和按钮  
         } else {  
             isUserPersonal.value = false; // 进入子路由时隐藏  
@@ -114,6 +128,13 @@ const userRules = ref({
             trigger: 'blur', 
         },
     ], 
+    withdrawAmount:[
+        {required:true, message:'请输入提现金额', trigger:'blur'},
+        {pattern: /^[0-9]/, 
+            message: '提现金额必须是数字', 
+            trigger: 'blur', 
+        },
+    ], 
 });
 const validateField = (field) => {  //编辑规则的应用
     refForm.value.validateField(field, (valid) => {  
@@ -158,6 +179,15 @@ const OpenRechargeWindow=()=>{
 }
 const leaveRechargeWindow=()=>{
     isRecharge.value=false;
+    isWallet.value=true;
+}
+const OpenWithdrawWindow=()=>{
+    currentUser.value = userForm.value;
+    isWithdraw.value=true;
+    isWallet.value=false;
+}
+const leaveWithdrawWindow=()=>{
+    isWithdraw.value=false;
     isWallet.value=true;
 }
 const OpenWPWindow=()=>{
@@ -224,6 +254,37 @@ const SaveRecharge=async()=>{
             }  
     });     
 }
+
+const SaveWithdraw=async()=>{
+    const isValid = await refForm.value.validate();   
+    if (!isValid) return; // 如果不合法，提前退出
+    if(currentUser.value.Wallet < currentUser.value.withdrawAmount) 
+    {
+        ElMessage.error('提现金额超出钱包金额')
+        return
+    }
+    walletWithdraw(currentUser.value.UserId,currentUser.value.withdrawAmount).then(data=>{
+        currentUser.value.Wallet=data.data;
+        userForm.value.Wallet=data.data;
+        ElMessage.success('提现成功');
+        isWithdraw.value=false;
+        isWallet.value=true;
+    }).catch(error => {
+        if (error.response && error.response.data) {  
+                const errorCode = error.response.data.errorCode;  
+                if (errorCode === 20000) {  
+                    ElMessage.error('没有更新数据');  
+                } else if (errorCode === 30000) {  
+                    ElMessage.error('连接失败' + error.response.data.msg);  
+                } else {  
+                    ElMessage.error('发生未知错误');  
+                }  
+            } else {  
+                    ElMessage.error('网络错误，请重试');  
+            }  
+    });     
+}
+
 const SaveWalletPassword=async()=>{
     const isValid = await refForm.value.validate();   
     if (!isValid) return; // 如果不合法，提前退出
@@ -277,16 +338,22 @@ const visitingCoupon=()=>{
     router.push('/user-home/personal/coupon');
 
 }
+const visitingMyOrder=()=>{
+    isUserPersonal.value=false;
+    router.push('/user-home/personal/myOrder');
+}
 </script>
 
 <template>
+  <div class="content">
     <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
-        <h1>{{userForm.UserName}}的个人中心</h1>
+        <header>{{userForm.UserName}}的个人中心</header>
+
         <div><button @click="gobackHome()">返回</button></div>
         <div><button @click="enterFavouriteMerchants()">收藏</button></div>
         <div><button @click="visitingCoupon()">优惠券</button></div>
         <div><button>积分与会员</button></div>
-        <div><button>我的订单</button></div>
+        <div><button @click="visitingMyOrder()">我的订单</button></div>
         <div><button @click="enterWallet()">钱包</button></div>
         <div><button @click="showPersonalInfo()">个人信息</button></div>
         <div><button @click="logout()">退出登录</button></div>
@@ -316,6 +383,7 @@ const visitingCoupon=()=>{
     <div v-if="isWallet">
         <div>钱包金额：{{userForm.Wallet}}</div>
         <button @click="OpenRechargeWindow">充值</button>
+        <button @click="OpenWithdrawWindow">提现</button>
         <button @click="OpenWPWindow">修改支付密码</button>
         <button @click="leaveWallet">返回</button>
     </div>
@@ -324,8 +392,13 @@ const visitingCoupon=()=>{
                 <div>充值金额</div>
                 <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
                 <button @click="SaveRecharge">充值</button>
-                <button>提现</button>
                 <button @click="leaveRechargeWindow">返回</button>
+            </div>
+            <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
+                <div>提现金额</div>
+                <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
+                <button @click="SaveWithdraw">提现</button>
+                <button @click="leaveWithdrawWindow">返回</button>
             </div>
             <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
                 <div>支付密码</div>
@@ -348,7 +421,7 @@ const visitingCoupon=()=>{
                     </li>
                 </ul>
             </div>
-
-        </el-form>
+    </el-form>
+  </div>
     <router-view />
 </template>

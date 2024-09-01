@@ -239,12 +239,10 @@ const removeInCart = async(dish) => {
 
 </script>
 
-
 <template>
-  <div>
-      <h3>购物车页面</h3>
-      <button @click="gobackHome">返回</button>
-      <div v-for="merchant in merchants" :key="merchant.merchantId">
+    <div class="content">
+      <header>我的购物车</header>
+      <div v-for="merchant in merchants" :key="merchant.merchantId" class="cart-item">
           <input type="checkbox" :checked="merchant.checked" @change="toggleMerchantSelection(merchant)" />
           {{ merchant.merchantName }}
           <button @click="goToMerchantPage(merchant.merchantId)">></button>
@@ -261,8 +259,32 @@ const removeInCart = async(dish) => {
           </ul>
       </div>
 
-      <div>
-        <div><strong>总价: {{ finalTotalPrice }} 元</strong><span v-if="totalDiscount != 0">({{ totalPrice }}-{{ totalDiscount }})</span></div>
-      </div>
-  </div>
+        <!-- 显示总价 -->
+        <div>
+          <div><strong>总价: {{ finalTotalPrice }} 元</strong><span v-if="totalDiscount != 0">({{ totalPrice }}-{{ totalDiscount }})</span></div>
+        </div>
+    </div>
 </template>
+
+
+<style scoped>
+.cart-item ul{
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  gap: 15px;
+}
+
+.cart_item-li{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-item-img {
+    align-content: center;
+    width: 60px; 
+    height: 60px;
+}
+
+</style>

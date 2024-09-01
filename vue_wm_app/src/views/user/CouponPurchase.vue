@@ -135,8 +135,10 @@ const cancelPurchase = () => {
 </script>
 
 <template>
+    <div class="content">
     <div v-if="!isCouponInfo">
-        <h2>购买优惠券&nbsp;&nbsp;<button @click="gobackHome()">返回</button></h2>
+        <header>购买优惠券</header>
+        <button @click="gobackHome()">返回</button>
 
         <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
@@ -148,6 +150,7 @@ const cancelPurchase = () => {
             <option value="minPrice">使用额度</option>  
             <option value="couponValue">券值</option>  
             <option value="couponPrice">价格</option>  
+            <option value="quantitySold">销量</option>
         </select>  
         &nbsp;&nbsp;
         <label>排序方式:</label>  
@@ -170,6 +173,7 @@ const cancelPurchase = () => {
                 <span>&nbsp;&nbsp;满{{ coupon.minPrice }}减{{ coupon.couponValue }}元</span> 
                 <span>&nbsp;&nbsp;{{ coupon.couponType===0?'通用券':'特殊券' }}</span> 
                 <span>&nbsp;&nbsp;{{ coupon.couponPrice }}元/张</span> 
+                <span>&nbsp;&nbsp;销量：{{ coupon.quantitySold }}张</span> 
                 <span>&nbsp;&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
             </li>  
         </ul> 
@@ -180,6 +184,7 @@ const cancelPurchase = () => {
         <div>价值：满{{ currentCoupon.minPrice }}减{{ currentCoupon.couponValue }}元</div>
         <div>类型：{{ currentCoupon.couponType===0?'通用券':'特殊券' }}</div>
         <div>价格：{{ currentCoupon.couponPrice }}元/张</div>
+        <div>销量：{{ currentCoupon.quantitySold }}张</div>
         <div>有效期：{{ currentCoupon.periodOfValidity }}天</div>
         <div>
                 <button @click="isPurchasing=true">购买</button>
@@ -208,5 +213,5 @@ const cancelPurchase = () => {
             </template>  
         </el-dialog>  
     </div>
-    
+</div>
 </template>

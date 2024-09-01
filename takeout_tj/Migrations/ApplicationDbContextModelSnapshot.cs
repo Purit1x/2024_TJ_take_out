@@ -236,9 +236,15 @@ namespace takeout_tj.Migrations
                     b.Property<int>("CouponId")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.HasKey("OrderId");
 
-                    b.HasIndex("CouponId");
+                    b.HasIndex("UserId", "CouponId", "ExpirationDate");
 
                     b.ToTable("order_coupons", (string)null);
                 });
@@ -255,13 +261,12 @@ namespace takeout_tj.Migrations
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<DateTime>("ExpectedTimeOfArrival")
+                    b.Property<DateTime?>("ExpectedTimeOfArrival")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<int>("MerchantRating")
+                    b.Property<int?>("MerchantRating")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("NeedUtensils")
@@ -273,10 +278,10 @@ namespace takeout_tj.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric(10,2)");
 
-                    b.Property<DateTime>("RealTimeOfArrival")
+                    b.Property<DateTime?>("RealTimeOfArrival")
                         .HasColumnType("TIMESTAMP(7)");
 
-                    b.Property<int>("RiderRating")
+                    b.Property<int?>("RiderRating")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("State")
@@ -300,6 +305,9 @@ namespace takeout_tj.Migrations
                     b.Property<int>("DishId")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<int>("DishNum")
+                        .HasColumnType("NUMBER(10)");
+
                     b.HasKey("OrderId", "MerchantId", "DishId");
 
                     b.HasIndex("MerchantId", "DishId");
@@ -312,7 +320,7 @@ namespace takeout_tj.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.Property<int>("RiderId")
+                    b.Property<int?>("RiderId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<decimal>("RiderPrice")
@@ -586,6 +594,22 @@ namespace takeout_tj.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.User.UserDefaultAddressDB", b =>
+                {
+                    b.Property<int>("AddressId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("AddressId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("user_default_addresses", (string)null);
+                });
+
             modelBuilder.Entity("takeout_tj.Models.Merchant.DishDB", b =>
                 {
                     b.HasOne("takeout_tj.Models.Merchant.MerchantDB", "MerchantDB")
@@ -648,21 +672,21 @@ namespace takeout_tj.Migrations
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderCouponDB", b =>
                 {
-                    b.HasOne("takeout_tj.Models.Platform.CouponDB", "CouponDB")
-                        .WithMany("OrderCouponDBs")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("takeout_tj.Models.Platform.OrderDB", "OrderDB")
                         .WithOne("OrderCouponDB")
                         .HasForeignKey("takeout_tj.Models.Platform.OrderCouponDB", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CouponDB");
+                    b.HasOne("takeout_tj.Models.User.UserCouponDB", "UserCouponDB")
+                        .WithMany("OrderCouponDB")
+                        .HasForeignKey("UserId", "CouponId", "ExpirationDate")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("OrderDB");
+
+                    b.Navigation("UserCouponDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.Platform.OrderDB", b =>
@@ -705,9 +729,7 @@ namespace takeout_tj.Migrations
 
                     b.HasOne("takeout_tj.Models.Rider.RiderDB", "RiderDB")
                         .WithMany("OrderRiderDBs")
-                        .HasForeignKey("RiderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RiderId");
 
                     b.Navigation("OrderDB");
 
@@ -842,6 +864,25 @@ namespace takeout_tj.Migrations
                     b.Navigation("UserDB");
                 });
 
+            modelBuilder.Entity("takeout_tj.Models.User.UserDefaultAddressDB", b =>
+                {
+                    b.HasOne("takeout_tj.Models.User.UserAddressDB", "UserAddressDB")
+                        .WithOne("UserDefaultAddressDB")
+                        .HasForeignKey("takeout_tj.Models.User.UserDefaultAddressDB", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("takeout_tj.Models.User.UserDB", "UserDB")
+                        .WithOne("UserDefaultAddressDB")
+                        .HasForeignKey("takeout_tj.Models.User.UserDefaultAddressDB", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserAddressDB");
+
+                    b.Navigation("UserDB");
+                });
+
             modelBuilder.Entity("takeout_tj.Models.Merchant.DishDB", b =>
                 {
                     b.Navigation("OrderDishDBs");
@@ -864,8 +905,6 @@ namespace takeout_tj.Migrations
             modelBuilder.Entity("takeout_tj.Models.Platform.CouponDB", b =>
                 {
                     b.Navigation("CouponPurchaseDBs");
-
-                    b.Navigation("OrderCouponDBs");
 
                     b.Navigation("UserCouponDBs");
                 });
@@ -904,6 +943,14 @@ namespace takeout_tj.Migrations
             modelBuilder.Entity("takeout_tj.Models.User.UserAddressDB", b =>
                 {
                     b.Navigation("OrderDBs");
+
+                    b.Navigation("UserDefaultAddressDB")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("takeout_tj.Models.User.UserCouponDB", b =>
+                {
+                    b.Navigation("OrderCouponDB");
                 });
 
             modelBuilder.Entity("takeout_tj.Models.User.UserDB", b =>
@@ -917,6 +964,9 @@ namespace takeout_tj.Migrations
                     b.Navigation("UserAddressDBs");
 
                     b.Navigation("UserCouponDBs");
+
+                    b.Navigation("UserDefaultAddressDB")
+                        .IsRequired();
 
                     b.Navigation("shoppingCartDBs");
                 });

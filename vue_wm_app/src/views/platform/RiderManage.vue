@@ -4,7 +4,7 @@ import { ElMessage,ElMessageBox } from "element-plus";
 import { ref, onMounted, watch } from 'vue';  
 import { useRouter } from 'vue-router';
 import {getStationIds,separateRiders,getStationsInfo,assignRiderStation,deleteRiderStation,editRiderStation} from '@/api/platform'
-import { riderInfo,stIdSearch } from '@/api/rider'
+import { riderInfo,stIdSearch, getDeliveredOrdersCountandAverageRating } from '@/api/rider'
 const router = useRouter();
 const unAssignedRiderIds = ref([]);  //未分配骑手id
 const assignedRiderIds = ref([]);  //已分配骑手id
@@ -23,6 +23,10 @@ const stationIds = ref([]);  //获取所有站点id
 const stationsInfo = ref([]); // 存储所有站点信息 
 const showStationsInfo = ref([]); // 显示站点信息列表
 const isEditAssigning = ref(false);  //是否正在编辑分配站点
+
+const sortField = ref('deliveredOrdersCount'); // 默认排序字段
+const sortOrder = ref('desc'); // 默认排序方向，'asc'表示升序，'desc'表示降序
+
  
 onMounted(async () => {
     try {  
@@ -32,8 +36,24 @@ onMounted(async () => {
         RiderIds.value = [...unAssignedRiderIds.value, ...assignedRiderIds.value];   
         
         // 获取所有骑手信息  
-        const responses = await Promise.all(RiderIds.value.map(id => riderInfo(id)));   
-        ridersInfo.value = responses.map(response => response.data);   
+        //const responses = await Promise.all(RiderIds.value.map(id => riderInfo(id)));   
+
+        // 获取所有骑手信息和他们的平均评分
+        const responses = await Promise.all(RiderIds.value.map(async id => {
+            const riderInfoResponse = await riderInfo(id); // 获取骑手信息
+            const averageRatingandOrdersCountResponse = await getDeliveredOrdersCountandAverageRating(id); // 获取骑手的平均评分
+            //console.info(averageRatingandOrdersCountResponse);
+            return {
+                ...riderInfoResponse.data,
+                averageRating: averageRatingandOrdersCountResponse.averageRating, // 添加平均评分到骑手信息中
+                deliveredOrdersCount:averageRatingandOrdersCountResponse.deliveredOrdersCount, //添加送达订单量
+            };
+        }));
+
+        ridersInfo.value = responses; // 更新ridersInfo以包含骑手信息和平均评分
+
+        //ridersInfo.value = responses.map(response => response.data); 
+        //console.info(ridersInfo.value);  
         
         // 筛选出已分配和未分配的骑手信息  
         asRidersInfo.value = ridersInfo.value.filter(rider => assignedRiderIds.value.includes(rider.riderId));  
@@ -52,6 +72,10 @@ onMounted(async () => {
         // 更新显示列表  
         showUnRidersInfo.value = unRidersInfo.value;  
         showAsRidersInfo.value = asRidersInfo.value;  
+
+        // 调用排序函数
+        sortRiders();
+
     } catch (err) {  
         ElMessage.error('获取骑手信息失败');   
     }  
@@ -65,6 +89,33 @@ onMounted(async () => {
         ElMessage.error('获取站点id失败'); 
     }); 
 });
+
+// 给骑手排序
+const sortRiders = () => {
+    const sortedUnRidersList = [...unRidersInfo.value];
+    const sortedAsRidersList = [...asRidersInfo.value];
+
+    const compare = (a, b) => {
+        const aValue = a[sortField.value] !== undefined ? a[sortField.value] : (sortField.value === 'averageRating' ? 0 : 0);
+        const bValue = b[sortField.value] !== undefined ? b[sortField.value] : (sortField.value === 'averageRating' ? 0 : 0);
+
+        //const aValue = a[sortField.value];
+        //const bValue = b[sortField.value];
+
+        if (sortOrder.value === 'asc') {
+            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        } else {
+            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        }
+    };
+
+    sortedUnRidersList.sort(compare);
+    sortedAsRidersList.sort(compare);
+
+    showUnRidersInfo.value = sortedUnRidersList;
+    showAsRidersInfo.value = sortedAsRidersList;
+};
+
 const getStationId= (riderId) => {  //获取站点id
     stIdSearch(riderId).then(res => {  
         console.log("站点id:", res.data);  
@@ -197,16 +248,33 @@ const leaveEditAssign = () => {
         </div>
         <label @click="isUnAssigned = true">未分配站点</label>&nbsp;&nbsp;
         <label @click="isUnAssigned = false">已分配站点</label>
+        <div>
+            <label>排序字段:</label>
+            <select v-model="sortField" @change="sortRiders">
+                <option value="deliveredOrdersCount">送达订单量</option>
+                <option value="averageRating">评价平均分</option>
+            </select>
+            &nbsp;&nbsp;
+            <label>排序方式:</label>
+            <select v-model="sortOrder" @change="sortRiders">
+                <option value="asc">升序</option>
+                <option value="desc">降序</option>
+            </select>
+        </div>
         <div v-if="isUnAssigned">
             <div>
                 <input type="text" v-model="searchQuery" placeholder="搜索Id或姓名" v-on:keyup.enter="handleUnSearch()"/> 
                 <button @click="handleUnSearch()">搜索</button>
             </div>
+            
             <ul>  
                 <li v-for="rider in showUnRidersInfo" :key="rider.riderId">  
                     <span>Id: {{ rider.riderId }}</span>
                     <span>&nbsp;&nbsp;{{ rider.riderName }}</span> 
                     <span>&nbsp;&nbsp;{{ rider.phoneNumber }}</span>
+                    <!--显示接单数与评分-->
+                    <span>&nbsp;&nbsp;送单量：{{ rider.deliveredOrdersCount }}</span>
+                    <span>&nbsp;&nbsp;评分：{{ rider.averageRating }}</span>
                     <button @click="enterAssign(rider)">分配站点</button>
                 </li>  
             </ul>  
@@ -216,12 +284,15 @@ const leaveEditAssign = () => {
                 <input type="text" v-model="searchQuery" placeholder="搜索Id、姓名或站点名" v-on:keyup.enter="handleAsSearch()"/> 
                 <button @click="handleAsSearch()">搜索</button>
             </div>
+            
             <ul>  
                 <li v-for="rider in showAsRidersInfo" :key="rider.riderId">  
                     <span>Id: {{ rider.riderId }}</span>
                     <span>&nbsp;&nbsp;{{ rider.riderName }}</span> 
                     <span>&nbsp;&nbsp;{{ rider.phoneNumber }}</span>
                     <span>&nbsp;&nbsp;{{ rider.stationName}}</span>
+                    <span>&nbsp;&nbsp;送单量：{{ rider.deliveredOrdersCount }}</span>
+                    <span>&nbsp;&nbsp;评分：{{ rider.averageRating }}</span>
                     <button @click="enterEditAssign(rider)">更改分配</button>
                     <button @click="deleteAssign(rider)">删除分配</button>
                 </li>  

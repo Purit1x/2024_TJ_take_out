@@ -29,5 +29,6 @@ namespace takeout_tj.Models.User
 
         public UserDB UserDB { get; set; }  // 导航属性，用于直接找到外键引用的类
         public ICollection<OrderDB> OrderDBs { get; set; }
+        public UserDefaultAddressDB UserDefaultAddressDB { get; set; }  
     }
 }

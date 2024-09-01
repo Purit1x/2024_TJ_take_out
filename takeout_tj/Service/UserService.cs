@@ -67,5 +67,19 @@ namespace takeout_tj.Service
             }
             return -1;
         }
+        public int AssignOrderId()
+        {
+            var usedOrderIds = _context.Orders.Select(c => c.OrderId).ToList();
+
+            // 从 1 开始找到一个未使用的 ID  
+            for (int id = 1; id <= usedOrderIds.Count + 1; id++)
+            {
+                if (!usedOrderIds.Contains(id))
+                {
+                    return id; // 返回第一个未使用的 ID  
+                }
+            }
+            return -1;
+        }
     }
 }

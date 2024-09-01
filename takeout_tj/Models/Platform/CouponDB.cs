@@ -32,7 +32,6 @@ namespace takeout_tj.Models.Platform
         public int IsOnShelves { get; set; }  //是否上架
         public ICollection<CouponPurchaseDB> CouponPurchaseDBs { get; set; }
 		public ICollection<UserCouponDB> UserCouponDBs { get; set; }
-		public ICollection<OrderCouponDB> OrderCouponDBs { get; set; }
 
 	}
 }
