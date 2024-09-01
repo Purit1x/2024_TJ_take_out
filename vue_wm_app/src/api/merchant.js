@@ -299,3 +299,33 @@ export const deliverOrder = async (data) => {
         throw error;
     }
 }
+
+export const getMerOrdersWithinThisMonth=async(id)=>{
+    try{
+        const response =await axios.get(`${BASE_URL}/Merchant/getMerOrdersWithinThisMonth?merchantId=${id}`);
+        return response.data.data;//返回本月订单列表，空则返回0
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+export const getMerOrdersWithinThisDay=async(id)=>{
+    try{
+        const response =await axios.get(`${BASE_URL}/Merchant/getMerOrdersWithinThisDay?merchantId=${id}`);
+        return response.data.data;//返回本日订单列表，空则返回0
+    }
+    catch(error){
+        throw error;
+    }
+}
+export const getMerPrice=async(id)=>{
+    try{
+        const response =await axios.get(`${BASE_URL}/Merchant/getMerPrice?orderId=${id}`);
+        console.log('销售盈利',response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}

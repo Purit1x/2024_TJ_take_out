@@ -1,19 +1,23 @@
 <script setup>
 // 导入element-plus的提示组件
 import { ElMessage } from 'element-plus'
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { inject } from 'vue';
 import store from '@/store';
 const router = useRouter();
-const merchant = inject('merchant');
-import { merchantInfo, updateMerchant, walletRecharge,walletWithdraw,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
+const merchant = ref({});
+import { merchantInfo, getMerPrice,updateMerchant, getMerOrdersWithinThisMonth,getMerOrdersWithinThisDay,walletRecharge,walletWithdraw,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
+import { useStore } from 'vuex';
 const isWallet=ref(false);  //是否是钱包界面
 const isRecharge=ref(false);  //是否是充值界面
 const isWithdraw=ref(false); //是否是提现页面
 const isChangeWP=ref(false);  //是否是修改钱包密码界面
 const refForm =ref(null);
-
+const totalTurnoverWithinThisMonth = ref(0);
+const totalTurnoverWithinThisDay = ref(0);
+const orderNum = ref(0);
+const orderDayNum=ref(0);
 const merchantForm = ref({
     MerchantId: 0,
     Password:"",
@@ -30,7 +34,10 @@ const merchantForm = ref({
     reWalletPassword:"",
 
 });
+
 const currentMerchant=ref({})
+let updateTurnoverInterval = null;
+
 const checkRePassword = (rule,value,callback) => {
     if(value == ''){
         callback(new Error('请再次确认密码'))
@@ -96,7 +103,7 @@ const validateField = (field) => {  //编辑规则的应用
         }  
     });  
 };  
-onMounted(() => {  
+onMounted(async () => {  
     const merchantData = store.state.merchant;
     merchantInfo(merchantData.MerchantId)
         .then((res) => {
@@ -117,6 +124,9 @@ onMounted(() => {
         .catch((err) => {
             console.log(err);
         });
+    await renewTurnoverStat();
+    updateTurnoverInterval = setInterval(renewTurnoverStat, 10000);
+
 });
 const formatTime=(seconds)=> {  
     const hours = Math.floor(seconds / 3600);  
@@ -125,6 +135,11 @@ const formatTime=(seconds)=> {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  
 }  
 const isOnlyShow = ref(true);
+onBeforeUnmount(() => {
+    if (updateTurnoverInterval) {
+        clearInterval(updateTurnoverInterval);  // 清除定时器
+    }
+})
 
 function editMerchant() {
     // 除去验证结果
@@ -353,6 +368,54 @@ const goToSpecialOffer = () => {
     router.push('/merchant-home/specialOffer');  
     isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
 };  
+const renewTurnoverStat=async()=>{
+    try{
+        const ordersData=await getMerOrdersWithinThisMonth(merchantForm.value.MerchantId);
+        const ordersDayData=await getMerOrdersWithinThisDay(merchantForm.value.MerchantId);
+        if(ordersData===0){
+            orderNum.value=0;
+            totalTurnoverWithinThisMonth.value=0;
+            return;
+
+        }
+        else{
+            orderNum.value=ordersData.length;
+            totalTurnoverWithinThisMonth.value=0;
+            const promise =await ordersData.map(orderItem=>getMerPrice(orderItem));
+
+            const fees=await Promise.all(promise);
+            for(const fee of fees){
+                totalTurnoverWithinThisMonth.value+=fee;
+            }
+            
+        }
+
+        if(ordersDayData===0)
+        {
+            orderDayNum.value=0;
+            totalTurnoverWithinThisDay.value=0;
+            return;
+        }
+        else{
+            orderDayNum.value=ordersDayData.length;
+            totalTurnoverWithinThisDay.value=0;
+            const promise =await ordersDayData.map(orderItem=>getMerPrice(orderItem));
+            const fees=await Promise.all(promise);
+            for(const fee of fees){
+                totalTurnoverWithinThisDay.value+=fee;
+            }
+        }
+    }
+    catch(error){
+        throw error;
+    }
+}
+function displayTotalTurnoverWithinThisMonth() {
+    return totalTurnoverWithinThisMonth.value || '加载中...';
+}
+function displayTotalTurnoverWithinThisDay() {
+    return totalTurnoverWithinThisDay.value || '加载中...';
+}
 </script>
 
 <template>
@@ -491,6 +554,15 @@ const goToSpecialOffer = () => {
                 <button @click="saveWalletPassword">修改</button>
             </div>
         </el-form>
+        <br><br>
+        <h2>本月销售额</h2>
+        <h3>您本月订单总量为:{{ orderNum }}  您本月的销售额为：{{ displayTotalTurnoverWithinThisMonth() }}</h3>
+        <br><br>
+        <h2>本日销售额</h2>
+        <h3>您本日订单总量为:{{ orderNum }}  您本日的销售额为：{{ displayTotalTurnoverWithinThisDay() }}</h3>
+    </div>
+    <div>
+        
     </div>
 </template>
 
