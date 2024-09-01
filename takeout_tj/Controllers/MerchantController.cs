@@ -947,8 +947,89 @@ namespace takeout_tj.Controllers
 
 			return Ok(ordersByRegion);
 		}
-		
-
+        [HttpGet]
+        [Route("getMerOrdersWithinThisMonth")]
+        public async Task<IActionResult> GetMerOrdersWithinThisMonth(int merchantId)
+        {
+            try
+            {
+                var orderMerchant = await _context.OrderDishes
+                    .Include(ou => ou.OrderDB)
+                    .Where(ou => ou.MerchantId == merchantId)
+                    .Select(ou => ou.OrderId)
+                    .ToListAsync();//获取指定商家的所有订单；
+                if(!orderMerchant.Any())
+                {
+                    return Ok(new { data = 0, msg = "指定商家无订单" });
+                }
+                var currentDate = DateTime.Now;
+                var orders = await _context.Orders
+                    .Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month
+                    && orderMerchant.Contains(o.OrderId) && o.State == 3)
+                    .Select(o => o.OrderId)
+                    .ToListAsync();
+                if(!orderMerchant.Any())
+                {
+                    return Ok(new { data = 0, msg = "指定商家本月内无订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+		[HttpGet]
+		[Route("getMerOrdersWithinThisDay")]
+		public async Task<IActionResult> GetMerOrdersWithinThisDay(int merchantId)
+		{
+			try
+			{
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+				var currentDate = DateTime.Now;
+				var orders = await _context.Orders
+					.Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month&& o.OrderTimestamp.Day == currentDate.Day
+					&& orderMerchant.Contains(o.OrderId) && o.State == 3)
+					.Select(o => o.OrderId)
+					.ToListAsync();
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家本日内无订单" });
+				}
+				return Ok(new { data = orders, msg = "获取成功" });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+        [HttpGet]
+        [Route("getMerPrice")]
+        public async Task<IActionResult>  GetMerPrice(int orderId)
+        {
+            try
+            {
+                var orderMer = await _context.Orders.FirstOrDefaultAsync(or => or.OrderId == orderId);
+                var orderRider = await _context.OrderRiders.FirstOrDefaultAsync(or => or.OrderId == orderId);
+				if (orderMer == null || orderRider == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+				}
+				return Ok(new { data = orderMer.Price - orderRider.RiderPrice, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
+			}
+        }
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()
