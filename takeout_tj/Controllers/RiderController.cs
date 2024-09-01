@@ -413,14 +413,23 @@ namespace takeout_tj.Controllers
         {
             try
             {
+                var orderRiders = await _context.OrderRiders
+                    .Where(or => or.RiderId == riderId)
+                    .Select(or => or.OrderId)
+                    .ToListAsync();  // 获取指定骑手的所有订单
+                if (!orderRiders.Any())
+                {
+                    return Ok(new { data = 0, msg = "指定骑手无订单" });
+                }
                 var currentDate = DateTime.Now;
                 var orders = await _context.Orders
-                    .Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month)
+                    .Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month
+                    && orderRiders.Contains(o.OrderId) && o.State == 3)
                     .Select(o => o.OrderId)
-                    .ToListAsync();
+                    .ToListAsync();  // 获取指定骑手本月已送达订单
                 if (!orders.Any())
                 {
-                    return Ok(new { data = 0, msg = "无指定骑手本月内送达订单信息" });
+                    return Ok(new { data = 0, msg = "指定骑手本月内无订单" });
                 }
                 return Ok(new { data = orders, msg = "获取成功" });
             }
