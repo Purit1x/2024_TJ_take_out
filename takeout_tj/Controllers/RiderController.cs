@@ -388,57 +388,57 @@ namespace takeout_tj.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
             }
         }
-		[HttpGet]
-		[Route("getRiderInOrder")]//按照指定顺序显示骑手列表
-		public IActionResult GetRiderInOrder()
-		{
-			// 查询状态为已送达的订单
-			var deliveredOrderIds = _context.Set<OrderDB>()
-				.Where(o => o.State == 3)  // 假设3代表订单已送达
-				.Select(o => o.OrderId)
-				.ToList(); // 确保转换为列表，以便在后续查询中使用
+        [HttpGet]
+        [Route("getRiderInOrder")]//按照指定顺序显示骑手列表
+        public IActionResult GetRiderInOrder()
+        {
+            // 查询状态为已送达的订单
+            var deliveredOrderIds = _context.Set<OrderDB>()
+                .Where(o => o.State == 3)  // 假设3代表订单已送达
+                .Select(o => o.OrderId)
+                .ToList(); // 确保转换为列表，以便在后续查询中使用
 
-			// 通过中间表关联订单和骑手
-			var orderRiders = _context.Set<OrderRiderDB>()
-				.Where(or => deliveredOrderIds.Contains(or.OrderId))
-				.ToList(); // 确保转换为列表以进行进一步操作
+            // 通过中间表关联订单和骑手
+            var orderRiders = _context.Set<OrderRiderDB>()
+                .Where(or => deliveredOrderIds.Contains(or.OrderId))
+                .ToList(); // 确保转换为列表以进行进一步操作
 
-			// 统计每位骑手的已送达订单数和评分
-			var ridersWithDeliveredOrders = orderRiders
-				.GroupBy(o => o.RiderId)
-				.Select(g => new
-				{
-					RiderId = g.Key,
-					// 计算每位骑手的平均评分
-					AverageRiderRating = g.Average(o => o.RiderPrice), // 假设用 RiderPrice 代替评分
-					DeliveredOrders = g.Count()
-				})
-				.OrderByDescending(r => r.AverageRiderRating)
-				.ThenByDescending(r => r.DeliveredOrders)
-				.ToList();
+            // 统计每位骑手的已送达订单数和评分
+            var ridersWithDeliveredOrders = orderRiders
+                .GroupBy(o => o.RiderId)
+                .Select(g => new
+                {
+                    RiderId = g.Key,
+                    // 计算每位骑手的平均评分
+                    AverageRiderRating = g.Average(o => o.RiderPrice), // 假设用 RiderPrice 代替评分
+                    DeliveredOrders = g.Count()
+                })
+                .OrderByDescending(r => r.AverageRiderRating)
+                .ThenByDescending(r => r.DeliveredOrders)
+                .ToList();
 
-			// 获取骑手详细信息
-			var riderDetails = _context.Set<RiderDB>()
-				.Where(r => ridersWithDeliveredOrders.Select(ro => ro.RiderId).Contains(r.RiderId))
-				.ToList();
+            // 获取骑手详细信息
+            var riderDetails = _context.Set<RiderDB>()
+                .Where(r => ridersWithDeliveredOrders.Select(ro => ro.RiderId).Contains(r.RiderId))
+                .ToList();
 
-			// 合并统计信息和详细信息
-			var result = ridersWithDeliveredOrders
-				.Join(riderDetails,
-					  stat => stat.RiderId,
-					  detail => detail.RiderId,
-					  (stat, detail) => new
-					  {
-						  detail.RiderId,
-						  detail.RiderName,
-						  detail.PhoneNumber,
+            // 合并统计信息和详细信息
+            var result = ridersWithDeliveredOrders
+                .Join(riderDetails,
+                      stat => stat.RiderId,
+                      detail => detail.RiderId,
+                      (stat, detail) => new
+                      {
+                          detail.RiderId,
+                          detail.RiderName,
+                          detail.PhoneNumber,
 
-						  stat.DeliveredOrders,
-						  stat.AverageRiderRating
-					  })
-				.ToList();
-			return Ok(result); // 返回结果
-		}
+                          stat.DeliveredOrders,
+                          stat.AverageRiderRating
+                      })
+                .ToList();
+            return Ok(result); // 返回结果
+        }
         [HttpGet]
         [Route("getOrdersWithinThisMonth")]  // 获得指定骑手本月内所有订单列表
         public async Task<IActionResult> getOrdersWithinThisMonth(int riderId)
@@ -470,5 +470,33 @@ namespace takeout_tj.Controllers
                 return BadRequest(ex.Message);
             }
         }
-	}
+        [HttpGet]
+        [Route("getFinishedOrders")]  // 获取已送达订单
+        public async Task<IActionResult> GetFinishedOrders(int riderId)
+        {
+            try
+            {
+                var orderRiders = await _context.OrderRiders
+                    .Where(or => or.RiderId == riderId)
+                    .Select(or => or.OrderId)
+                    .ToListAsync();
+                if (!orderRiders.Any())
+                {
+                    return Ok(new { data = 0, msg = "该骑手尚无订单"});
+                }
+                var orders = await _context.Orders
+                    .Where(o => orderRiders.Contains(o.OrderId) && o.State == 3)
+                    .ToListAsync();  // 获取指定骑手的已送达订单
+                if (!orders.Any())
+                {
+                    return Ok(new { data = 0, msg = "该骑手尚无已送达订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
 }
