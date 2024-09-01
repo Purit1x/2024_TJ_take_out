@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
@@ -281,4 +281,3 @@ async function handleReceiveOrder(data) {
     box-sizing: border-box;
 }
 </style>
-
