@@ -486,8 +486,5 @@ namespace takeout_tj.Controllers
 			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
 			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
 		}
-		
-		
-
 	}
 }
