@@ -123,3 +123,11 @@ export const createCoupon=async(data) => {  //新增优惠券
         throw error;   
     } 
 }
+export const getEcoInfo = async() => { // 获取环保比例
+    try {
+        const response = await axios.get(`${BASE_URL}/Platform/getEcoInfo`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    } 
+}
