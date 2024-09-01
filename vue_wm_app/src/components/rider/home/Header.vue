@@ -21,7 +21,7 @@
             store.dispatch('clearRider'); 
             router.push('/login');
         } else if (command == 'user') {
-            router.push('/information')
+            router.push('/rider-home/information')
         }
     }
 
@@ -75,7 +75,7 @@
 
         <div class="headerRight">
             <div class="headerUsercon">
-                <div class="btn-icon" @click="router.push('/information')">
+                <div class="btn-icon" @click="router.push('/rider-home/information')">
                     <el-tooltip
                         effect="dark"
                         :content="message ? `有${message}条未读消息` : `消息中心`"

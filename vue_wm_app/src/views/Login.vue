@@ -426,7 +426,7 @@ const login = () =>{  //登录
                     ElMessage.success('登录成功');
                     // 将用户信息保存到管理器
                     store.dispatch('setRider', riderRegisterData.value); // 设置用户状态
-                    router.push('/rider-home');
+                    router.push('/rider-home/assignment');
                 }
             }).catch(error => {
                 // 根据错误码处理不同的错误  

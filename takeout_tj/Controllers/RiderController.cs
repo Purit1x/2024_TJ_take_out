@@ -470,6 +470,43 @@ namespace takeout_tj.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut]
+        [Route("withdraw")]
+        public IActionResult WalletWithdraw(int riderId, int withdrawMoney)
+        {
+            var tran = _context.Database.BeginTransaction(); // 开始事务 
+            try
+            {
+                var rider = _context.Riders.FirstOrDefault(u => u.RiderId == riderId);
+                if (rider == null)
+                {
+                    return NotFound(new { errorCode = 404, msg = "用户未找到" });
+                }
+                if (withdrawMoney == 0)
+                {
+                    tran.Commit();
+                    return Ok(new { data = rider.Wallet, msg = "用户信息更新成功" });
+                }
+                rider.Wallet = rider.Wallet - withdrawMoney;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                {
+                    tran.Commit(); // 提交事务  
+                    return Ok(new { data = rider.Wallet, msg = "用户信息更新成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "提现失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback(); // 回滚事务  
+                return StatusCode(30000, new { errorCode = 30000, msg = $"提现异常: {ex.Message}" });
+            }
+        }
+
         [HttpGet]
         [Route("getFinishedOrders")]  // 获取已送达订单
         public async Task<IActionResult> GetFinishedOrders(int riderId)
@@ -500,3 +537,4 @@ namespace takeout_tj.Controllers
         }
     }
 }
+

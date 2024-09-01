@@ -252,7 +252,7 @@ async function handleReceiveOrder(data) {
 
 <style scoped>
 .demo-tabs {
-    margin-left: 10px;
+    margin-left: 40px;
 }
 
 .orders-scroll {
@@ -264,6 +264,7 @@ async function handleReceiveOrder(data) {
     overflow-y: auto;
     /* 使订单区域可以滚动 */
     margin-left: 20px;
+    margin-right: 20px;
 }
 
 .order-item {
