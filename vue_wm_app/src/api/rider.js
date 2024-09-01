@@ -112,6 +112,15 @@ export const getOrdersWithinThisMonth = async (id) => {
         throw error;
     }
 }
+export const getFinishedOrders = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getFinishedOrders?riderId=${id}`);
+        return response.data.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
 
 export const walletWithdraw= async(id,withdrawMoney) => {  //提现
     try {  
