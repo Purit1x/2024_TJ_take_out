@@ -879,7 +879,7 @@ namespace takeout_tj.Controllers
                         coupon.CouponType,
                         coupon.MinPrice,
                         coupon.PeriodOfValidity,
-                        //coupon.QuantitySold,
+                        coupon.QuantitySold,
                         //coupon.IsOnShelves
                     }).ToList();
 

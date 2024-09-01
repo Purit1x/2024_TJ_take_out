@@ -230,6 +230,38 @@ namespace takeout_tj.Controllers
                 }
             }
         }
+
+
+        [HttpGet]
+        [Route("getDeliveredOrdersCountandAverageRating")]
+        public async Task<IActionResult> GetDeliveredOrdersCountandAverageRating(int riderId)
+        {
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var deliveredOrders = await _context.Orders  // 获取指定骑手的已送达订单
+                        .Where(o => o.OrderRiderDB.RiderId == riderId && o.State == 3)
+                        .ToListAsync();
+
+                    if (deliveredOrders.Count == 0)
+                        return Ok(new { data = 20000, msg = "该骑手没有已送达的订单" });
+
+                    // 计算骑手评分的平均值
+                    var averageRating = deliveredOrders.Average(o => o.RiderRating ?? 5);
+
+                    // 获取已送达的订单量
+                    var deliveredOrdersCount = deliveredOrders.Count;
+
+                    return Ok(new { averageRating, deliveredOrdersCount, msg = "获取成功" });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, MsgBoxResult = ex.Message });
+                }
+            }
+        }
+
         [HttpGet]
         [Route("getPaidOrders")]
         public IActionResult getPaidOrders(int riderId)

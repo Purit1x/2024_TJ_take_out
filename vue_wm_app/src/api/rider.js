@@ -73,6 +73,17 @@ export const getReceivedOrders = async (id) => {  // 获取指定骑手已接订
         throw error;
     }
 }
+
+export const getDeliveredOrdersCountandAverageRating = async (id) => {  // 获取指定骑手已接订单数量与评价
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getDeliveredOrdersCountandAverageRating?riderId=${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 export const receiveOrder = async (data) => {  // 骑手接单
     try {
         const response = await axios.put(`${BASE_URL}/Rider/receiveOrder`, data);
