@@ -155,6 +155,7 @@ namespace takeout_tj.Controllers
                 throw new Exception($"无法获取商家地址: {ex.Message}", ex);
             }
         }
+
         [HttpPut]
         [Route("merchantEdit")]  //编辑个人信息
         public IActionResult EditMerchant([FromBody] MerchantDBDto dto)

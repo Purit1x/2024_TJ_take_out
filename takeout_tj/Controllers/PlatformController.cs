@@ -554,6 +554,38 @@ namespace takeout_tj.Controllers
                 return StatusCode(500, new { errorCode = 500, msg = $"查询异常: {ex.Message}" });
             }
         }
+        [HttpGet]
+        [Route("GetQuantityByRegion")]
+        public async Task<IActionResult> GetQuantityByRegion(string region)
+        {
+            try
+            {
+                // 使用LINQ查询指定地区（部分匹配）的订单量
+                var orders = await _context.Orders.ToListAsync();
+                var filteredOrders = orders
+                    .Where(order =>
+                    {
+                        string merchantAddress = GetMerAddrByOrderId(order.OrderId).Result;
+                        return MerchantAddressContainsRegion(merchantAddress, region);
+                    })
+                    .ToList(); // 确保在这里调用 .ToList() 以执行查询
+
+                var orderCount = filteredOrders.Count; // 获取满足条件的订单数量
+
+                if (orderCount > 0)
+                {
+                    return Ok(new { Region = region, OrderCount = orderCount });
+                }
+                else
+                {
+                    return NotFound(new { errorCode = 404, msg = "没有找到包含指定地区的订单量" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, msg = $"查询异常: {ex.Message}" });
+            }
+        }
 
 
     }
