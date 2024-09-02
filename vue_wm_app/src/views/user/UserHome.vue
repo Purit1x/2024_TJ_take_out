@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
 import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress } from "@/api/user";
-import {getDistanceBetweenAddresses} from "@/api/merchant";
+import {getDistanceBetweenAddresses,getMerAvgRating} from "@/api/merchant";
 import { ElMessage } from 'element-plus';
 
 const store = useStore();    
@@ -19,7 +19,7 @@ const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
 const DefaultAddressId=ref(null); // 用于跟踪默认地址id
-onMounted(() => {  
+onMounted(async() => {  
   const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
     isUserHome.value = false;
@@ -30,17 +30,32 @@ onMounted(() => {
   } else {  
     router.push('/login');
   }  
-  getMerchantIds().then(res => {  // 获取所有商家id
+  
+  await getMerchantIds().then(res => {  // 获取所有商家id
     merchantIds.value = res.data;  
     return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
   }).then(responses => {  
     merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
     fetchDefaultAddress();  // 获取用户默认地址
+    
     showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
   }).catch(err => {  
     ElMessage.error('获取商家id失败'); 
-  });  
+  }); 
+  await fetchMerAvgRating();
 }); 
+const fetchMerAvgRating = async () => {
+  try {
+    for (let info of showMerchantsInfo.value) {
+      const avgRating = await getMerAvgRating(info.merchantId);
+      console.log(`Merchant ID: ${info.merchantId}, Avg Rating: ${avgRating}`);
+      info.avgRating = avgRating; // 将平均评分添加到商家信息对象中
+    }
+    console.log("商家信息", showMerchantsInfo.value);
+  } catch (error) {
+    console.error('Failed to fetch merchant average ratings:', error);
+  }
+};
 const fetchDefaultAddress = async () => {  
     try {  
         const res = await GetDefaultAddress(user.value.userId); // 获取用户默认地址  
@@ -203,6 +218,7 @@ provide('merchantsInfo', merchantsInfo);
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
                   <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
+                  <td class="col-Rating">评分：{{ merchant.avgRating }}</td>
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
                 </tr>
@@ -240,7 +256,8 @@ th {
 }
 
 .col-name{width:40%;}
-.col-type{width:40%;}
+.col-type{width:30%;}
+.col-Rating{width:10%}
 .col-enter{width:10%;}
 .col-favorite{width:10%;}
 

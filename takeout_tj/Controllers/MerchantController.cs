@@ -861,7 +861,9 @@ namespace takeout_tj.Controllers
 
 					// 更新骑手钱包余额
 					orderRider.RiderDB.Wallet += orderRider.RiderPrice;
-
+                    //默认评价为5；
+                    orderRider.OrderDB.MerchantRating = 5;
+                    orderRider.OrderDB.RiderRating = 5;
 					// 获取订单中的所有菜品信息
 					var orderDishes = await _context.OrderDishes
 						.Where(od => od.OrderId == deliverDto.OrderId)
@@ -893,7 +895,7 @@ namespace takeout_tj.Controllers
 
 					// 更新商家钱包余额
 					merchant.Wallet += orderRider.OrderDB.Price - orderRider.RiderPrice;
-
+                    
 					// 提交更改
 					await _context.SaveChangesAsync();
 
@@ -966,7 +968,7 @@ namespace takeout_tj.Controllers
 			{
 				var orderMerchant = await _context.OrderDishes
 					.Include(ou => ou.OrderDB)
-					.Where(ou => ou.MerchantId == merchantId)
+					.Where(ou => ou.MerchantId == merchantId&&ou.OrderDB.State==3)
 					.Select(ou => ou.OrderId)
 					.ToListAsync();//获取指定商家的所有订单；
 				if (!orderMerchant.Any())
@@ -1009,6 +1011,47 @@ namespace takeout_tj.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
 			}
         }
+        [HttpGet]
+        [Route("getMerAvgRating")]
+		public async Task<IActionResult> GetMerAvgRating(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+
+                var orderNum= orderMerchant.Count();
+				var ratings = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderDB.MerchantRating)
+					.ToListAsync();//获取指定商家的所有评分；
+                if(!ratings.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家暂无评分记录" });
+                }
+                double sum = 0;
+                foreach (var rating in ratings)
+                {
+                    sum += rating??0;
+                }
+				double avgRating = orderNum > 0 ? Math.Round(sum / orderNum, 2, MidpointRounding.AwayFromZero) : 0;
+				return Ok(new { data = avgRating, msg = "成功" });
+
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import './assets/main.scss'
 import App from './App.vue'
-
+import { gsap } from 'gsap';
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import 'element-plus/dist/index.css'
