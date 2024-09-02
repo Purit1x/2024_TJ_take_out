@@ -5,6 +5,7 @@
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
     import imgurl from '@/assets/logo2.png';
+    import screenfull from "screenfull";
 
     const router = useRouter()
     const store = useStore()    
@@ -26,10 +27,11 @@
     }
 
     const setFullScreen = () => {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
-            document.body.requestFullscreen.call(document.body);   
+        if (screenfull.isEnabled && !screenfull.isFullscreen) {
+            screenfull.request();
+        }
+        if (screenfull.isEnabled && screenfull.isFullscreen) {
+            screenfull.exit();
         }
     }
 

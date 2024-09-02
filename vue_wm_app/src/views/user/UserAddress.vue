@@ -5,6 +5,15 @@ import { useStore } from "vuex"
 import { ref, onMounted } from 'vue';
 import { submitAddressService, getAddressService, deleteAddressService,EditUserAddress,GetDefaultAddress,CreateDefaultAddress,DeleteDefaultAddress } from '@/api/user';  // 引入API接口
 import {cloneDeep} from 'lodash';
+
+import {
+  House,
+  Edit,
+  Delete,
+  FolderAdd,
+  Star,
+  StarFilled,
+} from '@element-plus/icons-vue'
 const refForm = ref(null);
 const router = useRouter();
 const store = useStore();
@@ -188,19 +197,48 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 
   <div v-if="!isEditing&&!isCreating" class="content">
     <h2>我的地址
-      <button @click="enterCreate">新建</button>
-      <button @click="gobackHome">返回</button>
+      <!-- <button @click="enterCreate">新建</button>
+      <button @click="gobackHome">返回</button> -->
     </h2>
+
+    <el-button-group class="headbutton">
+      <el-tooltip content="新建" hide-after="0" placement="bottom">
+        <el-button @click="enterCreate" type="primary" :icon="FolderAdd" />
+      </el-tooltip>
+      <el-tooltip content="返回" hide-after="0" placement="bottom">
+        <el-button @click="gobackHome" type="primary" :icon="House" />
+      </el-tooltip>
+    </el-button-group>
+
     <ul>
       <li v-for="address in userAddresses" :key="address.addressId">
         <span>{{ address.contactName }}&nbsp;&nbsp;</span>
         <span>{{ address.phoneNumber }}&nbsp;&nbsp;</span>
         <span>{{ address.userAddress }}&nbsp;&nbsp;</span>
         <span>门牌号：{{ address.houseNumber }}&nbsp;&nbsp;</span>
-        <span><button @click="editAddress(address)">编辑</button></span>
+
+        <el-button-group class="editbutton">
+          <el-tooltip content="编辑" hide-after="0"	 placement="bottom">
+            <el-button type="primary" :icon="Edit" @click="editAddress(address)"/>
+          </el-tooltip>
+          <el-tooltip content="删除" hide-after="0" placement="bottom">
+            <el-button type="primary" :icon="Delete" @click="deleteAddress(address.addressId)"/>
+          </el-tooltip>
+          <el-tooltip content="设为默认" hide-after="0" placement="bottom">
+            <el-button type="primary" :icon="Star" v-if="!hasDefaultAddress" @click="setDefaultAddress(address.addressId)"></el-button>
+          </el-tooltip>
+          <el-tooltip content="取消默认" hide-after="0" placement="bottom">
+            <el-button type="primary" :icon="StarFilled" v-if="hasDefaultAddress&&DefaultAddressId===address.addressId" @click="deleteDA(address.addressId)"></el-button>
+          </el-tooltip>
+        
+        </el-button-group>
+
+        <!-- <span><button @click="editAddress(address)">编辑</button></span>
         <span><button @click="deleteAddress(address.addressId)">删除</button></span>
         <button v-if="!hasDefaultAddress" @click="setDefaultAddress(address.addressId)">设为默认</button>
-        <button v-if="hasDefaultAddress&&DefaultAddressId===address.addressId" @click="deleteDA(address.addressId)">取消默认</button>
+        <button v-if="hasDefaultAddress&&DefaultAddressId===address.addressId" @click="deleteDA(address.addressId)">取消默认</button> -->
+
+
     </li>
     </ul>
   </div>

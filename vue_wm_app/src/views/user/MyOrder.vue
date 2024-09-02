@@ -275,42 +275,58 @@ const cancelOrder = async() => {
             <button @click="showState=3">已完成</button>&nbsp;&nbsp;
         </div>
         <div v-if="showState===0">
-            <ul>
-                <li v-for="(order,index) in nopayedOrders" :key="index">
-                    <p>订单号：{{order.orderId}}</p>
-                    <p>订单总价：{{order.price}}元</p>
-                    <p>订单创建时间：{{ order.orderTimestamp }}</p>
-                    <p>支付剩余时间:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
-                    <button @click="enterOrderInfo(order)">></button>
-                </li>
-            </ul>
+            <el-scrollbar max-height="500px">
+                <ul>
+                    <li v-for="(order,index) in nopayedOrders" :key="index">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{order.price}}元</p>
+                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <p>支付剩余时间:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
+                        <button @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
         </div>
         
         <div v-if="showState===1">
-            <ul>
-                <li v-for="(order,index) in pendingOrders" :key="index">
-                    <p>订单号：{{order.orderId}}</p>
-                    <p>订单总价：{{order.price}}元</p>
-                    <p>订单创建时间：{{ order.orderTimestamp }}</p>
-                    <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
-                    <button @click="enterOrderInfo(order)">></button>
-                </li>
-            </ul>
+            <el-scrollbar max-height="500px">
+                <ul>
+                    <li v-for="(order,index) in pendingOrders" :key="index">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{order.price}}元</p>
+                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
+                        <button @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
         </div>
         
         <div v-if="showState===2">
-            <ul>
-                <li v-for="(order,index) in deliveringOrders":key ="inkey">
+            <el-scrollbar max-height="500px">
+                <ul>
+                    <li v-for="(order,index) in deliveringOrders":key ="inkey">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{ order.price }}元</p>
+                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <button @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
+        </div>
+        
+        <div v-if="showState===3">
+            
+            <!-- <ul>
+                <li v-for="(order,index) in completedOrders":key ="inkey">
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
                     <p>订单创建时间：{{ order.orderTimestamp }}</p>
                     <button @click="enterOrderInfo(order)">></button>
                 </li>
-            </ul>
-        </div>
-        
-        <div v-if="showState===3">
-            <ul>
+            </ul> -->
+            <el-scrollbar max-height="500px">
+                <ul>
                 <li v-for="(order,index) in completedOrders":key ="inkey">
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
@@ -318,6 +334,7 @@ const cancelOrder = async() => {
                     <button @click="enterOrderInfo(order)">></button>
                 </li>
             </ul>
+            </el-scrollbar>
         </div>
 
     </div>
