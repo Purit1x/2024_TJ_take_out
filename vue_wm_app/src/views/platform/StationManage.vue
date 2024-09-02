@@ -210,14 +210,7 @@ const submitCreate = async() => {
             </li>  
         </ul> 
     </div>
-    <!-- 添加区域订单量查询 -->
-    <div>
-            <input v-model="region" placeholder="输入区域名称">
-            <button @click="fetchOrderCount">查询订单量</button>
-            <p v-if="orderCount !== null">
-                区域 {{ region }} 的订单量: {{ orderCount }}
-            </p>
-        </div>
+    
     <div v-if="isEdit">
         <h2>编辑站点</h2> 
         <el-form :rules="editRules" ref="refForm" :model="currentStation">
