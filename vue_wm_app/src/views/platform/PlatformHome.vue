@@ -40,10 +40,15 @@ const gotoStation = () => {
     isPlatformHome.value = false;
     router.push('/platform-home/station-manage');
 }
+const gotoStatistic = () => {
+    isPlatformHome.value = false;
+    console.log('isPlatformHome:',isPlatformHome.value);
+    router.push('/platform-home/statistic-manage');
+}
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
-        if (newPath.startsWith('/platform-home')&& newPath !== '/platform-home/order-manage' && newPath !== '/platform-home/merchant-manage' && newPath !== '/platform-home/coupon-manage'&& newPath !== '/platform-home/rider-manage'&& newPath !== '/platform-home/comment-manage'&& newPath !== '/platform-home/station-manage') {  
+        if (newPath.startsWith('/platform-home')&& newPath !== '/platform-home/order-manage' && newPath !== '/platform-home/merchant-manage' && newPath !== '/platform-home/coupon-manage'&& newPath !== '/platform-home/rider-manage'&& newPath !== '/platform-home/comment-manage'&& newPath !== '/platform-home/station-manage' && newPath !== '/platform-home/statistic-manage') {  
             isPlatformHome.value = true; // 返回到商家主页时显示欢迎信息和按钮  
         } else {  
             isPlatformHome.value = false; // 进入子路由时隐藏  
@@ -65,6 +70,7 @@ watch(
         <div class="quarter-div"><a  @click="gotoStation">片区管理</a></div>
         <div class="quarter-div"><a  @click="gotoRider">骑手管理</a></div>
         <div class="quarter-div"><a  @click="gotoComment">评论管理</a></div>       
+        <div class="quarter-div"><a  @click="gotoStatistic">数据统计</a></div>   
         <div class="quarter-div"><a  @click="handleLogout">退出登录</a></div>
     </div>
     <router-view />
