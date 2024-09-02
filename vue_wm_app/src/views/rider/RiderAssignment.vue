@@ -24,12 +24,12 @@ let merchantAddrUpdateInterval = null;  // 商户地址更新计时器
 let targetAddrUpdateInterval = null;
 
 const activeName = ref('first')
-const handleClick = (tab,event) => {
+const handleClick = (tab, event) => {
     if (tab.index == 0)
         showState.value = 1;
-    else if(tab.index == 1)
+    else if (tab.index == 1)
         showState.value = 2;
-    else if(tab.index == 2)
+    else if (tab.index == 2)
         showState.value = 3;
 }
 
@@ -60,11 +60,11 @@ onBeforeUnmount(() => {
     if (updateInterval) {
         clearInterval(updateInterval); // 清除定时器  
     }
-    if(deliveryUpdateInterval)
+    if (deliveryUpdateInterval)
         clearInterval(deliveryUpdateInterval);
-    if(merchantAddrUpdateInterval)
+    if (merchantAddrUpdateInterval)
         clearInterval(merchantAddrUpdateInterval);
-    if(targetAddrUpdateInterval)
+    if (targetAddrUpdateInterval)
         clearInterval(targetAddrUpdateInterval);
 });
 
@@ -189,6 +189,15 @@ async function handleReceiveOrder(data) {
         // 这里可以处理错误的回调逻辑，例如显示错误提示等
     }
 }
+async function handleDeliverOrder(data) {
+    try {
+        const response = await deliverOrder(data);
+        console.log('Success: ', response);
+        renewRiderOrders();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 </script>
 
 <template>
@@ -205,19 +214,26 @@ async function handleReceiveOrder(data) {
             <!--显示可接订单-->
             <div class="orders-scroll" v-if="showState === 1">
                 <el-scrollbar max-height="500px">
-                    <div class="order-item" v-for="(orderItem, index) in receivableOrders" :key="index">                    
+                    <div class="order-item" v-for="(orderItem, index) in receivableOrders" :key="index">
                         <el-descriptions title="订单">
                             <el-descriptions-item label="订单号：">{{ orderItem.order.orderId }}</el-descriptions-item>
-                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.order.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.order.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.order.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.order.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.order.orderId) }}&nbsp;元</el-descriptions-item> 
-                        </el-descriptions>                            
+                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.order.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.order.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.order.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.order.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.order.orderId)
+                                }}&nbsp;元</el-descriptions-item>
+                        </el-descriptions>
                         <div>
-                            <el-button type="primary" 
-                                @click="handleReceiveOrder({ OrderId: orderItem.order.orderId, RiderId: rider.riderId })">                     
-                                接单<el-icon class="el-icon--right"><Check /></el-icon>       
+                            <el-button type="primary"
+                                @click="handleReceiveOrder({ OrderId: orderItem.order.orderId, RiderId: rider.riderId })">
+                                接单<el-icon class="el-icon--right">
+                                    <Check />
+                                </el-icon>
                             </el-button>
                         </div>
                     </div>
@@ -229,20 +245,26 @@ async function handleReceiveOrder(data) {
             <div class="orders-scroll" v-if="showState === 2">
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in receivedOrders" :key="index">
-                        <el-descriptions title="订单" >
+                        <el-descriptions title="订单">
                             <el-descriptions-item label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
-                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.orderId) }}&nbsp;元</el-descriptions-item> 
-                        </el-descriptions>       
-                        <div>                
-                            <el-button type="primary" 
-                                @click="deliverOrder({OrderId: orderItem.orderId})">                     
-                                送达<el-icon class="el-icon--right"><Check /></el-icon>       
+                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.orderId)
+                                }}&nbsp;元</el-descriptions-item>
+                        </el-descriptions>
+                        <div>
+                            <el-button type="primary" @click="handleDeliverOrder({ OrderId: orderItem.orderId })">
+                                送达<el-icon class="el-icon--right">
+                                    <Check />
+                                </el-icon>
                             </el-button>
-                        </div>     
+                        </div>
                     </div>
                 </el-scrollbar>
             </div>
