@@ -574,7 +574,7 @@ namespace takeout_tj.Controllers
 
                 if (orderCount > 0)
                 {
-                    return Ok(new { Region = region, TotalSales = orderCount });
+                    return Ok(new { Region = region, OrderCount = orderCount });
                 }
                 else
                 {
