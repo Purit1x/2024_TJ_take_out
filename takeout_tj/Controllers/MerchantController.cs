@@ -1009,6 +1009,47 @@ namespace takeout_tj.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
 			}
         }
+        [HttpGet]
+        [Route("getMerAvgRating")]
+		public async Task<IActionResult> GetMerAvgRating(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+
+                var orderNum= orderMerchant.Count();
+				var ratings = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderDB.MerchantRating)
+					.ToListAsync();//获取指定商家的所有评分；
+                if(!ratings.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家暂无评分记录" });
+                }
+                double sum = 0;
+                foreach (var rating in ratings)
+                {
+                    sum += rating??0;
+                }
+				double avgRating = orderNum > 0 ? Math.Round(sum / orderNum, 2, MidpointRounding.AwayFromZero) : 0;
+				return Ok(new { data = avgRating, msg = "成功" });
+
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()
