@@ -133,6 +133,13 @@ const renewDeliveryFees = async () => {  // 保存每个订单的配送费
             deliveryFees.value[receivedOrders.value[i].orderId] = fees2[i];
         }
     }
+    if(finishedOrders.value.length>0){
+        const promise3=finishedOrders.value.map(orderItem=>getRiderPrice(orderItem.orderId));
+        const fees3=await Promise.all(promise3);
+        for(let i=0;i<fees3.length;i++){
+            deliveryFees.value[finishedOrders.value[i].orderId] = fees3[i];
+        }
+    }
 }
 const renewMerchantAddresses = async () => {  // 保存每个订单的商户地址
     if (receivableOrders.value.length > 0) {
@@ -148,6 +155,14 @@ const renewMerchantAddresses = async () => {  // 保存每个订单的商户地�
         const addrs2 = await Promise.all(promise2);
         for (let i = 0; i < addrs2.length; i++) {
             merchantAddresses.value[receivedOrders.value[i].orderId] = addrs2[i].data;
+        }
+        console.log('各商户地址', merchantAddresses.value);
+    }
+    if (finishedOrders.value.length > 0) {
+        const promise3 = finishedOrders.value.map(orderItem => getMerAddrByOrderId(orderItem.orderId));
+        const addrs3 = await Promise.all(promise3);
+        for (let i = 0; i < addrs3.length; i++) {
+            merchantAddresses.value[finishedOrders.value[i].orderId] = addrs3[i].data;
         }
         console.log('各商户地址', merchantAddresses.value);
     }
@@ -174,9 +189,21 @@ const renewTargetAddresses = async () => {  // 保存每个订单的交付地址
             targetPhone.value[receivedOrders.value[i].orderId] = addrs2[i].data.phoneNumber;
         }
     }
+
+
+    if (finishedOrders.value.length > 0) {
+        const promise2 = finishedOrders.value.map(orderItem => GetAddressByAddressId(orderItem.addressId));
+        const addrs2 = await Promise.all(promise2);
+        for (let i = 0; i < addrs2.length; i++) {
+            targetAddresses.value[finishedOrders.value[i].orderId]
+                = addrs2[i].data.userAddress + ' ' + addrs2[i].data.houseNumber + '号';;
+            targetName.value[finishedOrders.value[i].orderId] = addrs2[i].data.contactName;
+            targetPhone.value[finishedOrders.value[i].orderId] = addrs2[i].data.phoneNumber;
+        }
+    }
 }
 function displayTargetAddr(orderId) {
-    return targetAddresses.value[orderId] || '加载中...';
+    return targetAddresses.value[orderId] ||'加载中...';
 }
 function displayMerchantAddr(orderId) {
     return merchantAddresses.value[orderId] || '加载中...';
