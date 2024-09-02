@@ -4,14 +4,15 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { getMerchantIds, getMerchantsInfo, GetAddressByAddressId, getOrderDishes } from '@/api/user';
-import { getPaidOrders, getReceivedOrders, receiveOrder, riderInfo, getRiderPrice } from '@/api/rider';
+import { getPaidOrders, getReceivedOrders, receiveOrder, riderInfo, getRiderPrice,getFinishedOrders } from '@/api/rider';
 import { getMerAddrByOrderId, deliverOrder } from '@/api/merchant';
 
 const store = useStore();
 const router = useRouter();
-const showState = ref(1);  // 决定显示可接订单还是已接订单
+const showState = ref(1);  // 决定显示可接订单还是已接订单,已完成订单
 const receivedOrders = ref([]);  // 已接订单列表
 const receivableOrders = ref([]);  // 可接订单列表
+const finishedOrders=ref([]);// 已完成订单列表
 const rider = ref({});  // 初始化骑手对象信息
 const deliveryFees = ref({});  // 存储配送费
 const merchantAddresses = ref({});  // 存储各订单商户地址
@@ -91,8 +92,19 @@ const renewRiderOrders = async () => {
         else {
             receivableOrders.value = receivableOrdersData.data;
         }
+        const finishedOrderData=await getFinishedOrders(rider.value.riderId);
+        if(finishedOrderData===0){
+            if(showState.value===3){
+                ElMessage.success('无已完成订单');
+            }
+            finishedOrders.value=[];
+        }
+        else{
+            finishedOrders.value=finishedOrderData;
+        }
         console.log('可接订单', receivableOrders.value);
         console.log('已接订单', receivedOrders.value);
+        console.log('已完成订单',finishedOrders.value);
     } catch (error) {
         throw error;
     }
@@ -265,6 +277,24 @@ async function handleDeliverOrder(data) {
                                 </el-icon>
                             </el-button>
                         </div>
+                    </div>
+                </el-scrollbar>
+            </div>
+
+
+            <!--显示已完成订单-->
+            <div class="orders-scroll" v-if="showState === 3">
+                <el-scrollbar max-height="500px">
+                    <div class="order-item" v-for="(orderItem, index) in finishedOrders" :key="index">
+                        <el-descriptions title="订单" >
+                            <el-descriptions-item label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
+                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.orderId) }}&nbsp;元</el-descriptions-item> 
+                        </el-descriptions>       
+                             
                     </div>
                 </el-scrollbar>
             </div>
