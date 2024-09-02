@@ -24,6 +24,7 @@
     "nprogress": "^0.2.0",
     "openai": "^3.2.1",
     "sanitize-html": "^2.10.0",
+    "screenfull": "^6.0.2",
     "tinymce": "^6.3.2",
     "universal-cookie": "^4.0.4",
     "vite-plugin-windicss": "^1.8.8",

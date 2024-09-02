@@ -140,10 +140,22 @@ const cancelPurchase = () => {
         <header>购买优惠券</header>
         <button @click="gobackHome()">返回</button>
 
-        <div>
+        <!-- <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
             <button @click="handleSearch()">搜索</button>
+        </div> -->
+
+        <div class="buy-search-bar">
+            <el-col :span="8">
+                <el-input  placeholder="搜索优惠券名称" v-model="searchQuery" clearable @clear="handleSearch()" @keydown.enter.native="handleSearch()">
+                <template #append>
+                <el-button type="primary" @click="handleSearch()"><el-icon><search /></el-icon></el-button>
+                </template>
+                </el-input>
+            </el-col>
         </div>
+
+
         <div>  
         <label>排序字段:</label>  
         <select v-model="sortField" @change="sortCoupons">  
@@ -215,3 +227,10 @@ const cancelPurchase = () => {
     </div>
 </div>
 </template>
+
+<style scoped>
+.buy-search-bar {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+</style>

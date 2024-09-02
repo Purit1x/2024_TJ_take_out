@@ -208,10 +208,21 @@ provide('merchantsInfo', merchantsInfo);
           <h1 v-if="isUserHome" class="welcome-text">欢迎，{{user.userId}}</h1>  
         </div>
         <div v-if="isUserHome">  
-            <div class="search-bar">
+            <!-- <div class="search-bar">
               <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
               <button @click="handleSearch()">搜索</button>
+            </div> -->
+
+            <div class="search-bar">
+              <el-col :span="8">
+                  <el-input  placeholder="搜索店名或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+                  <template #append>
+                    <el-button type="primary"@click="handleSearch"><el-icon><search /></el-icon></el-button>
+                  </template>
+                  </el-input>
+              </el-col>
             </div>
+
             <table>
               <tbody>
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
@@ -315,36 +326,10 @@ th {
   font-size: 15px;
 }
 
-/* #Q# 这里有bug 不知道为什么按钮总比旁边少一点高度，height都是100% */
 .search-bar {
-  width: 300px;
-  height: 40px;
   display: flex;
   margin-bottom: 20px;
   margin-top: 5px;
 }
-.search-bar input {
-    width: 75%;
-    height: 100%;
-    padding-left: 15px;
-    border-radius: 5px 0 0 5px;
-    border: 2px solid #7BA7AB;
-    background: #F9F0DA;
-    color: #9E9C9C;
-    outline: none;
-}
-.search-bar button {
-    width: 25%;
-    height: 100%;
-    background: #7BA7AB;
-    border: 2px solid #7BA7AB;
-    border-radius: 0 5px 5px 0;
-    font-size: 13px;
-    position: relative;
-    text-align: center;
-}
-.search-bar button:before {
-    font-size: 13px;
-    color: #F9F0DA;
-}
+
 </style>

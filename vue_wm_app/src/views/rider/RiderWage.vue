@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import { getOrdersWithinThisMonth, riderInfo, getRiderPrice, getFinishedOrders } from '@/api/rider';
+import dayjs from 'dayjs';
 
 const store = useStore();
 const router = useRouter();
@@ -19,7 +20,7 @@ onMounted(async () => {
         rider.value = riderData;
         const res = await riderInfo(rider.value.RiderId);
         rider.value = res.data;
-        console.log('骑手信息', rider.value);
+        // console.log('骑手信息', rider.value);
     }
     else {
         router.push('/login');  // 未登录，跳转至登陆界面
@@ -47,12 +48,12 @@ const renewFinishedOrders = async () => {
                 return {
                     orderId: orderItem.orderId,
                     deliveryFee: await getRiderPrice(orderItem.orderId) || "加载中",
-                    dateTime: orderItem.orderTimestamp
+                    dateTime: dayjs(orderItem.orderTimestamp).format('YYYY-MM-DD (+8)HH:mm')
                 };
             })
             finishedOrders.value = await Promise.all(promise);  // 等待所有映射完成
             finishedOrders.value.sort((a, b) => b.orderId - a.orderId);
-            console.log("处理后的数据为", finishedOrders.value);
+            // console.log("处理后的数据为", finishedOrders.value);
         }
     }
     catch (error) {
@@ -97,14 +98,13 @@ function displayTotalWageWithinThisMonth() {
     </div>
     <div class="fees-scroll">
         <el-scrollbar max-height="500px">
-            <el-table :data="finishedOrders" border="true" style="width: 70%">
+            <el-table :data="finishedOrders" border stripe>
                 <el-table-column prop="orderId" label="订单号" width="200" />
                 <el-table-column prop="deliveryFee" label="配送费" width="200" />
                 <el-table-column prop="dateTime" label="订单时间" />
             </el-table>
         </el-scrollbar>
     </div>
-    <!--显示工资详情-->
 </template>
 
 <style scoped>
@@ -113,10 +113,12 @@ function displayTotalWageWithinThisMonth() {
     /* 设置订单区域的最大高度 */
     display: flex;
     flex-direction: column;
+    justify-content: center;
     border: 1px solid transparent;
     overflow-y: auto;
     /* 使订单区域可以滚动 */
     margin-left: 20px;
+    width: 70%;
 }
 
 .fee-item {

@@ -348,7 +348,9 @@ const visitingMyOrder=()=>{
 
 <template>
   <div class="content">
-    <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isWithdraw&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
+
+    <div v-if="!personalInfo&!editPI&!isWallet&!isWithdraw&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
+
         <header>{{userForm.UserName}}的个人中心</header>
 
         <div><button @click="gobackHome()">返回</button></div>
