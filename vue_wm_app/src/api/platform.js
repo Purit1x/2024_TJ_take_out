@@ -132,3 +132,15 @@ export const getEcoInfo = async() => { // 获取环保比例
         throw error;   
     } 
 }
+
+// 获取区域订单量的函数
+export const getQuantityByRegion = async (region) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Platform/GetQuantityByRegion`, { params: { region } });
+        console.log('Response:', response.data); // 增加日志输出以验证响应数据
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching order count:', error);
+        throw error;
+    }
+}
