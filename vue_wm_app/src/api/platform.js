@@ -125,7 +125,8 @@ export const createCoupon=async(data) => {  //新增优惠券
 }
 export const getEcoInfo = async() => { // 获取环保比例
     try {
-        const response = await axios.get(`${BASE_URL}/Platform/getEcoInfo`);  
+        const response = await axios.get(`${BASE_URL}/Platform/getEcoOrder`);  
+        console.log(response.data)
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   

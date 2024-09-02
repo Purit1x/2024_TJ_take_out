@@ -1,5 +1,5 @@
 <script setup>
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, provide, inject } from 'vue';
     import imgurl from '@/assets/logo2.png';
     import { riderInfo, updateRider } from '@/api/rider'
     import { useStore } from "vuex" 
@@ -11,36 +11,9 @@
     const editPIDialogue = ref(false) //编辑个人信息弹窗状态
     const editPassword = ref(false)
     const editWalletPassword = ref(false)
-    const currentRiderInfo = ref({})
-    const riderInformation = ref({
-        RiderId: 0,
-        RiderName:'',
-        PhoneNumber: '',
-        Password: '',
-        Wallet: 0,
-        WalletPassword: '',
-    })
-
-    onMounted(() => {  
-        // 从 cookie 中读取用户信息  
-        const riderData = store.state.rider; 
-        riderInfo(riderData.RiderId)
-        .then((res) => {
-            riderInformation.value.RiderId=res.data.riderId;
-            riderInformation.value.RiderName=res.data.riderName;
-            riderInformation.value.PhoneNumber=res.data.phoneNumber;
-            riderInformation.value.Password=res.data.password;
-            riderInformation.value.Wallet=res.data.wallet;
-            riderInformation.value.WalletPassword=res.data.walletPassword;
-            currentRiderInfo.value = riderInformation.value;
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    });
-
-
-
+    const currentRiderInfo = inject('providecurrentRiderInfo')
+    const riderInformation = inject('provideRiderInformation')
+    
     const checkRePassword = (rule,value,callback) => {
         if(value == ''){
             callback(new Error('请再次确认密码'))
@@ -90,17 +63,21 @@
         });  
     };  
     const submitEdit = async () => {
+        console.log(1);
         const isValid = await refForm.value.validate();  
         if (!isValid) {  
             return; // 如果不合法，提前退出  
         }  
-        updateRider(currentRiderInfo.value).then(data=>{
+        updateRider(riderInformation.value).then(data=>{
             ElMessage.success('修改成功');
             editPIDialogue.value = false;
             editPassword.value = false;
             editWalletPassword.value = false;
-            riderInformation.value = currentRiderInfo.value;
+            currentRiderInfo.value.RiderName='';
+            currentRiderInfo.value.PhoneNumber='';
+            currentRiderInfo.value.Password='';
             currentRiderInfo.value.rePassword='';
+            currentRiderInfo.value.WalletPassword='';
             currentRiderInfo.value.reWalletPassword='';
         }).catch(error => {
             if (error.response && error.response.data) {  
@@ -160,14 +137,17 @@
     <el-dialog v-model="editPIDialogue" width="500" title="个人信息修改" draggable>
         <el-form label-width="80" ref="refForm" :model="currentRiderInfo" :rules="riderRules">
             <el-form-item label="姓名" prop="RiderName">
-                <el-input v-model="currentRiderInfo.RiderName" placeholder="请更改您的姓名" @blur="validateField('RiderName')"/>
+                <el-input v-model.lazy="currentRiderInfo.RiderName" placeholder="请更改您的姓名" @blur="validateField('RiderName')"/>
             </el-form-item>
             <el-form-item label="电话号码" prop="PhoneNumber">
-                <el-input v-model="currentRiderInfo.PhoneNumber" placeholder="请更改您的电话" @blur="validateField('PhoneNumber')"/>
+                <el-input v-model.lazy="currentRiderInfo.PhoneNumber" placeholder="请更改您的电话" @blur="validateField('PhoneNumber')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editPIDialogue=false">重置</el-button>
+                <el-button type="primary" @click="
+                    riderInformation.RiderName = currentRiderInfo.RiderName,
+                    riderInformation.PhoneNumber = currentRiderInfo.PhoneNumber,
+                    submitEdit()">修改</el-button>
+                <el-button @click="editPIDialogue=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -181,8 +161,9 @@
                 <el-input v-model="currentRiderInfo.rePassword"  placeholder="请输入登录密码" @blur="validateField('rePassword')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editPassword=false">重置</el-button>
+                <el-button type="primary" @click="riderInformation.Password = currentRiderInfo.Password;
+                    submitEdit()">修改</el-button>
+                <el-button @click="editPassword=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -196,8 +177,9 @@
                 <el-input v-model="currentRiderInfo.reWalletPassword"  placeholder="请输入钱包密码" @blur="validateField('reWalletPassword')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editWalletPassword=false">重置</el-button>
+                <el-button type="primary" @click="riderInformation.WalletPassword = currentRiderInfo.WalletPassword;
+                    submitEdit()">修改</el-button>
+                <el-button @click="editWalletPassword=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
