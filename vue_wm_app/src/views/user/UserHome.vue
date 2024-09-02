@@ -4,7 +4,9 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
 import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress } from "@/api/user";
-import {getDistanceBetweenAddresses,getMerAvgRating} from "@/api/merchant";
+
+import {getDistanceBetweenAddresses,getMerAvgRating, GetMultiSpecialOffer} from "@/api/merchant";
+
 import { ElMessage } from 'element-plus';
 
 const store = useStore();    
@@ -15,6 +17,9 @@ const merchantIds = ref([]);  //获取所有商家id
 const merchantsInfo = ref([]); // 存储所有商家信息 
 const isMenu= ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
+const filterAddressQuery = ref(''); // 过滤器内容(筛选用)
+const filterCouponTypeQuery = ref(false); // 优惠券类型筛选内容(筛选用)
+const filterSpecialOfferQuery = ref(false); // 满减筛选内容(筛选用)
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
@@ -170,6 +175,25 @@ const handleSearch = () => {   //字符串匹配搜索商家
     showMerchantsInfo.value = merchantsInfo.value;  
   }
 };  
+const filteredMerchants = async () => {
+  const query_address = filterAddressQuery.value.trim();
+  const query_couponType = filterCouponTypeQuery.value;
+  const query_specialOffer = filterSpecialOfferQuery.value;
+
+  const specialOfferRes = await GetMultiSpecialOffer(merchantIds.value);
+  const filteredmerchantIds = Array.from(new Set(specialOfferRes.data.map(offer => offer.merchantId)));
+
+  if (query_address || query_couponType || query_specialOffer) {
+    showMerchantsInfo.value = merchantsInfo.value.filter(merchant => {
+      const addressMatch = !query_address || (merchant.merchantAddress && merchant.merchantAddress.includes(query_address));
+      const coupontypeMatch = !query_couponType || (merchant.couponType === 0);
+      const specialOfferMatch = !query_specialOffer || (merchant.merchantId in filteredmerchantIds);
+      return addressMatch && coupontypeMatch && specialOfferMatch;
+    });
+  } else {
+    showMerchantsInfo.value = merchantsInfo.value;
+  } 
+};
 // 提供 user 对象 给其它子网页 
 provide('user', user); 
 provide('merchantsInfo', merchantsInfo); 
@@ -223,18 +247,31 @@ provide('merchantsInfo', merchantsInfo);
               </el-col>
             </div>
 
+            <div class="filter-bar">
+              <input type="text" v-model="filterAddressQuery" placeholder="筛选地址" v-on:keyup.enter="filteredMerchants()"/>
+              <label>
+                <input type="checkbox" v-model="filterCouponTypeQuery"> 可使用优惠券
+              </label>
+              <label>
+                <input type="checkbox" v-model="filterSpecialOfferQuery"> 正在特惠中
+              </label>
+              <button @click="filteredMerchants()">筛选</button>
+            </div>
+
             <table>
               <tbody>
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
+
                   <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
                   <td class="col-Rating">评分：{{ merchant.avgRating }}</td>
+
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
                 </tr>
               </tbody>
-            </table> 
+            </table>  
         </div>   
     </div>  
 </template>  
@@ -268,9 +305,13 @@ th {
 
 .col-name{width:40%;}
 .col-type{width:30%;}
+
+.col-distance{width:20%;}
+
 .col-Rating{width:10%}
 .col-enter{width:10%;}
 .col-favorite{width:10%;}
+
 
 .sidebar {
   width: 50px;
@@ -330,6 +371,53 @@ th {
   display: flex;
   margin-bottom: 20px;
   margin-top: 5px;
+}
+
+.search-bar input {
+    width: 75%;
+    height: 100%;
+    padding-left: 15px;
+    border-radius: 5px 0 0 5px;
+    border: 2px solid #7BA7AB;
+    background: #F9F0DA;
+    color: #9E9C9C;
+    outline: none;
+}
+.search-bar button {
+    width: 25%;
+    height: 100%;
+    background: #7BA7AB;
+    border: 2px solid #7BA7AB;
+    border-radius: 0 5px 5px 0;
+    font-size: 13px;
+    position: relative;
+    text-align: center;
+}
+.search-bar button:before {
+    font-size: 13px;
+    color: #F9F0DA;
+}
+
+.filter-bar {
+  width: 1000px;
+  height: 40px;
+  display: flex;
+  margin-bottom: 20px;
+  margin-top: 5px;
+
+  input{
+    width: 20%;
+  }
+  button{
+    width: 8%;
+  }
+  label{
+    width: 15%;
+    margin-left: 20px;
+    display: flex;
+    align-items:center;
+    border: 1px solid #7BA7AB;
+  }
 }
 
 </style>
