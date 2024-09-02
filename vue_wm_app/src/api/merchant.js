@@ -329,3 +329,13 @@ export const getMerPrice=async(id)=>{
         throw error;
     }
 }
+
+export const getMerAvgRating=async(id)=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Merchant/getMerAvgRating?merchantId=${id}`);
+        return response.data.data;//返回商家评分，
+    }
+    catch(error){
+        throw error;
+    }
+}
