@@ -176,6 +176,7 @@ const OpenRechargeWindow=()=>{
     currentUser.value = userForm.value;
     isRecharge.value=true;
     isWallet.value=false;
+    personalInfo.value = false;
 }
 const leaveRechargeWindow=()=>{
     isRecharge.value=false;
@@ -185,6 +186,7 @@ const OpenWithdrawWindow=()=>{
     currentUser.value = userForm.value;
     isWithdraw.value=true;
     isWallet.value=false;
+    personalInfo.value = false;
 }
 const leaveWithdrawWindow=()=>{
     isWithdraw.value=false;
@@ -346,7 +348,9 @@ const visitingMyOrder=()=>{
 
 <template>
   <div class="content">
-    <div v-if="!personalInfo&!editPI&!isWallet&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
+
+    <div v-if="!personalInfo&!editPI&!isWallet&!isWithdraw&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
+
         <header>{{userForm.UserName}}的个人中心</header>
 
         <div><button @click="gobackHome()">返回</button></div>
@@ -394,6 +398,7 @@ const visitingMyOrder=()=>{
                 <button @click="SaveRecharge">充值</button>
                 <button @click="leaveRechargeWindow">返回</button>
             </div>
+
             <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
                 <div>提现金额</div>
                 <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>

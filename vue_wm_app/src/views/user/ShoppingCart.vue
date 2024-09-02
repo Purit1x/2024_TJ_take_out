@@ -5,12 +5,13 @@ import {addToShoppingCart,decrementDishInCart,removeFromShoppingCart,getShopping
 import { GetMultiSpecialOffer } from '@/api/merchant';
 import { useStore } from "vuex";
 import { ElMessage } from 'element-plus';
-
+import gsap from 'gsap';
 const store = useStore();  
 const router = useRouter();
 const user = ref({}); // 初始化用户信息对象
 const merchants = ref([]);  // 存储按商家分类后的购物车物品列表
 const specialOffers=ref([]);  //商家满减活动
+
 
 onMounted(async () => {
     const userData = store.state.user;
@@ -103,7 +104,7 @@ const goToMerchantPage = (merchantId) => {
 };
 
 // 加入购物车函数
-const addToCart = async(dish) => {
+const addToCart = async(dish,buttonElement) => {
     const userId = user.value.userId;
 
     // 调用API，将购物车项保存到数据库    
@@ -118,6 +119,7 @@ const addToCart = async(dish) => {
 
         const response = await addToShoppingCart(shoppingCartItem); // 调用 API 创建收藏商户  
         ElMessage.success(response.msg); // 显示成功消息  
+
 
         // 更新前端数据中的商品数量
         for (const merchant of merchants.value) {

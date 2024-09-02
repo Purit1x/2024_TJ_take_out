@@ -75,7 +75,7 @@ export const getAllStationInfos=async() => {
         // 遍历每个站点，调用高德地图 API 获取经纬度  
         for (const station of stationsInfo) {  
             const address = encodeURIComponent(station.stationAddress); // 对地址进行 URL 编码  
-            const geoResponse = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${address}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`);  
+            const geoResponse = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${address}&output=JSON&key=873a2f8c732d6cf57df12bc8bef9572e`);  
 
             // 从高德地图 API 响应中提取经纬度  
             const location = geoResponse.data.geocodes && geoResponse.data.geocodes.length > 0  
@@ -101,7 +101,7 @@ export const assignStationToMerchant=async(address) => {
 
         // 获取目标地址的经纬度  
         const encodedAddress = encodeURIComponent(address); // 对地址进行 URL 编码  
-        const geoResponse = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`); // 替换为您的高德地图 API Key  
+        const geoResponse = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress}&output=JSON&key=873a2f8c732d6cf57df12bc8bef9572e`); // 替换为您的高德地图 API Key  
 
         const targetLocation = geoResponse.data.geocodes && geoResponse.data.geocodes.length > 0  
             ? geoResponse.data.geocodes[0].location.split(',')  
@@ -141,8 +141,8 @@ export const getDistanceBetweenAddresses = async (address1, address2) => {
         const encodedAddress2 = encodeURIComponent(address2);  
 
         // 获取两个地址的经纬度  
-        const geoResponse1 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress1}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`);  
-        const geoResponse2 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress2}&output=JSON&key=bf0d646ec03956c4f1fbf1215faa3864`);  
+        const geoResponse1 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress1}&output=JSON&key=873a2f8c732d6cf57df12bc8bef9572e`);  
+        const geoResponse2 = await axios.get(`https://restapi.amap.com/v3/geocode/geo?address=${encodedAddress2}&output=JSON&key=873a2f8c732d6cf57df12bc8bef9572e`);  
 
         const location1 = geoResponse1.data.geocodes && geoResponse1.data.geocodes.length > 0  
             ? geoResponse1.data.geocodes[0].location.split(',')  
@@ -326,6 +326,16 @@ export const getMerPrice=async(id)=>{
         return response.data.data;
     }
     catch (error) {
+        throw error;
+    }
+}
+
+export const getMerAvgRating=async(id)=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Merchant/getMerAvgRating?merchantId=${id}`);
+        return response.data.data;//返回商家评分，
+    }
+    catch(error){
         throw error;
     }
 }
