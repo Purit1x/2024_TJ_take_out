@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
-import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress } from "@/api/user";
+import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress, getAllMerchantsInfo } from "@/api/user";
 import {getDistanceBetweenAddresses} from "@/api/merchant";
 import { ElMessage } from 'element-plus';
 
@@ -15,6 +15,8 @@ const merchantIds = ref([]);  //获取所有商家id
 const merchantsInfo = ref([]); // 存储所有商家信息 
 const isMenu= ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
+const sortField = ref(''); // 搜索框内容
+const sortOrder = ref('1'); // 搜索框内容
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
@@ -30,17 +32,36 @@ onMounted(() => {
   } else {  
     router.push('/login');
   }  
-  getMerchantIds().then(res => {  // 获取所有商家id
+
+
+  getMerchantIds().then(res => { 
     merchantIds.value = res.data;  
-    return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
-  }).then(responses => {  
-    merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
-    fetchDefaultAddress();  // 获取用户默认地址
-    showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
-  }).catch(err => {  
-    ElMessage.error('获取商家id失败'); 
-  });  
+  });
+  getAllMerchantsInfo().then(res=>{
+    merchantsInfo.value  = res.data;
+    console.log(res);
+    fetchDefaultAddress();
+  })
+
+  // getMerchantIds().then(res => {  // 获取所有商家id
+  //   merchantIds.value = res.data;  
+  //   return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
+  // }).then(responses => {  
+  //   merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
+  //   fetchDefaultAddress();  // 获取用户默认地址
+  //   showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
+  // }).catch(err => {  
+  //   ElMessage.error('获取商家id失败'); 
+  // });  
 }); 
+
+
+const sortCoupons = () => {
+  getAllMerchantsInfo(sortField.value,sortOrder.value).then(res=>{
+    merchantsInfo.value  = res.data;
+    fetchDefaultAddress();
+  })
+};
 const fetchDefaultAddress = async () => {  
     try {  
         const res = await GetDefaultAddress(user.value.userId); // 获取用户默认地址  
@@ -197,11 +218,30 @@ provide('merchantsInfo', merchantsInfo);
               <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
               <button @click="handleSearch()">搜索</button>
             </div>
+
+            <div>
+              <label>排序字段:</label>  
+                <select v-model="sortField" @change="sortCoupons">  
+                  <option value="1">评分</option>  
+                    <option value="2">销售额</option>  
+                    <option value="3">销量</option>
+                </select>  
+                &nbsp;&nbsp;
+                <label>排序方式:</label>  
+                <select v-model="sortOrder" @change="sortCoupons">  
+                    <option value="1">升序</option>  
+                    <option value="2">降序</option>  
+                </select>  
+                &nbsp;&nbsp;
+            </div>
             <table>
               <tbody>
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
+                  <td class="col-enter">{{ merchant.allPrice }}</td>
+                  <td class="col-enter">{{ merchant.allCount }}</td>
+                  <td class="col-enter">{{ merchant.merchantRating }}</td>
                   <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
