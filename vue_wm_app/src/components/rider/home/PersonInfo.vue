@@ -221,7 +221,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between; 
-    background-color: gray;
     margin-bottom: 20px;
     margin-left:10px;
     margin-right:10px;
@@ -269,12 +268,17 @@
     user-select: none;
 }
 
-.user-name{
-    margin-left: 10px;
-}
 
 .pic{
     background-color: #FFF;
+}
+
+.el-descriptions {
+  background-color: #fff;
+  border: 2px solid #ffcc00;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 </style>
