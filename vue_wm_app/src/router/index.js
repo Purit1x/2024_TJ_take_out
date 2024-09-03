@@ -156,7 +156,7 @@ export const router = createRouter({
 })
 // 路由守卫  
 router.beforeEach((to, from, next) => {  
-    const isAuthenticated = store.state.user || store.state.merchant ||store.state.rider;  
+    const isAuthenticated = store.state.user || store.state.merchant ||store.state.rider||store.state.admin;  
     const requiresAuth = to.meta.requiresAuth; // 确保获取到目标路由的 requiresAuth 属性  
     if (requiresAuth && !isAuthenticated) {  
         next({ path: '/login' }); // 重定向到登录  

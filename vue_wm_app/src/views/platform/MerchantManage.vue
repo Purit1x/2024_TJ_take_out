@@ -31,7 +31,7 @@ onMounted(() => {
     });
     getAllMerchantsInfo().then(res=>{
         merchantsInfo.value  = res.data;
-        howMerchantsInfo.value = merchantsInfo.value;
+        showMerchantsInfo.value = merchantsInfo.value;
         // fetchDefaultAddress();
     })
 });
@@ -39,7 +39,7 @@ onMounted(() => {
 const sortCoupons = () => {
   getAllMerchantsInfo(sortField.value,sortOrder.value).then(res=>{
     merchantsInfo.value  = res.data;
-    fetchDefaultAddress();
+    showMerchantsInfo.value = merchantsInfo.value;
   })
 };
 const formatTime=(seconds)=> {  
