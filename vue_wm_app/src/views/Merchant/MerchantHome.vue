@@ -5,7 +5,11 @@ import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 import { useStore } from "vuex"  
 import { getOrderCoupon,getOrderDishes,GetAddressByAddressId,getMerchantsInfo,GetCouponInfo,userInfo,PurchaseOrder,deleteOrder } from '@/api/user'
+
 import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder } from '@/api/merchant'
+
+
+import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder ,getFinishedMerOrders} from '@/api/merchant'
 
 const store = useStore()    
 const router = useRouter()
@@ -309,6 +313,16 @@ provide('isMerchantHome', isMerchantHome);
             <div>订单总价：{{order.price}}元</div>
             <div>订单创建时间：{{ order.orderTimestamp }}</div>
             <div>送达时间:{{ order.realTimeOfArrival }}</div>
+          </div>
+        </div>
+        <div class="orders-scroll" v-if="showState===3">
+          <div class="order-item" v-for="(order,index) in completedOrders" :key="index">
+            <div>订单号：{{order.orderId}}</div>
+            <div>订单总价：{{order.price}}元</div>
+            <div>订单创建时间：{{ order.orderTimestamp }}</div>
+            <div>预计送达时间:</div>
+            
+            <button @click="enterOrderInfo(order)">></button>
           </div>
         </div>
       </div>

@@ -97,25 +97,22 @@ function displayTotalWageWithinThisMonth() {
         <h3>您本月送单总量：{{ orderNum }} 您本月获得的总配送费为： {{ displayTotalWageWithinThisMonth() }}</h3>
     </div>
     <div class="fees-scroll">
-        <el-scrollbar max-height="500px">
-            <el-table :data="finishedOrders" border stripe>
-                <el-table-column prop="orderId" label="订单号" width="200" />
-                <el-table-column prop="deliveryFee" label="配送费" width="200" />
-                <el-table-column prop="dateTime" label="订单时间" />
-            </el-table>
-        </el-scrollbar>
+        <el-table max-height="500px" :data="finishedOrders"     
+        :default-sort="{ prop: 'dateTime', order: 'descending' }"
+        border stripe>
+            <el-table-column prop="orderId" sortable label="订单号" width="200" />
+            <el-table-column prop="deliveryFee" sortable label="配送费" width="200" />
+            <el-table-column prop="dateTime" sortable label="订单时间" />
+        </el-table>
     </div>
 </template>
 
 <style scoped>
 .fees-scroll {
-    max-height: 600px;
-    /* 设置订单区域的最大高度 */
-    display: flex;
+    /* display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; */
     border: 1px solid transparent;
-    overflow-y: auto;
     /* 使订单区域可以滚动 */
     margin-left: 20px;
     width: 70%;
