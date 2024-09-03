@@ -3,8 +3,10 @@ import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
+
 import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress, getAllMerchantsInfo } from "@/api/user";
-import {getDistanceBetweenAddresses} from "@/api/merchant";
+import {getDistanceBetweenAddresses,getMerAvgRating, GetMultiSpecialOffer} from "@/api/merchant";
+
 import { ElMessage } from 'element-plus';
 
 const store = useStore();    
@@ -15,13 +17,19 @@ const merchantIds = ref([]);  //获取所有商家id
 const merchantsInfo = ref([]); // 存储所有商家信息 
 const isMenu= ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
+
 const sortField = ref(''); // 搜索框内容
 const sortOrder = ref('1'); // 搜索框内容
+
+const filterAddressQuery = ref(''); // 过滤器内容(筛选用)
+const filterCouponTypeQuery = ref(false); // 优惠券类型筛选内容(筛选用)
+const filterSpecialOfferQuery = ref(false); // 满减筛选内容(筛选用)
+
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
 const DefaultAddressId=ref(null); // 用于跟踪默认地址id
-onMounted(() => {  
+onMounted(async() => {  
   const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
     isUserHome.value = false;
@@ -32,34 +40,35 @@ onMounted(() => {
   } else {  
     router.push('/login');
   }  
-
-
+  
   getMerchantIds().then(res => { 
     merchantIds.value = res.data;  
   });
   getAllMerchantsInfo().then(res=>{
     merchantsInfo.value  = res.data;
     fetchDefaultAddress();
-  })
-
-  // getMerchantIds().then(res => {  // 获取所有商家id
-  //   merchantIds.value = res.data;  
-  //   return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
-  // }).then(responses => {  
-  //   merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
-  //   fetchDefaultAddress();  // 获取用户默认地址
-  //   showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
-  // }).catch(err => {  
-  //   ElMessage.error('获取商家id失败'); 
-  // });  
+  });
+  await fetchMerAvgRating();
 }); 
-
 
 const sortCoupons = () => {
   getAllMerchantsInfo(sortField.value,sortOrder.value).then(res=>{
     merchantsInfo.value  = res.data;
     fetchDefaultAddress();
   })
+}); 
+const fetchMerAvgRating = async () => {
+  try {
+    for (let info of showMerchantsInfo.value) {
+      const avgRating = await getMerAvgRating(info.merchantId);
+      console.log(`Merchant ID: ${info.merchantId}, Avg Rating: ${avgRating}`);
+      info.avgRating = avgRating; // 将平均评分添加到商家信息对象中
+    }
+    console.log("商家信息", showMerchantsInfo.value);
+  } catch (error) {
+    console.error('Failed to fetch merchant average ratings:', error);
+  }
+
 };
 const fetchDefaultAddress = async () => {  
     try {  
@@ -175,6 +184,25 @@ const handleSearch = () => {   //字符串匹配搜索商家
     showMerchantsInfo.value = merchantsInfo.value;  
   }
 };  
+const filteredMerchants = async () => {
+  const query_address = filterAddressQuery.value.trim();
+  const query_couponType = filterCouponTypeQuery.value;
+  const query_specialOffer = filterSpecialOfferQuery.value;
+
+  const specialOfferRes = await GetMultiSpecialOffer(merchantIds.value);
+  const filteredmerchantIds = Array.from(new Set(specialOfferRes.data.map(offer => offer.merchantId)));
+
+  if (query_address || query_couponType || query_specialOffer) {
+    showMerchantsInfo.value = merchantsInfo.value.filter(merchant => {
+      const addressMatch = !query_address || (merchant.merchantAddress && merchant.merchantAddress.includes(query_address));
+      const coupontypeMatch = !query_couponType || (merchant.couponType === 0);
+      const specialOfferMatch = !query_specialOffer || (merchant.merchantId in filteredmerchantIds);
+      return addressMatch && coupontypeMatch && specialOfferMatch;
+    });
+  } else {
+    showMerchantsInfo.value = merchantsInfo.value;
+  } 
+};
 // 提供 user 对象 给其它子网页 
 provide('user', user); 
 provide('merchantsInfo', merchantsInfo); 
@@ -213,9 +241,30 @@ provide('merchantsInfo', merchantsInfo);
           <h1 v-if="isUserHome" class="welcome-text">欢迎，{{user.userId}}</h1>  
         </div>
         <div v-if="isUserHome">  
-            <div class="search-bar">
+            <!-- <div class="search-bar">
               <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
               <button @click="handleSearch()">搜索</button>
+            </div> -->
+
+            <div class="search-bar">
+              <el-col :span="8">
+                  <el-input  placeholder="搜索店名或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter="handleSearch">
+                  <template #append>
+                    <el-button type="primary" @click="handleSearch"><el-icon><search /></el-icon></el-button>
+                  </template>
+                  </el-input>
+              </el-col>
+            </div>
+
+            <div class="filter-bar">
+              <input type="text" v-model="filterAddressQuery" placeholder="筛选地址" v-on:keyup.enter="filteredMerchants()"/>
+              <label>
+                <input type="checkbox" v-model="filterCouponTypeQuery"> 可使用优惠券
+              </label>
+              <label>
+                <input type="checkbox" v-model="filterSpecialOfferQuery"> 正在特惠中
+              </label>
+              <button @click="filteredMerchants()">筛选</button>
             </div>
 
             <div>
@@ -233,20 +282,25 @@ provide('merchantsInfo', merchantsInfo);
                 </select>  
                 &nbsp;&nbsp;
             </div>
+
             <table>
               <tbody>
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
+
                   <td class="col-enter">{{ merchant.allPrice }}</td>
                   <td class="col-enter">{{ merchant.allCount }}</td>
                   <td class="col-enter">{{ merchant.merchantRating }}</td>
+
                   <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
+                  <td class="col-Rating">评分：{{ merchant.avgRating }}</td>
+
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
                 </tr>
               </tbody>
-            </table> 
+            </table>  
         </div>   
     </div>  
 </template>  
@@ -260,7 +314,7 @@ body{
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 table{
   width: 100%;
   border-collapse: collapse;
@@ -279,9 +333,14 @@ th {
 }
 
 .col-name{width:40%;}
-.col-type{width:40%;}
+.col-type{width:30%;}
+
+.col-distance{width:20%;}
+
+.col-Rating{width:10%}
 .col-enter{width:10%;}
 .col-favorite{width:10%;}
+
 
 .sidebar {
   width: 50px;
@@ -337,14 +396,12 @@ th {
   font-size: 15px;
 }
 
-/* #Q# 这里有bug 不知道为什么按钮总比旁边少一点高度，height都是100% */
 .search-bar {
-  width: 300px;
-  height: 40px;
   display: flex;
   margin-bottom: 20px;
   margin-top: 5px;
 }
+
 .search-bar input {
     width: 75%;
     height: 100%;
@@ -369,4 +426,27 @@ th {
     font-size: 13px;
     color: #F9F0DA;
 }
+
+.filter-bar {
+  width: 1000px;
+  height: 40px;
+  display: flex;
+  margin-bottom: 20px;
+  margin-top: 5px;
+
+  input{
+    width: 20%;
+  }
+  button{
+    width: 8%;
+  }
+  label{
+    width: 15%;
+    margin-left: 20px;
+    display: flex;
+    align-items:center;
+    border: 1px solid #7BA7AB;
+  }
+}
+
 </style>

@@ -73,6 +73,7 @@ export const getReceivedOrders = async (id) => {  // 获取指定骑手已接订
         throw error;
     }
 }
+
 export const getDeliveredOrdersCountandAverageRating = async (id) => {  // 获取指定骑手已接订单数量与评价
     try {
         const response = await axios.get(`${BASE_URL}/Rider/getDeliveredOrdersCountandAverageRating?riderId=${id}`);
@@ -82,6 +83,7 @@ export const getDeliveredOrdersCountandAverageRating = async (id) => {  // 获�
         throw error;
     }
 }
+
 export const receiveOrder = async (data) => {  // 骑手接单
     try {
         const response = await axios.put(`${BASE_URL}/Rider/receiveOrder`, data);
@@ -94,11 +96,38 @@ export const receiveOrder = async (data) => {  // 骑手接单
 export const getRiderPrice = async (id) => {
     try {
         const response = await axios.get(`${BASE_URL}/Rider/getRiderPrice?orderId=${id}`);
-        console.log('配送费',response.data.data);
+        // console.log('配送费',response.data.data);
         return response.data.data;  // 返回配送费的数值（单位：元）
     }
     catch (error) {
         throw error;
+    }
+}
+export const getOrdersWithinThisMonth = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getOrdersWithinThisMonth?riderId=${id}`);
+        return response.data.data;  // 返回本月内订单列表, 若为空则返回0
+    }
+    catch (error) {
+        throw error;
+    }
+}
+export const getFinishedOrders = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/Rider/getFinishedOrders?riderId=${id}`);
+        return response.data.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export const walletWithdraw= async(id,withdrawMoney) => {  //提现
+    try {  
+        const response = await axios.put(`${BASE_URL}/Rider/withdraw?riderId=${id}&withdrawMoney=${withdrawMoney}`);  
+        return response.data; // 返回后端返回的数据
+    } catch (error) {  
+        throw error;   
     }
 }
 

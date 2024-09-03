@@ -426,7 +426,7 @@ const login = () =>{  //登录
                     ElMessage.success('登录成功');
                     // 将用户信息保存到管理器
                     store.dispatch('setRider', riderRegisterData.value); // 设置用户状态
-                    router.push('/rider-home');
+                    router.push('/rider-home/assignment');
                 }
             }).catch(error => {
                 // 根据错误码处理不同的错误  
@@ -547,16 +547,16 @@ const mySwitch = () => {
                         </el-form-item>  
                     </div>
                     <el-form-item v-if="roleType === 'merchant'" prop="Password">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="merchantRegisterData.Password"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入密码" v-model="merchantRegisterData.Password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="merchantRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入再次密码" v-model="merchantRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="WalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入支付密码" v-model="merchantRegisterData.WalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入支付密码" v-model="merchantRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次支付密码" v-model="merchantRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入再次支付密码" v-model="merchantRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                     <!--用户注册-->    
                     <el-form-item v-if="roleType === 'user'" prop="username">
@@ -566,16 +566,16 @@ const mySwitch = () => {
                         <el-input :prefix-icon="User" placeholder="请输入手机号码" v-model="userRegisterData.phoneNumber"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="password">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="userRegisterData.password"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入密码" v-model="userRegisterData.password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="userRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次密码" v-model="userRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="WalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入支付密码" v-model="userRegisterData.WalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入支付密码" v-model="userRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次支付密码" v-model="userRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次支付密码" v-model="userRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                     <!--骑手注册-->  
                     <el-form-item v-if="roleType === 'rider'" prop="RiderName">
@@ -585,16 +585,16 @@ const mySwitch = () => {
                         <el-input :prefix-icon="User" placeholder="请输入手机号码" v-model="riderRegisterData.PhoneNumber"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="Password">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="riderRegisterData.Password"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入密码" v-model="riderRegisterData.Password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码" v-model="riderRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次密码" v-model="riderRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="WalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入支付密码" v-model="riderRegisterData.WalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入支付密码" v-model="riderRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次支付密码" v-model="riderRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次支付密码" v-model="riderRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                 </el-form>
 
@@ -627,7 +627,7 @@ const mySwitch = () => {
                         <el-input :prefix-icon="User" placeholder="请输入用户Id" v-model="loginInfo.loginId"></el-input>
                     </el-form-item>
                     <el-form-item prop="loginPassword">
-                        <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码" v-model="loginInfo.loginPassword"></el-input>
+                        <el-input name="password" :prefix-icon="Lock" show-password placeholder="请输入密码" v-model="loginInfo.loginPassword"></el-input>
                     </el-form-item>
                 </el-form>
                 <!-- 按钮盒子 -->

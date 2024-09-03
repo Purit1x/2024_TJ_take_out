@@ -134,6 +134,28 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("merchantAddrSearch")]  //查询商户的地址
+        private string GetMerchantAddress(int merchantId)
+        {
+            try
+            {
+                // 查询指定 MerchantId 的商户信息  
+                var merchant = _context.Merchants.FirstOrDefault(m => m.MerchantId == merchantId);
+
+                if (merchant == null)
+                {
+                    return null;
+                }
+
+                return merchant.MerchantAddress;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"无法获取商家地址: {ex.Message}", ex);
+            }
+        }
+
         [HttpPut]
         [Route("merchantEdit")]  //编辑个人信息
         public IActionResult EditMerchant([FromBody] MerchantDBDto dto)
@@ -861,7 +883,9 @@ namespace takeout_tj.Controllers
 
 					// 更新骑手钱包余额
 					orderRider.RiderDB.Wallet += orderRider.RiderPrice;
-
+                    //默认评价为5；
+                    orderRider.OrderDB.MerchantRating = 5;
+                    orderRider.OrderDB.RiderRating = 5;
 					// 获取订单中的所有菜品信息
 					var orderDishes = await _context.OrderDishes
 						.Where(od => od.OrderId == deliverDto.OrderId)
@@ -893,7 +917,7 @@ namespace takeout_tj.Controllers
 
 					// 更新商家钱包余额
 					merchant.Wallet += orderRider.OrderDB.Price - orderRider.RiderPrice;
-
+                    
 					// 提交更改
 					await _context.SaveChangesAsync();
 
@@ -926,8 +950,159 @@ namespace takeout_tj.Controllers
 
 			return Ok(ordersByRegion);
 		}
-		
+        [HttpGet]
+        [Route("getMerOrdersWithinThisMonth")]
+        public async Task<IActionResult> GetMerOrdersWithinThisMonth(int merchantId)
+        {
+            try
+            {
+                var orderMerchant = await _context.OrderDishes
+                    .Include(ou => ou.OrderDB)
+                    .Where(ou => ou.MerchantId == merchantId)
+                    .Select(ou => ou.OrderId)
+                    .ToListAsync();//获取指定商家的所有订单；
+                if(!orderMerchant.Any())
+                {
+                    return Ok(new { data = 0, msg = "指定商家无订单" });
+                }
+                var currentDate = DateTime.Now;
+                var orders = await _context.Orders
+                    .Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month
+                    && orderMerchant.Contains(o.OrderId) && o.State == 3)
+                    .Select(o => o.OrderId)
+                    .ToListAsync();
+                if(!orderMerchant.Any())
+                {
+                    return Ok(new { data = 0, msg = "指定商家本月内无订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+		[HttpGet]
+		[Route("getMerOrdersWithinThisDay")]
+		public async Task<IActionResult> GetMerOrdersWithinThisDay(int merchantId)
+		{
+			try
+			{
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId&&ou.OrderDB.State==3)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+				var currentDate = DateTime.Now;
+				var orders = await _context.Orders
+					.Where(o => o.OrderTimestamp.Year == currentDate.Year && o.OrderTimestamp.Month == currentDate.Month&& o.OrderTimestamp.Day == currentDate.Day
+					&& orderMerchant.Contains(o.OrderId) && o.State == 3)
+					.Select(o => o.OrderId)
+					.ToListAsync();
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家本日内无订单" });
+				}
+				return Ok(new { data = orders, msg = "获取成功" });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+        [HttpGet]
+        [Route("getMerPrice")]
+        public async Task<IActionResult>  GetMerPrice(int orderId)
+        {
+            try
+            {
+                var orderMer = await _context.Orders.FirstOrDefaultAsync(or => or.OrderId == orderId);
+                var orderRider = await _context.OrderRiders.FirstOrDefaultAsync(or => or.OrderId == orderId);
+				if (orderMer == null || orderRider == null)
+				{
+					return NotFound(new { errorCode = 404, msg = "指定订单不存在" });
+				}
+				return Ok(new { data = orderMer.Price - orderRider.RiderPrice, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+				return StatusCode(StatusCodes.Status500InternalServerError, new { errorCode = 500, msg = "获取失败" });
+			}
+        }
+        [HttpGet]
+        [Route("getMerAvgRating")]
+		public async Task<IActionResult> GetMerAvgRating(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
 
+                var orderNum= orderMerchant.Count();
+				var ratings = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderDB.MerchantRating)
+					.ToListAsync();//获取指定商家的所有评分；
+                if(!ratings.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家暂无评分记录" });
+                }
+                double sum = 0;
+                foreach (var rating in ratings)
+                {
+                    sum += rating??0;
+                }
+				double avgRating = orderNum > 0 ? Math.Round(sum / orderNum, 2, MidpointRounding.AwayFromZero) : 0;
+				return Ok(new { data = avgRating, msg = "成功" });
+
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+        }
+        [HttpGet]
+        [Route("getFinishedMerOrders")]
+        public async Task<IActionResult>GetFinishedMerOrders(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+                var orders = await _context.Orders
+                    .Where(o => orderMerchant.Contains(o.OrderId) && o.State == 3)
+                    .ToListAsync();
+                if(!orders.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家尚无已送达订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()

@@ -171,33 +171,224 @@ const deleteSpecialOffer = async(offerId) => {
 
 <template>
     <div class="content">
-        <header>满减活动</header>
-        <button @click="gobackHome()">返回</button>
+        <header class="welcome-text">满减活动</header>
         <div>
-            <ul>
+            <ul class = "offers-list">
             <li v-for="offer in offers" :key="offer.offerId">
                 <div v-if="editingOfferId !== offer.offerId">
                     满{{offer.minPrice}}元&nbsp;&nbsp;减{{offer.amountRemission}}元
-                    <button @click="startEditingOffer(offer)">修改</button>
-                    <button @click="deleteSpecialOffer(offer.offerId)">删除</button>
                 </div>
-                <div v-else>
+                <div class ="right-group" v-if="editingOfferId !== offer.offerId">
+                    <button @click="startEditingOffer(offer)" class = "edit-btn">修改</button>
+                    <button @click="deleteSpecialOffer(offer.offerId)" class = "delete-btn">删除</button>
+                </div>
+                <div v-if="editingOfferId == offer.offerId">
                     <el-input v-model="editedOffer.minPrice" placeholder="修改满多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
                     <el-input v-model="editedOffer.amountRemission" placeholder="修改减多少元" @input="editedOffer.amountRemission = validatePositiveInteger($event)" />
-                    <el-button type="primary" @click="updateSpecialOffer(offer)">保存</el-button>
-                    <el-button @click="cancelEditingOffer">取消</el-button>
+                    <el-button type="primary" @click="updateSpecialOffer(offer)" class = "save-btn">保存</el-button>
+                    <el-button @click="cancelEditingOffer" class = "delete-btn">取消</el-button>
                 </div>
             </li>
             </ul>
         </div>
 
-        <button @click="showInputFields = true">创建满减活动</button>
-        <div v-if="showInputFields">
+        <button @click="showInputFields = !showInputFields" class= "normal-button">创建满减活动</button>
+        <div v-if="showInputFields" class = "edit-container">
             <el-input v-model="newOffer.minPrice" placeholder="请输入满多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
             <el-input v-model="newOffer.amountRemission" placeholder="请输入减多少元" @input="editedOffer.minPrice = validatePositiveInteger($event)" />
-            <el-button type="primary" @click="addSpecialOffer({ minprice: newOffer.minPrice, remission: newOffer.amountRemission })">提交</el-button>
-            <el-button @click="showInputFields = false">取消</el-button>
+            <el-button style = "margin:10px;" type="primary" @click="addSpecialOffer({ minprice: newOffer.minPrice, remission: newOffer.amountRemission })">提交</el-button>
+            <el-button @click="showInputFields = false" class = "cancel-btn">取消</el-button>
         </div>
 
     </div>
 </template>
+
+<style scoped lang ="scss">
+
+.welcome-text {
+  font-size: 35px;
+  margin-left: 15px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.offers-list {
+  list-style: none;
+  padding: 0;
+  margin-right: 30px;
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 0 30px;     // 修改左右外边距
+    margin-bottom: 10px;
+    border: 2px solid #ffee00;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+    }
+
+    span {
+      margin-right: 15px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .right-group {
+      margin-left: auto; /* 将右侧按钮推到右边 */
+      display: flex;
+    }
+
+    button {
+      margin-left: 5px;
+      margin-right: 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &.edit-btn {
+        background-color: #ffcc00;
+        color: white;
+
+        &:hover {
+          background-color: #ffdd00;
+        }
+      }
+
+      &.save-btn {
+        background-color: #4caf50;
+        color: white;
+        margin:10px;
+
+        &:hover {
+            background-color: #45a049;
+        }
+      }
+
+      &.delete-btn {
+        background-color: #f44336;
+        color: white;
+
+        &:hover {
+          background-color: #ff5b58;
+        }
+      }
+
+      &.cancel-btn {
+        background-color: #f44336;
+        color: white;
+        margin:10px;
+
+        &:hover {
+          background-color: #ff5b58;
+        }
+      }
+    }
+  }
+}
+
+/* 编辑区域的容器样式 */
+.edit-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 10px 30px;
+  background-color: #f9f9f9;
+  border: 2px solid #ffee00;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .el-form {
+    display: flex;
+    flex-direction: column;
+
+    .el-form-item {
+      margin-bottom: 15px;
+      label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        box-sizing: border-box; /* 包括内边距和边框 */
+        
+        &:focus {
+          border-color: #4caf50;
+          box-shadow: 0 0 4px rgba(76, 175, 80, 0.2);
+        }
+      }
+
+      input[type="file"] {
+        border: none;
+        padding: 0;
+      }
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    outline: none;
+
+    &.submit-btn {
+      background-color: #4caf50;
+      color: white;
+
+      &:hover {
+        background-color: #45a049;
+      }
+    }
+
+    &.cancel-btn {
+      background-color: #f44336;
+      color: white;
+
+      &:hover {
+        background-color: #e53935;
+      }
+    }
+  }
+}
+
+.normal-button {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    background-color: #ffcc00;
+    color: white;
+}
+
+
+</style>

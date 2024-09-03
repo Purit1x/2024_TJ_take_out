@@ -131,10 +131,21 @@ const leavePurchaseInfo = () => {
         <button @click="enterCouponPurchase">购买优惠券</button>&nbsp;&nbsp;
         <button @click="enterPurchaseList">购买记录</button>&nbsp;&nbsp;
         <button @click="gobackHome">返回</button>
-        <div>
+        <!-- <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
             <button @click="handleSearch()">搜索</button>
+        </div> -->
+
+        <div class="search-bar">
+            <el-col :span="8">
+                <el-input  placeholder="搜索优惠券名称" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+                <template #append>
+                <el-button type="primary"@click="handleSearch"><el-icon><search /></el-icon></el-button>
+                </template>
+                </el-input>
+            </el-col>
         </div>
+
         <ul>  
             <li v-for="coupon in showUserCoupons" :key="coupon.couponId">  
                 <span>{{ coupon.coupon.couponName }}</span> 
@@ -158,10 +169,22 @@ const leavePurchaseInfo = () => {
         <h2>购买记录
             <button @click="leavePurchaseList()">返回</button>
         </h2>
-        <div>
+        <!-- <div>
             <input type="text" v-model="searchPurchaseQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handlePurchaseSearch()"/> 
             <button @click="handlePurchaseSearch()">搜索</button>
+        </div> -->
+
+        <div class="search-bar">
+            <el-col :span="8">
+                <el-input  placeholder="搜索优惠券名称" v-model="searchPurchaseQuery" clearable @clear="handlePurchaseSearch" @keydown.enter.native="handlePurchaseSearch">
+                <template #append>
+                <el-button type="primary"@click="handlePurchaseSearch"><el-icon><search /></el-icon></el-button>
+                </template>
+                </el-input>
+            </el-col>
         </div>
+
+
         <ul>  
             <li v-for="coupon in showCouponPurchaseList" :key="coupon.couponPurchaseId">  
                 <span>{{ coupon.coupon.couponName }}</span> 
@@ -189,3 +212,10 @@ const leavePurchaseInfo = () => {
   </div>
     <router-view />
 </template>
+
+<style scoped>
+.search-bar {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+</style>

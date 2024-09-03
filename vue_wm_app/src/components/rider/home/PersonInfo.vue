@@ -1,45 +1,44 @@
 <script setup>
-    import { onMounted, ref } from 'vue';
-    import imgurl from '@/assets/logo2.png';
+    import { onMounted, ref, provide, inject } from 'vue';
+    import imgurl from '@/assets/my_logo.png';
     import { riderInfo, updateRider } from '@/api/rider'
     import { useStore } from "vuex" 
     import { ElMessage } from 'element-plus';
+    import { stIdSearch } from "@/api/rider"
+    import { getStationsInfo } from "@/api/platform"
+
+
 
     const store = useStore()    
     const refForm = ref(null);
-
+    const rider = ref({})
+    const stationId = ref(null); // 用于存储站点 ID  
+    const riderStation = ref({}); // 用于存储站点信息  
     const editPIDialogue = ref(false) //编辑个人信息弹窗状态
     const editPassword = ref(false)
     const editWalletPassword = ref(false)
-    const currentRiderInfo = ref({})
-    const riderInformation = ref({
-        RiderId: 0,
-        RiderName:'',
-        PhoneNumber: '',
-        Password: '',
-        Wallet: 0,
-        WalletPassword: '',
-    })
-
+    const currentRiderInfo = inject('providecurrentRiderInfo')
+    const riderInformation = inject('provideRiderInformation')
+    
     onMounted(() => {  
         // 从 cookie 中读取用户信息  
         const riderData = store.state.rider; 
-        riderInfo(riderData.RiderId)
-        .then((res) => {
-            riderInformation.value.RiderId=res.data.riderId;
-            riderInformation.value.RiderName=res.data.riderName;
-            riderInformation.value.PhoneNumber=res.data.phoneNumber;
-            riderInformation.value.Password=res.data.password;
-            riderInformation.value.Wallet=res.data.wallet;
-            riderInformation.value.WalletPassword=res.data.walletPassword;
-            currentRiderInfo.value = riderInformation.value;
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    });
-
-
+        if (riderData) {  
+            rider.value = riderData;  
+        } else {   
+            router.push('/login');
+        }  
+        stIdSearch(rider.value.RiderId).then(res => {  
+            stationId.value = res.data; 
+            getStationsInfo(stationId.value).then(res => {  
+            riderStation.value = res.data; 
+            console.log(riderStation);
+            }).catch(err => {  
+                riderStation.value = "站点信息获取失败"; 
+            });  
+        }).catch(err => {  
+        });   
+    });  
 
     const checkRePassword = (rule,value,callback) => {
         if(value == ''){
@@ -90,17 +89,21 @@
         });  
     };  
     const submitEdit = async () => {
+        console.log(1);
         const isValid = await refForm.value.validate();  
         if (!isValid) {  
             return; // 如果不合法，提前退出  
         }  
-        updateRider(currentRiderInfo.value).then(data=>{
+        updateRider(riderInformation.value).then(data=>{
             ElMessage.success('修改成功');
             editPIDialogue.value = false;
             editPassword.value = false;
             editWalletPassword.value = false;
-            riderInformation.value = currentRiderInfo.value;
+            currentRiderInfo.value.RiderName='';
+            currentRiderInfo.value.PhoneNumber='';
+            currentRiderInfo.value.Password='';
             currentRiderInfo.value.rePassword='';
+            currentRiderInfo.value.WalletPassword='';
             currentRiderInfo.value.reWalletPassword='';
         }).catch(error => {
             if (error.response && error.response.data) {  
@@ -121,31 +124,34 @@
 
 <template>
     <div class="personTop">
-            <div class="topLeft">
-                <el-avatar
-                    size="large"
-                    :src= imgurl
-                    alt="wrong"
-                />
-                <div class="name-and-title">
-                    <h2>{{riderInformation.RiderName}}</h2>
-                    <p>黄金骑手</p>
-                </div>
-            </div>
-            <div class="topRight">
-                <el-descriptions title="Personal Information" border>
+                <el-descriptions title="骑手个人信息" border>
+                    <el-descriptions-item
+                    :rowspan="2"
+                    :width="140"
+                    label="Photo"
+                    align="center"
+                    >
+                        <el-avatar
+                            class="pic"
+                            :src= imgurl
+                            alt="wrong"
+                            style="width:100px;height: 100px;"
+                        />
+                    </el-descriptions-item>
                     <el-descriptions-item label="Id">{{riderInformation.RiderId}}</el-descriptions-item>
+                    <el-descriptions-item label="Telephone">{{riderInformation.PhoneNumber}}</el-descriptions-item>
                     <el-descriptions-item label="Name">{{riderInformation.RiderName}}</el-descriptions-item>
-                    <el-descriptions-item label="Phone">{{riderInformation.PhoneNumber}}</el-descriptions-item>
+                    <el-descriptions-item label="Remarks">
+                        <el-tag size="small">School</el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Address"> {{ riderStation.stationName }}  {{ riderStation.stationAddress }}</el-descriptions-item>
                 </el-descriptions>
-                
+
+
                 <el-dropdown class="user-name" trigger="click">
-                    <span class="changeinfo">
-                        <p class="changetext">修改</p>
-                        <el-icon>
-                            <Operation />
-                        </el-icon>
-                    </span>
+                    <el-button type="primary" circle>
+                        <el-icon><Edit /></el-icon>
+                    </el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item @click="editPIDialogue=true">修改个人信息</el-dropdown-item>
@@ -155,19 +161,22 @@
                     </template>
                 </el-dropdown>
             </div>
-    </div>
+
 
     <el-dialog v-model="editPIDialogue" width="500" title="个人信息修改" draggable>
         <el-form label-width="80" ref="refForm" :model="currentRiderInfo" :rules="riderRules">
             <el-form-item label="姓名" prop="RiderName">
-                <el-input v-model="currentRiderInfo.RiderName" placeholder="请更改您的姓名" @blur="validateField('RiderName')"/>
+                <el-input v-model.lazy="currentRiderInfo.RiderName" placeholder="请更改您的姓名" @blur="validateField('RiderName')"/>
             </el-form-item>
             <el-form-item label="电话号码" prop="PhoneNumber">
-                <el-input v-model="currentRiderInfo.PhoneNumber" placeholder="请更改您的电话" @blur="validateField('PhoneNumber')"/>
+                <el-input v-model.lazy="currentRiderInfo.PhoneNumber" placeholder="请更改您的电话" @blur="validateField('PhoneNumber')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editPIDialogue=false">重置</el-button>
+                <el-button type="primary" @click="
+                    riderInformation.RiderName = currentRiderInfo.RiderName,
+                    riderInformation.PhoneNumber = currentRiderInfo.PhoneNumber,
+                    submitEdit()">修改</el-button>
+                <el-button @click="editPIDialogue=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -181,8 +190,9 @@
                 <el-input v-model="currentRiderInfo.rePassword"  placeholder="请输入登录密码" @blur="validateField('rePassword')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editPassword=false">重置</el-button>
+                <el-button type="primary" @click="riderInformation.Password = currentRiderInfo.Password;
+                    submitEdit()">修改</el-button>
+                <el-button @click="editPassword=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -196,8 +206,9 @@
                 <el-input v-model="currentRiderInfo.reWalletPassword"  placeholder="请输入钱包密码" @blur="validateField('reWalletPassword')"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitEdit">添加</el-button>
-                <el-button @click="editWalletPassword=false">重置</el-button>
+                <el-button type="primary" @click="riderInformation.WalletPassword = currentRiderInfo.WalletPassword;
+                    submitEdit()">修改</el-button>
+                <el-button @click="editWalletPassword=false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -214,7 +225,7 @@
     margin-bottom: 20px;
     margin-left:10px;
     margin-right:10px;
-    height: 20%;
+    height: 50%;
     border-radius: 15px; /* 圆角 */
     width:100%
 }
@@ -256,6 +267,14 @@
 
 .changetext {
     user-select: none;
+}
+
+.user-name{
+    margin-left: 10px;
+}
+
+.pic{
+    background-color: #FFF;
 }
 
 </style>

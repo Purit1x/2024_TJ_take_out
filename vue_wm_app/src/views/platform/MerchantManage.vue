@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getMerchantIds,getMerchantsInfo,getAllMerchantsInfo } from "@/api/user";
 import { merchantDeleteService } from "@/api/platform";
+import { getMerAvgRating } from "@/api/merchant";
 const router = useRouter();
 const merchantIds = ref([]);  //获取所有商家id
 const merchantsInfo = ref([]); // 存储所有商家信息 
@@ -13,8 +14,11 @@ const searchQuery = ref(''); // 搜索框内容
 const isMerchantInfo= ref(false); // 是否显示商家信息
 const currentMerchantId = ref(null); // 当前商家id
 const MerchantInfo=ref({});  //商户信息
+
 const sortField = ref(''); // 搜索框内容
 const sortOrder = ref('1'); // 搜索框内容
+const parentBorder=ref(false);
+const childBorder=ref(false);
 onMounted(() => {
     
     // getMerchantIds().then(res => {  // 获取所有商家id
@@ -34,6 +38,7 @@ onMounted(() => {
         showMerchantsInfo.value = merchantsInfo.value;
         // fetchDefaultAddress();
     })
+    await fetchMerAvgRating();
 });
 
 const sortCoupons = () => {
@@ -41,6 +46,19 @@ const sortCoupons = () => {
     merchantsInfo.value  = res.data;
     showMerchantsInfo.value = merchantsInfo.value;
   })
+
+const fetchMerAvgRating = async () => {
+  try {
+    for (let info of showMerchantsInfo.value) {
+      const avgRating = await getMerAvgRating(info.merchantId);
+      console.log(`Merchant ID: ${info.merchantId}, Avg Rating: ${avgRating}`);
+      info.avgRating = avgRating; // 将平均评分添加到商家信息对象中
+    }
+    console.log("商家信息", showMerchantsInfo.value);
+  } catch (error) {
+    console.error('Failed to fetch merchant average ratings:', error);
+  }
+
 };
 const formatTime=(seconds)=> {  
     const hours = Math.floor(seconds / 3600);  
@@ -88,7 +106,7 @@ const gobackHome = () => {
 }
 </script>
 
-<template>
+<!-- <template>
     <div v-if="!isMerchantInfo">
         <div>
             商家管理
@@ -137,4 +155,48 @@ const gobackHome = () => {
             <button @click="isMerchantInfo=false">返回</button>
         </div>
     </div>
+</template> -->
+
+
+
+
+<template>
+    <div v-if="!isMerchantInfo">
+        <div>
+            商家管理
+            <button @click="gobackHome">返回</button>
+        </div>
+        <h2>商家列表</h2>  
+        <div>
+            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
+            <button @click="handleSearch()">搜索</button>
+        </div>
+    
+            <el-table :data="showMerchantsInfo":border="parentBorder"style="width:100%">
+            <el-table-column type="expand">
+                <template #default="props">
+                    <div m="4">
+                        <p m="t-0 b-2">商家信息</p>
+                        <p m="t-0 b-2">地址：{{ props.row.merchantAddress }}</p>
+                        <p m="t-0 b-2">营业时间：{{formatTime(props.row.timeforOpenBusiness)}}-{{ formatTime(props.row.timeforCloseBusiness) }}</p>
+                        <p m="t-0 b-2">联系电话：{{ props.row.contact }}</p>
+                        <p m="t-0 b-2">是否可以使用通用优惠券：{{ props.row.couponType ? '否' : '是' }}</p>
+                        <p m="t-0 b-2">商家评分：{{ props.row.avgRating }}</p>
+                        <button @click="deleteMerchant(currentMerchantId)">销号</button>
+                
+                    </div>
+                </template>
+
+            </el-table-column>
+            <el-table-column label="商家" prop="merchantName" />
+            <el-table-column label="商品类别" prop="dishType" />
+            </el-table>
+    </div>
+
+
 </template>
+<style scoped>
+
+
+</style>
+

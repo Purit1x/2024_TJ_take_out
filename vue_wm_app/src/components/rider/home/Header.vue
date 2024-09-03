@@ -4,7 +4,8 @@
     import { ref,onMounted} from 'vue'
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
-    import imgurl from '@/assets/logo2.png';
+    import imgurl from '@/assets/my_logo.png';
+    import screenfull from "screenfull";
 
     const router = useRouter()
     const store = useStore()    
@@ -21,15 +22,16 @@
             store.dispatch('clearRider'); 
             router.push('/login');
         } else if (command == 'user') {
-            router.push('/information')
+            router.push('/rider-home/information')
         }
     }
 
     const setFullScreen = () => {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
-            document.body.requestFullscreen.call(document.body);   
+        if (screenfull.isEnabled && !screenfull.isFullscreen) {
+            screenfull.request();
+        }
+        if (screenfull.isEnabled && screenfull.isFullscreen) {
+            screenfull.exit();
         }
     }
 
@@ -75,7 +77,7 @@
 
         <div class="headerRight">
             <div class="headerUsercon">
-                <div class="btn-icon" @click="router.push('/information')">
+                <div class="btn-icon" @click="router.push('/rider-home/information')">
                     <el-tooltip
                         effect="dark"
                         :content="message ? `有${message}条未读消息` : `消息中心`"
@@ -181,6 +183,7 @@
 
 .user-avator {
     margin: 0 10px 0 20px;
+    background-color: #FFF;
 }
 
 .el-dropdown-link {
