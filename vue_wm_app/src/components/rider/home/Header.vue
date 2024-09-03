@@ -4,7 +4,7 @@
     import { ref,onMounted} from 'vue'
     import { stIdSearch } from "@/api/rider"
     import { getStationsInfo } from "@/api/platform"
-    import imgurl from '@/assets/logo2.png';
+    import imgurl from '@/assets/my_logo.png';
     import screenfull from "screenfull";
 
     const router = useRouter()
@@ -183,6 +183,7 @@
 
 .user-avator {
     margin: 0 10px 0 20px;
+    background-color: #FFF;
 }
 
 .el-dropdown-link {

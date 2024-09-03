@@ -251,7 +251,18 @@ const cancelCreate = () => {
 <template>  
     <slot name="sidebar"></slot>
     <div class="content"> 
-        <header>这里是菜单页面，{{ merchant.MerchantId }}</header>  
+        <header class = "welcome-text">这里是菜单页面，{{ merchant.merchantName }}</header>  
+
+        <div class="search-bar" v-if="!isEditing&!isCreating">
+            <el-col :span="8">
+                <el-input  placeholder="请输入关键词..." v-model="searchQuery" clearable @clear="searchDishes" @keydown.enter="searchDishes">
+                <template #append>
+                <el-button type="primary" @click="searchDishes"><el-icon><search /></el-icon></el-button>
+                </template>
+                </el-input>
+            </el-col>
+        </div>
+<!--
         <div class="search-container" v-if="!isEditing&!isCreating">  
             <input   
                 type="text"   
@@ -263,19 +274,23 @@ const cancelCreate = () => {
             <button class="search-button" @click="searchDishes">搜索</button> 
             <button @click="startCreatingDish">新建菜单项</button> 
         </div>  
-        <ul v-if="!isEditing&!isCreating">  
+-->
+        <ul class = "dish-list" v-if="!isEditing&!isCreating">  
             <li v-for="dish in displayedDishes" :key="dish.dishId">
                 <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">    
                 <span>&nbsp;&nbsp;{{ dish.dishName }}&nbsp;&nbsp;</span>  
                 <span>价格: {{ dish.dishPrice }}&nbsp;&nbsp;</span>  
                 <span>类别描述: {{ dish.dishCategory }}&nbsp;&nbsp;</span>
                 <span>库存：{{ dish.dishInventory }}&nbsp;&nbsp;</span> 
-                <button @click="editDish(dish)">编辑</button>
-                <button @click="deleteDish(dish.dishId)">删除</button>
+                <div class = "right-group">
+                    <button @click="editDish(dish)" class="button edit-btn">编辑</button>
+                    <button @click="deleteDish(dish.dishId)" class="button delete-btn">删除</button>
+                </div>
             </li>  
         </ul>  
+        <button @click="startCreatingDish" class = "normal-button" v-if="!isEditing&!isCreating">新建菜单项</button>
         <!-- 编辑表单 -->  
-        <div v-if="isEditing">  
+        <div v-if="isEditing" class="edit-container">  
             <h2>编辑菜品</h2> 
             <el-form :rules="editRules" ref="dishForm" :model="currentDish">
                 <el-form-item label="图片上传" prop="selectedImage"><input type="file" @change="handleImageChange" accept="image/*"/></el-form-item> <!-- 图片上传 -->   
@@ -284,10 +299,10 @@ const cancelCreate = () => {
                 <el-form-item label="类别描述" prop="dishCategory"><input v-model="currentDish.dishCategory" placeholder="类别描述" @blur="validateField('dishCategory')"/> </el-form-item>
                 <el-form-item label="库存" prop="dishInventory"><input type="number" v-model="currentDish.dishInventory" placeholder="库存" @blur="validateField('dishInventory')"/> </el-form-item> 
            </el-form>  
-            <button @click="submitEdit">提交</button>  
-            <button @click="cancelEdit">取消</button>
+            <button @click="submitEdit" class = "submit-btn">提交</button>  
+            <button @click="cancelEdit" class = "cancel-btn">取消</button>
         </div>
-        <div v-if="isCreating">
+        <div v-if="isCreating" class ="edit-container">
             <h2>创建菜品</h2>
             <el-form :rules="editRules" ref="dishForm" :model="currentDish">
                 <el-form-item label="图片上传" prop="selectedImage"><input type="file" @change="handleImageChange" accept="image/*" @blur="validateField('selectedImage')"/></el-form-item> <!-- 图片上传 -->   
@@ -296,12 +311,183 @@ const cancelCreate = () => {
                 <el-form-item label="类别描述" prop="dishCategory"><input v-model="currentDish.dishCategory" placeholder="类别描述" @blur="validateField('dishCategory')"/> </el-form-item>
                 <el-form-item label="库存" prop="dishInventory"><input type="number" v-model="currentDish.dishInventory" placeholder="库存" @blur="validateField('dishInventory')"/> </el-form-item> 
             </el-form>
-            <button @click="submitCreate">提交</button>  
-            <button @click="cancelCreate">取消</button>
+            <button @click="submitCreate" class = "submit-btn">提交</button>  
+            <button @click="cancelCreate" class = "cancel-btn">取消</button>
         </div>
     </div>
 </template>  
 
-<style scoped>
+<style scoped lang="scss">
+
+.dish-list {
+  list-style: none;
+  padding: 0;
+  margin-right: 30px;
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 0 30px;     // 修改左右外边距
+    margin-bottom: 10px;
+    border: 2px solid #ffee00;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+    }
+
+    span {
+      margin-right: 15px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .right-group {
+      margin-left: auto; /* 将右侧按钮推到右边 */
+      display: flex;
+    }
+
+    button {
+      margin-left: 5px;
+      margin-right: 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &.edit-btn {
+        background-color: #ffcc00;
+        color: white;
+
+        &:hover {
+          background-color: #ffdd00;
+        }
+      }
+
+      &.delete-btn {
+        background-color: #f44336;
+        color: white;
+
+        &:hover {
+          background-color: #ff5b58;
+        }
+      }
+    }
+  }
+}
+
+/* 编辑区域的容器样式 */
+.edit-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border: 2px solid #ffee00;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .el-form {
+    display: flex;
+    flex-direction: column;
+
+    .el-form-item {
+      margin-bottom: 15px;
+      label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        box-sizing: border-box; /* 包括内边距和边框 */
+        
+        &:focus {
+          border-color: #4caf50;
+          box-shadow: 0 0 4px rgba(76, 175, 80, 0.2);
+        }
+      }
+
+      input[type="file"] {
+        border: none;
+        padding: 0;
+      }
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    outline: none;
+
+    &.submit-btn {
+      background-color: #4caf50;
+      color: white;
+
+      &:hover {
+        background-color: #45a049;
+      }
+    }
+
+    &.cancel-btn {
+      background-color: #f44336;
+      color: white;
+
+      &:hover {
+        background-color: #e53935;
+      }
+    }
+  }
+}
+
+.normal-button {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    background-color: #ffcc00;
+    color: white;
+}
+
+.search-bar {
+  display: flex;
+  margin-bottom: 20px;
+  margin-top: 5px;
+}
+
+.welcome-text {
+  font-size: 35px;
+  margin-left: 15px;
+  color: #000000;
+  font-weight: bold;
+}
 
 </style>

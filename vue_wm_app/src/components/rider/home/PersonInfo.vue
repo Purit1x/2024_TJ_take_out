@@ -1,19 +1,45 @@
 <script setup>
     import { onMounted, ref, provide, inject } from 'vue';
-    import imgurl from '@/assets/logo2.png';
+    import imgurl from '@/assets/my_logo.png';
     import { riderInfo, updateRider } from '@/api/rider'
     import { useStore } from "vuex" 
     import { ElMessage } from 'element-plus';
+    import { stIdSearch } from "@/api/rider"
+    import { getStationsInfo } from "@/api/platform"
+
+
 
     const store = useStore()    
     const refForm = ref(null);
-
+    const rider = ref({})
+    const stationId = ref(null); // 用于存储站点 ID  
+    const riderStation = ref({}); // 用于存储站点信息  
     const editPIDialogue = ref(false) //编辑个人信息弹窗状态
     const editPassword = ref(false)
     const editWalletPassword = ref(false)
     const currentRiderInfo = inject('providecurrentRiderInfo')
     const riderInformation = inject('provideRiderInformation')
     
+    onMounted(() => {  
+        // 从 cookie 中读取用户信息  
+        const riderData = store.state.rider; 
+        if (riderData) {  
+            rider.value = riderData;  
+        } else {   
+            router.push('/login');
+        }  
+        stIdSearch(rider.value.RiderId).then(res => {  
+            stationId.value = res.data; 
+            getStationsInfo(stationId.value).then(res => {  
+            riderStation.value = res.data; 
+            console.log(riderStation);
+            }).catch(err => {  
+                riderStation.value = "站点信息获取失败"; 
+            });  
+        }).catch(err => {  
+        });   
+    });  
+
     const checkRePassword = (rule,value,callback) => {
         if(value == ''){
             callback(new Error('请再次确认密码'))
@@ -98,31 +124,34 @@
 
 <template>
     <div class="personTop">
-            <div class="topLeft">
-                <el-avatar
-                    size="large"
-                    :src= imgurl
-                    alt="wrong"
-                />
-                <div class="name-and-title">
-                    <h2>{{riderInformation.RiderName}}</h2>
-                    <p>黄金骑手</p>
-                </div>
-            </div>
-            <div class="topRight">
-                <el-descriptions title="Personal Information" border>
+                <el-descriptions title="骑手个人信息" border>
+                    <el-descriptions-item
+                    :rowspan="2"
+                    :width="140"
+                    label="Photo"
+                    align="center"
+                    >
+                        <el-avatar
+                            class="pic"
+                            :src= imgurl
+                            alt="wrong"
+                            style="width:100px;height: 100px;"
+                        />
+                    </el-descriptions-item>
                     <el-descriptions-item label="Id">{{riderInformation.RiderId}}</el-descriptions-item>
+                    <el-descriptions-item label="Telephone">{{riderInformation.PhoneNumber}}</el-descriptions-item>
                     <el-descriptions-item label="Name">{{riderInformation.RiderName}}</el-descriptions-item>
-                    <el-descriptions-item label="Phone">{{riderInformation.PhoneNumber}}</el-descriptions-item>
+                    <el-descriptions-item label="Remarks">
+                        <el-tag size="small">School</el-tag>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="Address"> {{ riderStation.stationName }}  {{ riderStation.stationAddress }}</el-descriptions-item>
                 </el-descriptions>
-                
+
+
                 <el-dropdown class="user-name" trigger="click">
-                    <span class="changeinfo">
-                        <p class="changetext">修改</p>
-                        <el-icon>
-                            <Operation />
-                        </el-icon>
-                    </span>
+                    <el-button type="primary" circle>
+                        <el-icon><Edit /></el-icon>
+                    </el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item @click="editPIDialogue=true">修改个人信息</el-dropdown-item>
@@ -132,7 +161,7 @@
                     </template>
                 </el-dropdown>
             </div>
-    </div>
+
 
     <el-dialog v-model="editPIDialogue" width="500" title="个人信息修改" draggable>
         <el-form label-width="80" ref="refForm" :model="currentRiderInfo" :rules="riderRules">
@@ -192,11 +221,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between; 
-    background-color: gray;
     margin-bottom: 20px;
     margin-left:10px;
     margin-right:10px;
-    height: 20%;
+    height: 50%;
     border-radius: 15px; /* 圆角 */
     width:100%
 }
@@ -238,6 +266,19 @@
 
 .changetext {
     user-select: none;
+}
+
+
+.pic{
+    background-color: #FFF;
+}
+
+.el-descriptions {
+  background-color: #fff;
+  border: 2px solid #ffcc00;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 </style>

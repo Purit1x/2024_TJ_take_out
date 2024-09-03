@@ -1,10 +1,10 @@
 <script setup>  
-import { ref, onMounted, watch } from 'vue';  
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';  
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
-import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress } from "@/api/user";
 
+import { getMerchantIds,getMerchantsInfo,createFavouriteMerchant,GetDefaultAddress,GetUserAddress, getAllMerchantsInfo } from "@/api/user";
 import {getDistanceBetweenAddresses,getMerAvgRating, GetMultiSpecialOffer} from "@/api/merchant";
 
 import { ElMessage } from 'element-plus';
@@ -17,13 +17,19 @@ const merchantIds = ref([]);  //获取所有商家id
 const merchantsInfo = ref([]); // 存储所有商家信息 
 const isMenu= ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
+
+const sortField = ref(''); // 搜索框内容
+const sortOrder = ref('1'); // 搜索框内容
+
 const filterAddressQuery = ref(''); // 过滤器内容(筛选用)
 const filterCouponTypeQuery = ref(false); // 优惠券类型筛选内容(筛选用)
 const filterSpecialOfferQuery = ref(false); // 满减筛选内容(筛选用)
+
 const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
 const DefaultAddressId=ref(null); // 用于跟踪默认地址id
+let updateAvgRatingItv = null;
 onMounted(async() => {  
   const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
@@ -36,18 +42,29 @@ onMounted(async() => {
     router.push('/login');
   }  
   
-  await getMerchantIds().then(res => {  // 获取所有商家id
+  getMerchantIds().then(res => { 
     merchantIds.value = res.data;  
-    return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
-  }).then(responses => {  
-    merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
-    fetchDefaultAddress();  // 获取用户默认地址
-    
-    showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
-  }).catch(err => {  
-    ElMessage.error('获取商家id失败'); 
-  }); 
+  });
+  getAllMerchantsInfo().then(res=>{
+    merchantsInfo.value  = res.data;
+    fetchDefaultAddress();
+  });
   await fetchMerAvgRating();
+  updateAvgRatingItv = setInterval(fetchMerAvgRating,5000);
+
+}); 
+
+onBeforeUnmount(() => {
+  if(updateAvgRatingItv)
+    clearInterval(updateAvgRatingItv);
+})
+
+
+const sortCoupons = () => {
+  getAllMerchantsInfo(sortField.value,sortOrder.value).then(res=>{
+    merchantsInfo.value  = res.data;
+    fetchDefaultAddress();
+  })
 }); 
 const fetchMerAvgRating = async () => {
   try {
@@ -60,6 +77,7 @@ const fetchMerAvgRating = async () => {
   } catch (error) {
     console.error('Failed to fetch merchant average ratings:', error);
   }
+
 };
 const fetchDefaultAddress = async () => {  
     try {  
@@ -81,11 +99,11 @@ const fetchDefaultAddress = async () => {
                     // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
                     merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;  
                 }  
-                merchantsInfo.value.sort((a, b) => {  //升序排列
-                    const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
-                    const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
-                    return distanceA - distanceB;  
-                });  
+                // merchantsInfo.value.sort((a, b) => {  //升序排列
+                //     const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
+                //     const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
+                //     return distanceA - distanceB;  
+                // });  
             }  
             console.log(merchantsInfo.value);  
             showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
@@ -119,6 +137,7 @@ watch(
 );   
 // 返回主页函数
 const gobackHome = () => {
+
   router.push('/user-home');
 };
 // 跳转到个人信息  
@@ -287,6 +306,7 @@ body {
   padding: 0;
   height: 100vh;
   font-family: Arial, sans-serif;
+
 }
 
 /* 侧边栏样式 */

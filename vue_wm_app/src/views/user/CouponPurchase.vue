@@ -147,7 +147,7 @@ const cancelPurchase = () => {
 
         <div class="buy-search-bar">
             <el-col :span="8">
-                <el-input  placeholder="搜索优惠券名称" v-model="searchQuery" clearable @clear="handleSearch()" @keydown.enter.native="handleSearch()">
+                <el-input  placeholder="搜索优惠券名称" v-model="searchQuery" clearable @clear="handleSearch()" @keydown.enter="handleSearch()">
                 <template #append>
                 <el-button type="primary" @click="handleSearch()"><el-icon><search /></el-icon></el-button>
                 </template>
