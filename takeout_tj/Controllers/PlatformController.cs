@@ -586,9 +586,50 @@ namespace takeout_tj.Controllers
                 return StatusCode(500, new { errorCode = 500, msg = $"查询异常: {ex.Message}" });
             }
         }
+        [HttpGet]
+        [Route("getFinishedOrders")]
+        public async Task<IActionResult>GetFinishedOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Where(or => or.State == 3)
+                    .ToListAsync();
+                if(orders.Count ==0)
+                {
+                    return Ok(new { data = 0, msg = "没有已完成订单" });
+                }
+                return Ok(new { data = orders, msg = "已找到" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
+            }
+        }
+		[HttpGet]
+		[Route("getFinishedOrdersComment")]
+		public async Task<IActionResult> GetFinishedOrderscomment(int orderId)
+		{
+			try
+			{
+				var orders = await _context.Orders
+					.Where(or => or.State == 3&&or.OrderId==orderId)
+					.Select(or => new { OrderId = or.OrderId, Comment = or.Comment })
+					.FirstOrDefaultAsync();
 
+				if (orders == null)
+				{
+					return Ok(new { data = 0, msg = "没有已完成订单" });
+				}
+				return Ok(new { data = orders.Comment, msg = "已找到" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
+			}
+		}
 
-    }
+	}
 		
 }
 
