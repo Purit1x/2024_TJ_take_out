@@ -199,225 +199,267 @@ provide('user', user);
 provide('merchantsInfo', merchantsInfo); 
 </script>  
 
-<template>  
+<template>
   <nav class="sidebar">
-      <div class="sidebar-content">
-        <img class="sidebar-img" src="@\assets\my_logo.png" alt="logo"/>
-        
-        <button class="sidebar-button" @click="gobackHome">
-          <img src="@\assets\merchant_home.png" alt="主页"/>
-          <span>主页</span>
-        </button>
-        
-        <button class="sidebar-button" @click="goToCart">
-          <img src="@\assets\user_order.png" alt="购物车"/>
-          <span>购物车</span>
-        </button>
-        
-        <button class="sidebar-button" @click="goToPersonal">
-          <img src="@\assets\merchant_personal.png" alt="个人信息"/>
-          <span>个人信息</span>
-        </button>
+    <div class="sidebar-content">
+      <img class="sidebar-img" src="@/assets/my_logo.png" alt="logo"/>
 
-        <button class="sidebar-button" @click="goToAddress">
-          <img src="@\assets\address.png" alt="地址"/>
-          <span>地址</span>
-        </button>
-        <router-view /> <!-- 渲染子路由 -->
-      </div>
+      <button class="sidebar-button" @click="gobackHome">
+        <img src="@/assets/merchant_home.png" alt="主页"/>
+        <span class="button-text">主页</span>
+      </button>
+
+      <button class="sidebar-button" @click="goToCart">
+        <img src="@/assets/user_order.png" alt="购物车"/>
+        <span class="button-text">购物车</span>
+      </button>
+
+      <button class="sidebar-button" @click="goToPersonal">
+        <img src="@/assets/merchant_personal.png" alt="个人信息"/>
+        <span class="button-text">个人信息</span>
+      </button>
+
+      <button class="sidebar-button" @click="goToAddress">
+        <img src="@/assets/address.png" alt="地址"/>
+        <span class="button-text">地址</span>
+      </button>
+      <router-view /> <!-- 渲染子路由 -->
+    </div>
   </nav>
 
-    <div class="content">  
-        <div class="content-header">
-          <h1 v-if="isUserHome" class="welcome-text">欢迎，{{user.userId}}</h1>  
-        </div>
-        <div v-if="isUserHome">  
-            <!-- <div class="search-bar">
-              <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
-              <button @click="handleSearch()">搜索</button>
-            </div> -->
+  <div class="content">
+    <div class="content-header">
+      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userId }}</h1>
+    </div>
 
-            <div class="search-bar">
-              <el-col :span="8">
-                  <el-input  placeholder="搜索店名或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
-                  <template #append>
-                    <el-button type="primary"@click="handleSearch"><el-icon><search /></el-icon></el-button>
-                  </template>
-                  </el-input>
-              </el-col>
-            </div>
+    <div v-if="isUserHome">
+      <div class="search-bar">
+        <el-col :span="16">
+          <el-input placeholder="搜索店名或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+            <template #append>
+              <el-button type="primary" @click="handleSearch" class="search-button">
+                <el-icon><search /></el-icon>
+              </el-button>
+            </template>
+          </el-input>
+        </el-col>
+      </div>
 
-            <div class="filter-bar">
-              <input type="text" v-model="filterAddressQuery" placeholder="筛选地址" v-on:keyup.enter="filteredMerchants()"/>
-              <label>
-                <input type="checkbox" v-model="filterCouponTypeQuery"> 可使用优惠券
-              </label>
-              <label>
-                <input type="checkbox" v-model="filterSpecialOfferQuery"> 正在特惠中
-              </label>
-              <button @click="filteredMerchants()">筛选</button>
-            </div>
+      <div class="filter-bar">
+        <el-input v-model="filterAddressQuery" placeholder="筛选地址" clearable @keydown.enter="filteredMerchants()" class="filter-input"></el-input>
+        <el-checkbox v-model="filterCouponTypeQuery" class="filter-checkbox">可使用优惠券</el-checkbox>
+        <el-checkbox v-model="filterSpecialOfferQuery" class="filter-checkbox">正在特惠中</el-checkbox>
+        <el-button type="primary" @click="filteredMerchants()" class="filter-button">筛选</el-button>
+      </div>
 
-            <table>
-              <tbody>
-                <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
-                  <td class="col-name">{{ merchant.merchantName }}</td> 
-                  <td class="col-type">{{ merchant.dishType }}</td>
 
-                  <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
-                  <td class="col-Rating">评分：{{ merchant.avgRating }}</td>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th class="col-name">店名</th>
+            <th class="col-type">类别</th>
+            <th class="col-distance" v-if="hasDefaultAddress">距离</th>
+            <th class="col-Rating">评分</th>
+            <th class="col-enter">操作</th>
+            <th class="col-favorite">收藏</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
+            <td class="col-name">{{ merchant.merchantName }}</td>
+            <td class="col-type">{{ merchant.dishType }}</td>
+            <td class="col-distance" v-if="hasDefaultAddress">{{ merchant.distanceFromDefaultAddress }}km</td>
+            <td class="col-Rating">{{ merchant.avgRating }}</td>
+            <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">查看</button></td>
+            <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
 
-                  <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
-                  <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
-                </tr>
-              </tbody>
-            </table>  
-        </div>   
-    </div>  
-</template>  
-
-<style>
-body{
+<style scoped>
+/* 页面背景和整体容器样式 */
+body {
   background: linear-gradient(to bottom right, #f4ebf5, #f38bd248);
   margin: 0;
   padding: 0;
   height: 100vh;
-}
-</style>
-
-<style scoped>
-table{
-  width: 100%;
-  border-collapse: collapse;
+  font-family: Arial, sans-serif;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-th {
-  background-color: #7BA7AB;
-  color: #fff;
-  text-align: center;
-}
-
-.col-name{width:40%;}
-.col-type{width:30%;}
-
-.col-distance{width:20%;}
-
-.col-Rating{width:10%}
-.col-enter{width:10%;}
-.col-favorite{width:10%;}
-
-
+/* 侧边栏样式 */
 .sidebar {
-  width: 50px;
+  width: 80px; /* 调整侧边栏宽度为50px */
   background: linear-gradient(to bottom, #f0d6f2, #f77dd048);
-  padding: 20px;
+  padding: 20px 0; /* 调整为顶部和底部填充 */
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .sidebar-img {
-  width: 100%;
+  width: 80%; /* 根据新宽度调整logo大小 */
   height: auto;
   margin-bottom: 15px;
 }
 
 .sidebar-button {
-  display: block;
-  width: 50px;
-  height: auto;
-  margin-bottom: 20px;
-  padding: 0;
-  text-align: center;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-}
-.sidebar-button img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+  margin-bottom: 15px;
+  padding: 5px 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex-direction: column; /* 改为列方向布局，使图标在上，文字在下 */
+}
+
+.sidebar-button img {
+  width: 30px; /* 调整按钮图片大小 */
   height: auto;
 }
-.sidebar-button span {
-  display: block;
-  font-size: 12px;
-  text-align: center;
-}
 
-.sidebar-button.active {
-  color: #0f628b;
-}
-
-.sidebar-content button:hover {
-  background-color: #3686d748;
+/* 头部和欢迎信息 */
+.content-header {
+  margin-bottom: 20px;
+  margin-left: 40px; /* 调整左边距，避免被侧边栏遮挡 */
 }
 
 .welcome-text {
-  font-size: 35px;
-  margin-left: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
 }
 
-.content {
-  font-size: 15px;
-}
-
+/* 搜索栏样式 */
 .search-bar {
   display: flex;
+  justify-content: flex-start; /* 将搜索栏从左侧对齐 */
+  margin-left: 40px; /* 调整左边距 */
   margin-bottom: 20px;
-  margin-top: 5px;
+  width: calc(50% - 60px); /* 调整搜索栏宽度 */
 }
 
-.search-bar input {
-    width: 75%;
-    height: 100%;
-    padding-left: 15px;
-    border-radius: 5px 0 0 5px;
-    border: 2px solid #7BA7AB;
-    background: #F9F0DA;
-    color: #9E9C9C;
-    outline: none;
-}
-.search-bar button {
-    width: 25%;
-    height: 100%;
-    background: #7BA7AB;
-    border: 2px solid #7BA7AB;
-    border-radius: 0 5px 5px 0;
-    font-size: 13px;
-    position: relative;
-    text-align: center;
-}
-.search-bar button:before {
-    font-size: 13px;
-    color: #F9F0DA;
+.search-bar .el-input {
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.search-button {
+  border-radius: 50%;
+  background-color: #ff69b4;
+  border: none;
+  color: #fff;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.search-button:hover {
+  background-color: #ff85c1;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+/* 筛选栏样式 */
 .filter-bar {
-  width: 1000px;
-  height: 40px;
   display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 将筛选栏从左侧对齐 */
+  margin-left: 40px;/* 调整左边距 */
   margin-bottom: 20px;
-  margin-top: 5px;
-
-  input{
-    width: 20%;
-  }
-  button{
-    width: 8%;
-  }
-  label{
-    width: 15%;
-    margin-left: 20px;
-    display: flex;
-    align-items:center;
-    border: 1px solid #7BA7AB;
-  }
+  width: 100%; /* 使筛选栏宽度占满容器 */
 }
 
+.filter-input {
+  width: 250px;
+  border-radius: 25px;
+  background-color: #faf0f0;
+  margin-right: 15px; /* 给输入框添加右边距 */
+}
+
+.filter-checkbox {
+  margin-right: 15px; /* 给复选框添加右边距 */
+  font-size: 16px;
+  color: #555;
+}
+
+.filter-button {
+  padding: 10px 20px;
+  border-radius: 25px;
+  background-color: #ff69b4;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.filter-button:hover {
+  background-color: #ff85c1;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+/* 表格样式 */
+.styled-table {
+  width: calc(100% - 80px); /* 调整表格宽度，考虑侧边栏的宽度 */
+  border-collapse: collapse;
+  max-width: 1300px;
+  margin-left: 40px; /* 调整表格左边距 */
+  margin-right: 40px; /* 调整表格右边距 */
+  margin-bottom: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #7BA7AB;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #7BA7AB;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #7BA7AB;
+}
+
+
+.col-enter button, .col-favorite button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #ff69b4;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.col-enter button:hover, .col-favorite button:hover {
+  background-color: #ff85c1;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
 </style>
