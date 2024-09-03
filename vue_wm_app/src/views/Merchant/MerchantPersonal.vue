@@ -13,6 +13,7 @@ const isWallet=ref(false);  //是否是钱包界面
 const isRecharge=ref(false);  //是否是充值界面
 const isWithdraw=ref(false); //是否是提现页面
 const isChangeWP=ref(false);  //是否是修改钱包密码界面
+const isOnlyShow = ref(true); //是否是修改界面
 const refForm =ref(null);
 const totalTurnoverWithinThisMonth = ref(0);
 const totalTurnoverWithinThisDay = ref(0);
@@ -134,7 +135,7 @@ const formatTime=(seconds)=> {
     const secs = seconds % 60;  
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;  
 }  
-const isOnlyShow = ref(true);
+
 onBeforeUnmount(() => {
     if (updateTurnoverInterval) {
         clearInterval(updateTurnoverInterval);  // 清除定时器
@@ -421,11 +422,11 @@ function displayTotalTurnoverWithinThisDay() {
 <template>
     <div class="content">
         <div class="person_body" v-if="!isWallet">
-            <el-descriptions class="margin-top" title="简介" :column="2" border v-if="isOnlyShow">
+            <el-descriptions class="margin-top" title="简介" :column="2" v-if="isOnlyShow">
                 <template #extra>
-                    <button @click="gobackHome">返回</button>
-                    <el-button type="primary" size="small" @click="editMerchant">编辑</el-button>
-                    <el-button type="primary" size="small" @click="logout">退出</el-button>
+
+                    <el-button type="primary" size="small" @click="editMerchant" class = "edit-button">编辑</el-button>
+                    
                 </template>
                 <el-descriptions-item>
                     <template #label>
@@ -519,213 +520,265 @@ function displayTotalTurnoverWithinThisDay() {
                     </el-form-item>
                 </div>
                 <div class="dialog-footer">
-                    <el-button @click="cancelEdit">取 消</el-button>
-                    <el-button type="primary" @click="saveMerchant">提 交</el-button>
+                    <el-button @click="cancelEdit" class = "cancel-button">取 消</el-button>
+                    <el-button type="primary" @click="saveMerchant" class = "submit-button">提 交</el-button>
                 </div>
             </el-form>
-            <button v-if="isOnlyShow" @click="enterWallet">钱包</button>
+            <div v-if="!isWallet&isOnlyShow" class = "el-descriptions">
+                <h4>本月销售额</h4>
+                <span>您本月订单总量为:{{ orderNum }}</span><span>  您本月的销售额为：{{ displayTotalTurnoverWithinThisMonth() }}</span>
+                <br>
+                <h4>本日销售额</h4>
+                <span>您本日订单总量为:{{ orderNum }}</span><span>  您本日的销售额为：{{ displayTotalTurnoverWithinThisDay() }}</span>
+            </div>
+            <button v-if="isOnlyShow" @click="enterWallet" class = "wallet-button">钱包</button>
+            <br>
+            <button v-if="isOnlyShow" @click="logout" class = "exit-button">退出登录</button>
         </div>
-        <div class="wallet" v-if="isWallet">  <!-- 钱包 -->
-            <button @click="leaveWallet">返回</button>
+        <div class="wallet" v-if="isWallet" >  <!-- 钱包 -->
             <div>钱包金额：{{merchantForm.Wallet}}</div>
             <button @click="OpenRechargeWindow">充值</button>
             <button @click="OpenWithdrawWindow">提现</button>
             <button @click="OpenWPWindow">修改支付密码</button>
+            <button @click="leaveWallet">返回</button>
         </div>
         <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm">
             <div class="recharge" v-if="isRecharge">  <!-- 充值 -->
                 <div>充值金额</div>
                 <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentMerchant.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
                 <button @click="SaveRecharge">充值</button>    
-                <button @click="leaveRechargeWindow">返回</button>
+                <button @click="leaveRechargeWindow">关闭</button>
             </div>
             <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
                 <div>提现金额</div>
                 <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentMerchant.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
                 <button @click="SaveWithdraw">提现</button>
-                <button @click="leaveWithdrawWindow">返回</button>
+                <button @click="leaveWithdrawWindow">关闭</button>
             </div>
             <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
-                <button @click="leaveWPWindow">返回</button>
                 <div>支付密码</div>
                 <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentMerchant.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
                 <div>确认支付密码</div>
                 <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentMerchant.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
                 <button @click="saveWalletPassword">修改</button>
+                <button @click="leaveWPWindow">关闭</button>
             </div>
         </el-form>
-        <br><br>
-        <h2>本月销售额</h2>
-        <h3>您本月订单总量为:{{ orderNum }}  您本月的销售额为：{{ displayTotalTurnoverWithinThisMonth() }}</h3>
-        <br><br>
-        <h2>本日销售额</h2>
-        <h3>您本日订单总量为:{{ orderNum }}  您本日的销售额为：{{ displayTotalTurnoverWithinThisDay() }}</h3>
     </div>
-    <div>
-        
-    </div>
+    
 </template>
 
-<style scoped>
-.me-video-player {
-    background-color: transparent;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    display: block;
-    position: fixed;
-    left: 0;
-    z-index: 0;
-    top: 0;
+<style scoped lang = "scss">
+
+/* Wallet Section */
+.wallet {
+  background-color: #ffd666;  /* 背景颜色 */
+  padding: 20px;              /* 内边距 */
+  border-radius: 20px;         /* 圆角 */
+  border:2px, solid, black;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  /* 盒子阴影 */
+  margin-bottom: 20px;        /* 下边距 */
+  margin-right: 30px;
 }
 
-.PersonTop {
-    width: 1000px;
-    height: 140px;
-    padding-top: 20px;
-    background-color: white;
-    margin-top: 30px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    border-radius: 5px;
+.wallet button {
+  background-color: #f59322;  /* 按钮背景颜色 */
+  color: white;               /* 按钮字体颜色 */
+  padding: 10px 20px;         /* 按钮内边距 */
+  margin-right: 10px;         /* 按钮右边距 */
+  border: none;               /* 去掉按钮边框 */
+  border-radius: 15px;         /* 按钮圆角 */
+  cursor: pointer;            /* 鼠标悬停时显示手形光标 */
 }
 
-.PersonTop_img {
-    width: 150px;
-    height: 120px;
-    background-color: #8c939d;
-    margin-right: 24px;
-    margin-left: 20px;
-    overflow: hidden;
-    border-radius: 20px;
+.wallet button:hover {
+  background-color: #ba8200;  /* 悬停时的背景颜色 */
 }
 
-.PersonTop_img img {
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
+.wallet div {
+  font-size: 18px;            /* 钱包金额字体大小 */
+  margin-bottom: 10px;        /* 钱包金额下边距 */
 }
 
-.PersonTop_text {
-    height: 120px;
-    width: 880px;
-    display: flex;
+/* Recharge Section */
+.recharge, .withdraw, .changewp {
+  background-color: #fff;     /* 背景颜色 */
+  padding: 20px;              /* 内边距 */
+  border-radius: 8px;         /* 圆角 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  /* 盒子阴影 */
+  margin-bottom: 20px;        /* 下边距 */
+  margin-right: 30px;
 }
 
-.user_text {
-    width: 60%;
-    height: 100%;
-    line-height: 30px;
+.recharge div, .withdraw div, .changewp div {
+  font-size: 18px;            /* 标题字体大小 */
+  margin-bottom: 10px;        /* 标题下边距 */
 }
 
-.user_name {
-    font-weight: bold;
+.recharge button, .withdraw button, .changewp button {
+  background-color: #2196f3;  /* 按钮背景颜色 */
+  color: white;               /* 按钮字体颜色 */
+  padding: 10px 20px;         /* 按钮内边距 */
+  margin-right: 10px;         /* 按钮右边距 */
+  border: none;               /* 去掉按钮边框 */
+  border-radius: 5px;         /* 按钮圆角 */
+  cursor: pointer;            /* 鼠标悬停时显示手形光标 */
 }
 
-.user-v {
-    margin-bottom: -5px;
+.recharge button:hover, .withdraw button:hover, .changewp button:hover {
+  background-color: #1e88e5;  /* 悬停时的背景颜色 */
 }
 
-.user-v-img {
-    width: 15px;
-    height: 15px;
+.el-form-item {
+  margin-bottom: 15px;        /* 表单项下边距 */
 }
 
-.user-v-font {
-    font-size: 15px;
-    color: #00c3ff;
+.el-form-item input {
+  width: 100%;                /* 输入框宽度 */
+  padding: 10px;              /* 输入框内边距 */
+  border-radius: 4px;         /* 输入框圆角 */
+  border: 1px solid #ccc;     /* 输入框边框 */
+  box-sizing: border-box;     /* 盒子大小包含内边距和边框 */
 }
 
-.user_qianming {
-    font-size: 14px;
-    color: #999;
-}
-
-.user_num {
-    width: 40%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-}
-
-.user_num>div {
-    text-align: center;
-    border-right: 1px dotted #999;
-    box-sizing: border-box;
-    width: 80px;
-    height: 40px;
-    line-height: 20px;
-}
-
-.num_text {
-    color: #999;
-}
-
-.num_number {
-    font-size: 20px;
-    color: #333;
-}
-
-.el-menu-item>span {
-    font-size: 16px;
-    color: #999;
-}
-
-/*下面部分样式*/
+/* style */
 .person_body {
-    width: 85vw;
-    position:relative;
-    left: 0%;
-    border-radius: 5px;
-    top: 10%;   
+  padding: 20px;
+  background-color: #ffd666;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  margin-right: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.person_body_left {
-    width: 27%;
-    height: 600px;
-    border-radius: 5px;
-    margin-right: 3%;
-    text-align: center;
+.margin-top {
+  margin-top: 20px;
 }
 
-.person_body_list {
-    width: 100%;
-    height: 50px;
-    margin-top: 25px;
-    font-size: 22px;
-    border-bottom: 1px solid #f0f0f0;
-    background-image: -webkit-linear-gradient(left,
-            rgb(42, 134, 141),
-            #e9e625dc 20%,
-            #3498db 40%,
-            #e74c3c 60%,
-            #09ff009a 80%,
-            rgba(82, 196, 204, 0.281) 100%);
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-    -webkit-background-size: 200% 100%;
-    -webkit-animation: masked-animation 4s linear infinite;
+/* el-descriptions 样式 */
+.el-descriptions {
+  background-color: #fff;
+  border: 2px solid #ffcc00;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.el-menu-item {
-    margin-top: 22px;
+.el-descriptions-item {
+  margin-bottom: 10px;
 }
 
-.person_body_right {
-    width: 70%;
-    /* height: 500px; */
-    border-radius: 5px;
-    background-color: white;
+.el-descriptions-item i {
+  margin-right: 8px;
+  color: #409eff;
 }
 
-.box-card {
-    height: 500px;
-}
-
-/*ui样式*/
+/* 按钮样式 */
 .el-button {
-    width: 84px;
+  margin-left: 10px;
 }
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 0;
+}
+
+/* 编辑表单样式 */
+.updateinfo {
+  margin-top: 20px;
+}
+
+.el-form-item {
+  margin-bottom: 15px;
+}
+
+.el-input,
+.el-time-picker {
+  width: 100%;
+}
+
+.el-radio-group {
+  display: flex;
+  align-items: center;
+}
+
+.el-radio {
+  margin-right: 20px;
+}
+
+/* 钱包按钮样式 */
+/*button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #409eff;
+  color: #fff;
+  cursor: pointer;
+}*/
+
+.wallet-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #ffcc00;
+    color: black;
+
+    &:hover {
+        background-color: #ffdd00;
+    }
+}
+
+.edit-button {
+    cursor: pointer;
+    background-color: #ffcc00;
+    color: white;
+
+    &:hover {
+        background-color: #ffdd00;
+    }
+}
+
+.submit-button {
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+
+    &:hover {
+    background-color: #45a049;
+    }
+}
+
+.exit-button {
+    margin-top: 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background-color: #f44336;
+    color: white;
+
+    &:hover {
+        background-color: #ff5b58;
+    }
+}
+
+.cancel-button {
+    cursor: pointer;
+    background-color: #f44336;
+    color: white;
+
+    &:hover {
+        background-color: #ff5b58;
+    }
+}
+
 </style>
