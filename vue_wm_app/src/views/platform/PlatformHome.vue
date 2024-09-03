@@ -45,6 +45,18 @@ const gotoStatistic = () => {
     console.log('isPlatformHome:',isPlatformHome.value);
     router.push('/platform-home/statistic-manage');
 }
+const fetchMerAvgRating = async () => {
+  try {
+    for (let info of showMerchantsInfo.value) {
+      const avgRating = await getMerAvgRating(info.merchantId);
+      console.log(`Merchant ID: ${info.merchantId}, Avg Rating: ${avgRating}`);
+      info.avgRating = avgRating; // 将平均评分添加到商家信息对象中
+    }
+    console.log("商家信息", showMerchantsInfo.value);
+  } catch (error) {
+    console.error('Failed to fetch merchant average ratings:', error);
+  }
+};
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  

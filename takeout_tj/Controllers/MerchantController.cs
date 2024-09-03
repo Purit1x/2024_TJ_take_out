@@ -1073,7 +1073,36 @@ namespace takeout_tj.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-		}
+        }
+        [HttpGet]
+        [Route("getFinishedMerOrders")]
+        public async Task<IActionResult>GetFinishedMerOrders(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+                var orders = await _context.Orders
+                    .Where(o => orderMerchant.Contains(o.OrderId) && o.State == 3)
+                    .ToListAsync();
+                if(!orders.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家尚无已送达订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()
