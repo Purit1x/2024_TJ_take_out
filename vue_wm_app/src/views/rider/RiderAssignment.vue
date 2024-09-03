@@ -255,16 +255,16 @@ async function handleDeliverOrder(data) {
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in receivableOrders" :key="index">
                         <el-descriptions title="订单">
-                            <el-descriptions-item label="订单号：">{{ orderItem.order.orderId }}</el-descriptions-item>
-                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.order.orderId)
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.order.orderId }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.order.orderId)
+                            <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.order.orderId)
                                 }}&nbsp;元</el-descriptions-item>
                         </el-descriptions>
                         <div>
@@ -285,16 +285,16 @@ async function handleDeliverOrder(data) {
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in receivedOrders" :key="index">
                         <el-descriptions title="订单">
-                            <el-descriptions-item label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
-                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.orderId)
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.orderId)
+                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.orderId)
+                            <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.orderId)
+                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.orderId)
+                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.orderId)
                                 }}&nbsp;元</el-descriptions-item>
                         </el-descriptions>
                         <div>
@@ -314,12 +314,12 @@ async function handleDeliverOrder(data) {
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in finishedOrders" :key="index">
                         <el-descriptions title="订单" >
-                            <el-descriptions-item label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
-                            <el-descriptions-item label="商户地址：">{{ displayMerchantAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="交付地址：">{{ displayTargetAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="收货人：">{{ displayTargetName(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="客户电话：">{{ displayTargetPhone(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item label="配送费：">{{ displayDeliveryFee(orderItem.orderId) }}&nbsp;元</el-descriptions-item> 
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.orderId) }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.orderId) }}&nbsp;元</el-descriptions-item> 
                         </el-descriptions>       
                              
                     </div>
