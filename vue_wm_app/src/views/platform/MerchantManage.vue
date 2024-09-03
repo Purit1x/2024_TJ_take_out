@@ -3,7 +3,7 @@ import { useStore } from "vuex";
 import { ElMessage,ElMessageBox } from "element-plus";
 import { ref, onMounted } from 'vue';  
 import { useRouter } from 'vue-router';
-import { getMerchantIds,getMerchantsInfo } from "@/api/user";
+import { getMerchantIds,getMerchantsInfo,getAllMerchantsInfo } from "@/api/user";
 import { merchantDeleteService } from "@/api/platform";
 import { getMerAvgRating } from "@/api/merchant";
 const router = useRouter();
@@ -14,21 +14,39 @@ const searchQuery = ref(''); // 搜索框内容
 const isMerchantInfo= ref(false); // 是否显示商家信息
 const currentMerchantId = ref(null); // 当前商家id
 const MerchantInfo=ref({});  //商户信息
+
+const sortField = ref(''); // 搜索框内容
+const sortOrder = ref('1'); // 搜索框内容
 const parentBorder=ref(false);
 const childBorder=ref(false);
-
-onMounted(async() => {
-    await getMerchantIds().then(res => {  // 获取所有商家id
-        merchantIds.value = res.data;  
-        return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
-    }).then(responses => {  
-        merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
-        showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
-    }).catch(err => {  
-        ElMessage.error('获取商家id失败'); 
-    }); 
+onMounted(() => {
+    
+    // getMerchantIds().then(res => {  // 获取所有商家id
+    //     merchantIds.value = res.data;  
+    //     return Promise.all(merchantIds.value.map(id => getMerchantsInfo(id))); // 并发请求所有商家信息
+    // }).then(responses => {  
+    //     merchantsInfo.value = responses.map(response => response.data); // 提取商家信息  
+    //     showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
+    // }).catch(err => {  
+    //     ElMessage.error('获取商家id失败'); 
+    // }); 
+    getMerchantIds().then(res => { 
+    merchantIds.value = res.data;  
+    });
+    getAllMerchantsInfo().then(res=>{
+        merchantsInfo.value  = res.data;
+        showMerchantsInfo.value = merchantsInfo.value;
+        // fetchDefaultAddress();
+    })
     await fetchMerAvgRating();
 });
+
+const sortCoupons = () => {
+  getAllMerchantsInfo(sortField.value,sortOrder.value).then(res=>{
+    merchantsInfo.value  = res.data;
+    showMerchantsInfo.value = merchantsInfo.value;
+  })
+
 const fetchMerAvgRating = async () => {
   try {
     for (let info of showMerchantsInfo.value) {
@@ -40,6 +58,7 @@ const fetchMerAvgRating = async () => {
   } catch (error) {
     console.error('Failed to fetch merchant average ratings:', error);
   }
+
 };
 const formatTime=(seconds)=> {  
     const hours = Math.floor(seconds / 3600);  
@@ -98,10 +117,29 @@ const gobackHome = () => {
             <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
             <button @click="handleSearch()">搜索</button>
         </div>
+        <div>
+              <label>排序字段:</label>  
+                <select v-model="sortField" @change="sortCoupons">  
+                  <option value="1">评分</option>  
+                    <option value="2">销售额</option>  
+                    <option value="3">销量</option>
+                </select>  
+                &nbsp;&nbsp;
+                <label>排序方式:</label>  
+                <select v-model="sortOrder" @change="sortCoupons">  
+                    <option value="1">升序</option>  
+                    <option value="2">降序</option>  
+                </select>  
+                &nbsp;&nbsp;
+            </div>
+
         <ul>  
             <li v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">  
                 <span>{{ merchant.merchantName }}</span> 
                 <span>&nbsp;&nbsp;{{ merchant.dishType }}</span>
+                <span>&nbsp;&nbsp;{{ merchant.allPrice }}</span>
+                <span>&nbsp;&nbsp;{{ merchant.allCount }}</span>
+                <span>&nbsp;&nbsp;{{ merchant.merchantRating }}</span>
                 <span>&nbsp;<button @click="enterMerchantInfo(merchant.merchantId)">></button></span>
             </li>  
         </ul> 

@@ -91,31 +91,52 @@ function displayTotalWageWithinThisMonth() {
 </script>
 
 <template>
-    <div>
-        <br><br>
-        <h2>您所在的位置：工资记录</h2>
-        <h3>您本月送单总量：{{ orderNum }} 您本月获得的总配送费为： {{ displayTotalWageWithinThisMonth() }}</h3>
-    </div>
-    <div class="fees-scroll">
-        <el-table max-height="500px" :data="finishedOrders"     
-        :default-sort="{ prop: 'dateTime', order: 'descending' }"
-        border stripe>
-            <el-table-column prop="orderId" sortable label="订单号" width="200" />
-            <el-table-column prop="deliveryFee" sortable label="配送费" width="200" />
-            <el-table-column prop="dateTime" sortable label="订单时间" />
-        </el-table>
-    </div>
+    <div class="main_body">
+        <div class="person_body">
+            <div>
+                <h2>工资记录</h2>
+                <h3>您本月送单总量：{{ orderNum }} </h3>
+                <h3>您本月获得的总配送费为： {{ displayTotalWageWithinThisMonth() }}</h3>
+            </div>
+        
+            <div class="fees-scroll">
+                <el-table max-height="500px" :data="finishedOrders"     
+                :default-sort="{ prop: 'dateTime', order: 'descending' }"
+                border stripe>
+                    <el-table-column prop="orderId" sortable label="订单号"  />
+                    <el-table-column prop="deliveryFee" sortable label="配送费"  />
+                    <el-table-column prop="dateTime" sortable label="订单时间" />
+                </el-table>
+            </div>
+        </div>
+    </div>  
 </template>
 
 <style scoped>
+
+.main_body {
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
 .fees-scroll {
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center; */
     border: 1px solid transparent;
-    /* 使订单区域可以滚动 */
-    margin-left: 20px;
-    width: 70%;
+    width: 100%;
+}
+
+.person_body {
+  padding: 20px;
+  background-color: #ffd666;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-left:20%;
+  width: 60%;
+  text-align: center;
+
 }
 
 .fee-item {
