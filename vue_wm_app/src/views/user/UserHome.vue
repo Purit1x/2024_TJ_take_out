@@ -1,5 +1,5 @@
 <script setup>  
-import { ref, onMounted, watch } from 'vue';  
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';  
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
@@ -24,6 +24,7 @@ const showMerchantsInfo = ref([]); // 显示商家信息列表
 const hasDefaultAddress = ref(true); // 用于跟踪是否有默认地址
 const DefaultAddress=ref(null); // 用于跟踪默认地址
 const DefaultAddressId=ref(null); // 用于跟踪默认地址id
+let updateAvgRatingItv = null;
 onMounted(async() => {  
   const userData = store.state.user; 
   if(router.currentRoute.value.path !== '/user-home')
@@ -48,7 +49,13 @@ onMounted(async() => {
     ElMessage.error('获取商家id失败'); 
   }); 
   await fetchMerAvgRating();
+  updateAvgRatingItv = setInterval(fetchMerAvgRating,5000);
+
 }); 
+onBeforeUnmount(() => {
+  if(updateAvgRatingItv)
+    clearInterval(updateAvgRatingItv);
+})
 const fetchMerAvgRating = async () => {
   try {
     for (let info of showMerchantsInfo.value) {
@@ -119,6 +126,7 @@ watch(
 );   
 // 返回主页函数
 const gobackHome = () => {
+
   router.push('/user-home');
 };
 // 跳转到个人信息  
@@ -263,9 +271,9 @@ provide('merchantsInfo', merchantsInfo);
                 <tr v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">
                   <td class="col-name">{{ merchant.merchantName }}</td> 
                   <td class="col-type">{{ merchant.dishType }}</td>
-
-                  <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
                   <td class="col-Rating">评分：{{ merchant.avgRating }}</td>
+                  <span v-if="hasDefaultAddress">&nbsp;&nbsp;{{ merchant.distanceFromDefaultAddress }}km</span>
+                  
 
                   <td class="col-enter"><button @click="enterDishes(merchant.merchantId)">></button></td>
                   <td class="col-favorite"><button @click="addToFavorite(merchant.merchantId)">收藏</button></td>
