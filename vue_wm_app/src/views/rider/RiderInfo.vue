@@ -146,8 +146,6 @@
                 </el-button>
             </div>
         </div>
-        <div class="personInfo">
-        </div>
     </div>
 
     <el-dialog v-model="isWithdraw" width="500" title="提现页面" draggable>
