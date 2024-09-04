@@ -411,14 +411,14 @@ th {
 
 .search-button {
   border-radius: 50%;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .search-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 
@@ -453,7 +453,7 @@ th {
 .filter-button {
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   cursor: pointer;
@@ -461,7 +461,7 @@ th {
 }
 
 .filter-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 
@@ -514,7 +514,7 @@ th {
 .col-favorite button {
   padding: 6px 12px;
   border-radius: 20px;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   cursor: pointer;
@@ -523,7 +523,7 @@ th {
 
 .col-enter button:hover,
 .col-favorite button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 </style>
