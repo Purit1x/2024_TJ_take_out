@@ -5,10 +5,6 @@ import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 import { useStore } from "vuex"  
 import { getOrderCoupon,getOrderDishes,GetAddressByAddressId,getMerchantsInfo,GetCouponInfo,userInfo,PurchaseOrder,deleteOrder } from '@/api/user'
-
-import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder } from '@/api/merchant'
-
-
 import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder ,getFinishedMerOrders} from '@/api/merchant'
 
 const store = useStore()    
@@ -66,7 +62,12 @@ const renewOrders = async() => {  //更新order信息
           completedOrders.value=[];
           return;
         }
-        orders.value = ordersData.data;
+        //orders.value = ordersData.data;
+        // 给每个订单添加 hover 属性
+        orders.value = ordersData.data.map(order => ({
+          ...order,
+          hover: false,
+        }));
         const newOrderIds = new Set(orders.value.filter(order => order.state === 1 || order.state === 2).map(order => order.orderId)); 
         for (const orderId of newOrderIds) {  
             if (!preOrderIds.has(orderId)) {  
@@ -214,7 +215,6 @@ provide('isMerchantHome', isMerchantHome);
 </script>  
 
 <template>
-  <div>
     <!-- 左侧导航栏 在dish和personal界面下出现主页按钮的虚影，不知道是哪里的bug-->
     <nav class="sidebar">
       <slot class="sidebar-content">
@@ -247,7 +247,7 @@ provide('isMerchantHome', isMerchantHome);
     <div  v-if="isMerchantHome" class="content">
       <header>
         <!-- #Q# 考虑将MerchantId改为MerchantName -->
-        <span class="welcome-text">欢迎，{{ merchant.merchantName }}!</span>
+        <span class="welcome-text">欢迎&nbsp;{{ merchant.merchantName }}!</span>
         <!-- <span class="revenue-text">今日营收：{{ todayRevenue }}元    </span>-->
       </header>
       <!-- 当前订单 实际变量根据平台方订单结构调整 -->
@@ -266,63 +266,57 @@ provide('isMerchantHome', isMerchantHome);
             :class="{ active: showState === 3 }"
           >已完成订单</label>&nbsp;&nbsp;
         </h2>
-        <div class="orders-scroll" v-if="showState===1">
-          <div 
-            class="order-item" 
-            v-for="(order, index) in pendingOrders" 
-            :key="index"
-            @click="enterOrderInfo(order)"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-           :style="{ backgroundColor: hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
-          >
-            <div>订单号：{{order.orderId}}</div>
-            <div>订单总价：{{order.price}}元</div>
-            <div>订单创建时间：{{ order.orderTimestamp }}</div>
-            <div>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</div>
-         </div>
-        </div>
-        <div class="orders-scroll" v-if="showState===2">
-          <div 
-            class="order-item" 
-            v-for="(order, index) in deliveringOrders" 
-            :key="index"
-            @click="enterOrderInfo(order)"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-           :style="{ backgroundColor: hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
-          >
-            <div>订单号：{{order.orderId}}</div>
-            <div>订单总价：{{order.price}}元</div>
-            <div>订单创建时间：{{ order.orderTimestamp }}</div>
-            <div>预计送达时间: {{ order.expectedTimeOfArrival }}</div>
-            
+
+        <div class="orders-container">
+          <div class="orders-scroll" v-if="showState===1">
+            <div 
+              class="order-item" 
+              v-for="(order, index) in pendingOrders" 
+              :key="index"
+              @click="enterOrderInfo(order);order.hover = false"
+              @mouseover="order.hover = true"
+              @mouseleave="order.hover = false"
+            :style="{ backgroundColor: order.hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
+            >
+              <div>订单号：{{order.orderId}}</div>
+              <div>订单总价：{{order.price}}元</div>
+              <div>订单创建时间：{{ order.orderTimestamp }}</div>
+              <div>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</div>
+            </div>
           </div>
-        </div>
-        <div class="orders-scroll" v-if="showState===3">
-          <div 
-            class="order-item" 
-            v-for="(order, index) in completedOrders" 
-            :key="index"
-            @click="enterOrderInfo(order)"
-            @mouseover="hover = true"
-            @mouseleave="hover = false"
-           :style="{ backgroundColor: hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
-          >
-            <div>订单号：{{order.orderId}}</div>
-            <div>订单总价：{{order.price}}元</div>
-            <div>订单创建时间：{{ order.orderTimestamp }}</div>
-            <div>送达时间:{{ order.realTimeOfArrival }}</div>
+          <div class="orders-scroll" v-if="showState===2">
+            <div 
+              class="order-item" 
+              v-for="(order, index) in deliveringOrders" 
+              :key="index"
+              @click="enterOrderInfo(order);order.hover = false"
+              @mouseover="order.hover = true"
+              @mouseleave="order.hover = false"
+            :style="{ backgroundColor: order.hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
+            >
+              <div>订单号：{{order.orderId}}</div>
+              <div>订单总价：{{order.price}}元</div>
+              <div>订单创建时间：{{ order.orderTimestamp }}</div>
+              <div>预计送达时间: {{ order.expectedTimeOfArrival }}</div>
+              
+            </div>
           </div>
-        </div>
-        <div class="orders-scroll" v-if="showState===3">
-          <div class="order-item" v-for="(order,index) in completedOrders" :key="index">
-            <div>订单号：{{order.orderId}}</div>
-            <div>订单总价：{{order.price}}元</div>
-            <div>订单创建时间：{{ order.orderTimestamp }}</div>
-            <div>预计送达时间:</div>
-            
-            <button @click="enterOrderInfo(order)">></button>
+      
+          <div class="orders-scroll" v-if="showState===3">
+            <div 
+              class="order-item" 
+              v-for="(order, index) in completedOrders" 
+              :key="index"
+              @click="enterOrderInfo(order);order.hover = false"
+              @mouseover="order.hover = true"
+              @mouseleave="order.hover = false"
+            :style="{ backgroundColor: order.hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
+            >
+              <div>订单号：{{order.orderId}}</div>
+              <div>订单总价：{{order.price}}元</div>
+              <div>订单创建时间：{{ order.orderTimestamp }}</div>
+              <div>送达时间:{{ order.realTimeOfArrival }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -331,8 +325,8 @@ provide('isMerchantHome', isMerchantHome);
         <h2>菜单预览</h2>
         <img src="@\assets\merchant_menu.png" alt="菜单"/>
       </div>-->
-      <div v-if="isOrderInfo">
-        <h2 style="color: black; font-weight: bold ">订单详情</h2>
+      <div v-if="isOrderInfo" class = "order-info">
+        <span>订单详情</span>
         <p>订单号：{{currentOrder.orderId}}</p>
         <p>状态：{{ currentOrder.state===0?'未支付':currentOrder.state===1?'待处理':currentOrder.state===2?'派送中':currentOrder.state===3?'已完成':'未知状态' }}</p>
         <div>
@@ -351,11 +345,11 @@ provide('isMerchantHome', isMerchantHome);
         </ul>
         <p>优惠券：{{currentOrder.coupon?currentOrder.coupon.couponInfo.couponName:'无'}} &nbsp;{{currentOrder.coupon?'满'+currentOrder.coupon.couponInfo.minPrice+'减'+currentOrder.coupon.couponInfo.couponValue+'元':''}}</p>
         <p>总价：{{currentOrder.price}}元</p>
-        <button @click="leaveOrderInfo()" style="background-color: #ffcc00;color:black">返回</button>
+        <button @click="leaveOrderInfo()" class = "back">返回</button>
         <button v-if="currentOrder.state===1||currentOrder.state===2" @click="cancelOrder()">取消订单</button>
       </div>
     </div>
-  </div>
+
 </template>
 
 <script>
@@ -379,18 +373,18 @@ export default {
 };*/
 </script>
 
-<style scoped>
+<style scoped lang = "scss">
 h2 {
   display: flex;
   align-items: center;
   justify-content: space-between; /* 均匀分布标签 */
-  font-size: 18px;
+  font-size: 20px;
   margin: 20px;
-  padding: 10px;
+  padding: 5px;
   padding-left: 100px;
-  background-color: rgba(249, 249, 249, 0.1);
-  border-radius: 20px;
-  border: 2px solid #ffcc00;
+  background-color: #ffcc00;
+  border-radius: 40px;
+  border: 2px solid #000000;
 }
 
 .sidebar {
@@ -443,7 +437,7 @@ h2 {
 
 label {
   cursor: pointer;
-  color: #666; /* 默认颜色 */
+  color: #000000; /* 默认颜色 */
   border-radius:20px;
 }
 
@@ -453,8 +447,9 @@ label {
 }
 
 label.active {
-  background-color: rgb(255, 204, 0); /* 选中时的颜色 */
-  padding:15px;
+  background-color: rgb(255, 255, 255); /* 选中时的颜色 */
+  border:2px,solid,#000000;
+  padding:10px;
   border-radius:40px;
 }
 
@@ -463,25 +458,59 @@ label.active {
 }
 
 .orders-scroll {
-  max-height: 600px; /* 设置订单区域的最大高度 */
+  max-height: 390px; /* 设置订单区域的最大高度 */
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* 使订单区域可以滚动 */
-  margin-left: 20px;
+  margin-left: 10px;
+  margin-top:13px;
+}
+
+/* 隐藏滚动条 */
+.orders-scroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* 滚动条轨道 */
+.orders-scroll::-webkit-scrollbar-track {
+    background: #ffd666;
+}
+/* 滚动条滑块 */
+.orders-scroll::-webkit-scrollbar-thumb {
+    background-color: #ffd666;
+    border-radius: 10px;
+    border: 2px solid #000000;
 }
 
 .order-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px;
+  margin: 0 30px;     
+  margin-bottom: 10px;
+  border: 2px solid #ffee00;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.orders-container{
+    background-color: #ffd666;
+    border:2px solid black;
+    border-radius: 20px;
+    padding:5px;
+    
+    max-height: 410px; /* 设置订单区域的最大高度 */
+    min-height: 410px;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 10px;
-    margin: 0 80px;     
-    margin-bottom: 10px;
-    border: 2px solid #ffee00;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+    flex-direction: column;
+    overflow-y: auto; /* 使订单区域可以滚动 */
+    
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom:10px;
+}
 
 .order-item div{
   margin-left: 20px;
@@ -507,5 +536,99 @@ label.active {
 
 .menu-preview { 
   margin-bottom: 20px;
+}
+
+.order-info {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  margin-right:30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  span {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 10px 0;
+    
+    &.status {
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    
+    &:nth-child(odd) {
+      background-color: #fff;
+    }
+    
+    &:nth-child(even) {
+      background-color: #f1f1f1;
+    }
+  }
+
+  .contact-info {
+    margin-top: 15px;
+    p {
+      margin: 5px 0;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    
+    li {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      
+      img {
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .coupon-info {
+    margin: 20px 0;
+    font-style: italic;
+  }
+
+  .total-price {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-right: 10px;
+
+    &.back {
+      background-color: #ffcc00;
+      color: black;
+      
+      &:hover {
+        background-color: #ffb700;
+      }
+    }
+
+    &.cancel {
+      background-color: #f44336;
+      color: white;
+
+      &:hover {
+        background-color: #d32f2f;
+      }
+    }
+  }
 }
 </style>
