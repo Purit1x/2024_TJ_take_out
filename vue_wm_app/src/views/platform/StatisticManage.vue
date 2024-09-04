@@ -70,7 +70,7 @@
 <style scoped lang="scss">
 .box{
     padding: 20px;
-    background-color: #ffd666;
+    background-color: #7ac2ee;
     border: 2px solid #000000;
     border-radius: 20px;
     margin-right: 30px;
@@ -89,34 +89,36 @@
     position: absolute;
     right: 10px;
     bottom: 10px;
-    background-color: #f69c36;
+    background-color: #FFC0CB;
 }
 .return:hover{
-    background-color: #eb732d;
+    background-color: #f7ced5;
 }
 .head{
     display:flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
     left:50%;
-    font-size: 4vmin; /* 字体大小 */
-    color:#583004;
+    font-size: 4.5vmin; /* 字体大小 */
+    color:#000000;
+
 }
 .choose{
     padding: 5px 8px;         /* 按钮内边距 */
     margin-right: 8px;         /* 按钮右边距 */
-    background-color: #f3a144;
+    background-color: #f68396;
     font-size: 2.5vmin; /* 字体大小 */
 }
 .choose:hover{
-    background-color: #eb732d;
+    background-color: #FFC0CB;
 }
 .head2{
-    margin-top:5%;
+    margin-top:4%;
+    margin-bottom: 3%;
     display:flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
-    color:#eb732d;
+    color:#54141f;
 }
 .input{
     display:flex;
@@ -131,7 +133,9 @@
     display:flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
+    margin-top:1%;
    // width:100%;
     font-size: 3vmin;
+    color:#583def;
 }
 </style>
