@@ -1103,6 +1103,28 @@ namespace takeout_tj.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet]
+        [Route("getMerRating")]
+        public async Task<IActionResult>GetMerRating(int orderId)
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Where(ou => ou.OrderId == orderId)
+                    .Select(ou => ou.MerchantRating)
+                    .ToListAsync();
+
+				if (!orders.Any())
+				{
+					return Ok(new { data = 0, msg = "无评分" });
+				}
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()
