@@ -290,102 +290,188 @@ const confirmPurchase = async () => {
 </script>
 
 <template>
-    <div class="content">
+  <div class="content">
     <div>
-        <h2>
-            下单
-            <button @click="gobackHome">返回</button>
-        </h2>
-        <div>
-            <div>联系人与地址：&nbsp;&nbsp;<button @click="showAddressDialog=true">更换></button></div>
-            <div v-if="hasDefaultAddress">
-                {{ choosedAddress.contactName }}&nbsp;&nbsp;
-                {{ choosedAddress.phoneNumber }}&nbsp;&nbsp;
-                <div>
-                    {{ choosedAddress.userAddress }}&nbsp;&nbsp;
-                    {{ choosedAddress.houseNumber }}&nbsp;&nbsp;      
-                </div>
+      <h2 class="order-header">
+        下单
+        <button class="action-button" @click="gobackHome">返回</button>
+      </h2>
+      <div class="address-section">
+        <div class="address-info">
+          联系人与地址：&nbsp;&nbsp;
+          <button class="action-button" @click="showAddressDialog=true">更换</button>
+        </div>
+        <div v-if="hasDefaultAddress" class="default-address">
+          {{ choosedAddress.contactName }}&nbsp;&nbsp;
+          {{ choosedAddress.phoneNumber }}&nbsp;&nbsp;
+          <div>
+            {{ choosedAddress.userAddress }}&nbsp;&nbsp;
+            {{ choosedAddress.houseNumber }}&nbsp;&nbsp;
+          </div>
+        </div>
+        <div v-if="!hasDefaultAddress" class="no-address">
+          <div v-if="!choosedAddress.contactName">尚未设置默认地址，请选择地址。</div>
+          <div v-else>
+            {{ choosedAddress.contactName }}&nbsp;&nbsp;
+            {{ choosedAddress.phoneNumber }}&nbsp;&nbsp;
+            <div>
+              {{ choosedAddress.userAddress }}&nbsp;&nbsp;
+              {{ choosedAddress.houseNumber }}&nbsp;&nbsp;
             </div>
-            <div v-if="!hasDefaultAddress">
-                <div v-if="!choosedAddress.contactName">尚未设置默认地址，请选择地址。</div>
-                <div v-else>
-                    {{ choosedAddress.contactName }}&nbsp;&nbsp;
-                    {{ choosedAddress.phoneNumber }}&nbsp;&nbsp;
-                    <div>
-                        {{ choosedAddress.userAddress }}&nbsp;&nbsp;
-                        {{ choosedAddress.houseNumber }}&nbsp;&nbsp;      
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-        <div>
-            <p>订单：</p>
-            <ul>
-            <li v-for="item in shoppingCart" :key="item.dishId">
-              <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-              {{item.dishName}}：{{item.dishPrice}}元 &nbsp;&nbsp;
-              ×{{item.dishNum}}  <!-- 显示商品数量 -->
-            </li>
-          </ul>
-          <strong>总价: {{ MerchantPrice }} 元</strong><span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
-        </div>
-        <div>
-            优惠券：
-            {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }}
-            <button @click="showCouponDialog=true">更换></button>
-        </div>
-        <div>打包费：{{ packetPrice }}元</div>
-        <div>骑手配送费：{{ choosedAddress.userAddress ? riderPrice+"元" : "请选择地址" }}</div>
-        <strong>应付金额: {{ FinalPrice }} 元</strong>
-        <div>  
-            <label>  
-                <input type="checkbox" v-model="isNeedUtensils" />  
-                需要餐具  
-            </label>  
-        </div>  
-        <div><button @click="submitOrder()">提交订单</button></div>
+      </div>
+      <div class="order-details">
+        <p>订单：</p>
+        <ul>
+          <li v-for="item in shoppingCart" :key="item.dishId" class="order-item">
+            <img :src="item.imageUrl" alt="菜品图片" class="dish-image">
+            {{ item.dishName }}：{{ item.dishPrice }}元 &nbsp;&nbsp;×{{ item.dishNum }}
+          </li>
+        </ul>
+        <strong>总价: {{ MerchantPrice }} 元</strong>
+        <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
+      </div>
+      <div class="coupon-section">
+        优惠券：
+        {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }}
+        <button class="action-button" @click="showCouponDialog=true">更换</button>
+      </div>
+      <div>打包费：{{ packetPrice }}元</div>
+      <div>骑手配送费：{{ choosedAddress.userAddress ? riderPrice+"元" : "请选择地址" }}</div>
+      <strong>应付金额: {{ FinalPrice }} 元</strong>
+      <div class="utensils-section">
+        <label>
+          <input type="checkbox" v-model="isNeedUtensils" />需要餐具
+        </label>
+      </div>
+      <div class="submit-order">
+        <button class="submit-button" @click="submitOrder()">提交订单</button>
+      </div>
     </div>
-    <!-- 地址选择弹出框 -->  
-    <el-dialog title="选择地址" :model-value="showAddressDialog" width="600px"  @close="showAddressDialog=false">  
-            <div>  
-                <ul>  
-                    <li v-for="address in Addresses" :key="address.id" @click="selectAddress(address)">  
-                        {{ address.contactName }} - {{ address.userAddress }} {{ address.houseNumber }}  
-                        <button @click="selectAddress(address)">选择</button>
-                    </li>  
-                </ul>  
-            </div>  
-            <span class="dialog-footer">  
-                <el-button @click="showAddressDialog = false">取消</el-button>  
-            </span>  
-    </el-dialog>  
-    <!-- 优惠券选择弹出框 -->  
-     <el-dialog title="选择优惠券" :model-value="showCouponDialog" width="800px"  @close="showCouponDialog=false">  
-            <div>  
-                <ul>  
-                    <li v-for="coupon in coupons" :key="coupon.couponId" @click="selectCoupon(coupon)">  
-                        {{ coupon.couponName }} 满{{coupon.minPrice}}减{{ coupon.couponValue }}元 过期时间：{{ coupon.expirationDate }}  &nbsp;&nbsp;&nbsp;×{{ coupon.amountOwned }}
-                        <button @click="selectCoupon(coupon)">选择</button>
-                    </li>  
-                </ul>  
-            </div>  
-            <span class="dialog-footer">  
-                <el-button @click="noCoupon()">取消使用优惠券</el-button>  
-            </span>  
+
+    <!-- 地址选择弹出框 -->
+    <el-dialog title="选择地址" :model-value="showAddressDialog" width="600px" @close="showAddressDialog=false">
+      <div>
+        <ul>
+          <li v-for="address in Addresses" :key="address.id" @click="selectAddress(address)">
+            {{ address.contactName }} - {{ address.userAddress }} {{ address.houseNumber }}
+            <button class="select-button" @click="selectAddress(address)">选择</button>
+          </li>
+        </ul>
+      </div>
+      <span class="dialog-footer">
+        <el-button @click="showAddressDialog = false">取消</el-button>
+      </span>
     </el-dialog>
-     <!-- 弹窗 -->  
-     <el-dialog title="输入支付密码" :model-value="showPayDialog" @close="cancelPurchase()">  
-        <el-input   
-            type="password"   
-            v-model="paymentPassword"   
-            placeholder="请输入6位支付密码"   
-            clearable   
-        />  
-        <div v-if="paymentError" style="color: red;">{{ paymentError }}</div>  
-        <template #footer>  
-            <el-button @click="cancelPurchase()">取消</el-button>  
-            <el-button type="primary" @click="confirmPurchase()">确认</el-button>  
-        </template>  
-    </el-dialog>  
-    </div>
+
+    <!-- 优惠券选择弹出框 -->
+    <el-dialog title="选择优惠券" :model-value="showCouponDialog" width="800px" @close="showCouponDialog=false">
+      <div>
+        <ul>
+          <li v-for="coupon in coupons" :key="coupon.couponId" @click="selectCoupon(coupon)">
+            {{ coupon.couponName }} 满{{coupon.minPrice}}减{{ coupon.couponValue }}元 过期时间：{{ coupon.expirationDate }}
+            &nbsp;&nbsp;&nbsp;×{{ coupon.amountOwned }}
+            <button class="select-button" @click="selectCoupon(coupon)">选择</button>
+          </li>
+        </ul>
+      </div>
+      <span class="dialog-footer">
+        <el-button @click="noCoupon()">取消使用优惠券</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 支付弹窗 -->
+    <el-dialog title="输入支付密码" :model-value="showPayDialog" @close="cancelPurchase()">
+      <el-input type="password" v-model="paymentPassword" placeholder="请输入6位支付密码" clearable />
+      <div v-if="paymentError" class="payment-error">{{ paymentError }}</div>
+      <template #footer>
+        <el-button @click="cancelPurchase()">取消</el-button>
+        <el-button type="primary" @click="confirmPurchase()">确认</el-button>
+      </template>
+    </el-dialog>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.content {
+  padding: 20px;
+  background-color: #f9f9f9;
+  margin-left: 120px; /* 给侧边栏留出空间 */
+}
+
+.order-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.address-section,
+.order-details,
+.coupon-section {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dish-image {
+  width: 50px;
+  height: 50px;
+}
+
+.action-button {
+  padding: 10px 15px;
+  border-radius: 25px;
+  background-color: #dda0dd;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.action-button:hover {
+  background-color: #d8bfd8;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  background-color: #dda0dd;
+  color: #fff;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #d8bfd8;
+}
+
+.select-button {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background-color: #dda0dd;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.select-button:hover {
+  background-color: #d8bfd8;
+}
+
+.utensils-section {
+  margin-bottom: 20px;
+}
+
+.payment-error {
+  color: red;
+}
+</style>
