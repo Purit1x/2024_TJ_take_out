@@ -305,7 +305,7 @@ const cancelOrder = async() => {
         <div v-if="showState===2">
             <el-scrollbar max-height="500px">
                 <ul>
-                    <li v-for="(order,index) in deliveringOrders":key ="inkey">
+                    <li v-for="(order,index) in deliveringOrders":key ="index">
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{ order.price }}元</p>
                         <p>订单创建时间：{{ order.orderTimestamp }}</p>
@@ -327,7 +327,7 @@ const cancelOrder = async() => {
             </ul> -->
             <el-scrollbar max-height="500px">
                 <ul>
-                <li v-for="(order,index) in completedOrders":key ="inkey">
+                <li v-for="(order,index) in completedOrders":key ="index">
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
                     <p>订单创建时间：{{ order.orderTimestamp }}</p>
