@@ -88,30 +88,27 @@ function displayOrdersComment(orderId) {
 
 
 <template>
-    <div>
-        <h2>评论管理</h2>
-        <button @click="gobackHome">返回</button>
-        <el-table :data="finishedOrders" style="width:100%">
-            <el-table-column label="订单号" width="180">
-                <template #default="scope">
-                    <div style="display: flex; align-items: center">
-                        
-                        <span style="margin-left: 10px">{{ scope.row.orderId }}</span>
+    <div class="box">
+        <div class="head">评论管理</div>
+        <el-table :data="finishedOrders"  class="table" border>
+            <el-table-column label="订单号" width="180" align="center">
+                <template #default="scope" align="center">
+                    <div style="display: flex; align-items: center; justify-content: center;" class="comment">
+                        <span style="margin-left: 10px" align="center">{{ scope.row.orderId }}</span>
                     </div>
                 </template>
             </el-table-column>
 
-            <el-table-column label="评论" width="180">
+            <el-table-column label="评论" width="540" align="center">
                 <template #default="scope">
-                    <div style="display: flex; align-items: center">
-                        
-                        <span style="margin-left: 10px">{{ displayOrdersComment(scope.row.orderId) }}</span>
+                    <div style="display: flex; align-items: center; justify-content: center;" class="comment">
+                        <span style="margin-left: 10px;">{{ displayOrdersComment(scope.row.orderId) }}</span>
                     </div>
                 </template>
             </el-table-column>
 
-            <el-table-column label="操作">
-                <template #default="scope">
+            <el-table-column label="操作" align="center">
+                <template #default="scope" align="center">
                     <el-button
                         size="small"
                         type="danger"
@@ -122,5 +119,73 @@ function displayOrdersComment(orderId) {
                 </template>
             </el-table-column>
         </el-table>
+        <button @click="gobackHome" class="return">返回</button>
     </div>
 </template>
+<style scoped lang="scss">
+.comment{
+    display: flex;
+    width:100%;
+    text-align: center;
+}
+.table{
+    margin-top:10px;
+    margin-left:5%;
+    height:80%;
+    width:90%;
+    border-radius: 20px;
+    border: 2px solid #01042a;
+    table-layout: auto;
+}
+
+.box{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 60px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 70%;
+    height: 85%;
+
+    .el-table {
+        max-height: 100%; // 确保表格的最大高度不超过其父元素
+        overflow-y: auto; // 表格内部也启用滚动条
+    }
+}
+
+.return{
+    padding: 10px 15px;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+}
+.return:hover{
+    background-color: #f7ced5;
+}
+.head{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4vmin; /* 字体大小 */
+    color:#000000;
+}
+
+.input{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-left:30%;
+    margin-right:30%;
+    width:40%;
+    font-size: 3vmin;
+}
+</style>

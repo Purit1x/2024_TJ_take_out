@@ -217,22 +217,34 @@ const leaveCouponCreate = () => {
             <labal @click="showIsOnShelves" class="choose">上架中</labal>&nbsp;&nbsp;
             <labal @click="showNotOnShelves" class="choose">已下架</labal>
         </div>
-        <div>
+        <div class="top">
             <input type="text" v-model="searchQuery" placeholder="搜索Id或名称" v-on:keyup.enter="handleSearch()" class="inputtext"/> 
             <button @click="handleSearch()" class="search">搜索</button>
             <button @click="enterCouponCreate()" class="release">发布优惠券</button>
         </div>
         
-        <ul>  
-            <li v-for="coupon in showCouponsInfo" :key="coupon.couponId">  
-                <div class="show">
-                <span class="couponID">{{ coupon.couponId }}</span> 
-                <span class="couponName">&nbsp;&nbsp;{{ coupon.couponName }}</span> 
-                <span class="quantitySold">&nbsp;&nbsp;销量:{{ coupon.quantitySold }}</span> 
-                <span class="infoButton">&nbsp;<button @click="enterCouponInfo(coupon)" class="info">></button></span>
-                </div>
-            </li>  
-        </ul> 
+        <el-table :data="showCouponsInfo" style="width: 100%" class="table">
+        <el-table-column prop="couponId" label="优惠券ID" width="180">
+            <template #default="{ row }">
+                {{ row.couponId }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="couponName" label="优惠券名称" width="180">
+            <template #default="{ row }">
+                {{ row.couponName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="quantitySold" label="销量" width="150">
+            <template #default="{ row }">
+                {{ row.quantitySold }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作">
+            <template #default="{ row }">
+                <button  type="danger" size="small" @click="enterCouponInfo(row)" class="info">详情</button>
+            </template>
+        </el-table-column>
+    </el-table>
         
     </div>
 
@@ -297,23 +309,28 @@ const leaveCouponCreate = () => {
     </div>
 </template>
 <style scoped lang="scss">
+.top{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
 .search{
     padding: 5px 8px;         /* 按钮内边距 */
     margin-right: 8px;         /* 按钮右边距 */
-    background-color: #fab15e;
-    font-size: 2.8vmin; /* 字体大小 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
 }
 .release{
     padding: 5px 8px;         /* 按钮内边距 */
     margin-right: 8px;         /* 按钮右边距 */
-    background-color: #f69f48;
-    font-size: 2.8vmin; /* 字体大小 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
 }
 .body{
     display:flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
-    left:50%;
+    left:10%;
 }
 .main-choice{
     margin-top: 10px;
@@ -322,12 +339,15 @@ const leaveCouponCreate = () => {
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
     left:50%;
+    margin-bottom: 2%;
 }
 .inputtext{
     height: 30px;
     width: 250px;
     right:5%;
     font-size: 2.8vmin;
+    border-radius: 9px;
+    margin-right: 2%;
 }
 .show{
     display:flex;
@@ -337,13 +357,13 @@ const leaveCouponCreate = () => {
     height: 45px;
 }
 .info{
-    padding: 5px 11px;         /* 按钮内边距 */
-    margin-right: 70px;         /* 按钮右边距 */
-    background-color: #f69c36;
+    padding: 4px 20px;         /* 按钮内边距 */
+    //margin-right: 10px;         /* 按钮右边距 */
+    background-color: #f8a6b3;
     right: 10px;
 }
 .info:hover{
-    background-color: #eb732d;
+    background-color: #f7ced5;
 
 }
 .texttype{
@@ -377,7 +397,7 @@ const leaveCouponCreate = () => {
 
 .box{
     padding: 20px;
-    background-color: #ffd666;
+    background-color: #7ac2ee;
     border: 2px solid #000000;
     border-radius: 20px;
     margin-right: 30px;
@@ -396,10 +416,10 @@ const leaveCouponCreate = () => {
     position: absolute;
     right: 10px;
     bottom: 10px;
-    background-color: #f69c36;
+    background-color: #FFC0CB;
 }
 .return:hover{
-    background-color: #eb732d;
+    background-color: #f7ced5;
 }
 .head{
     display:flex;
@@ -407,24 +427,24 @@ const leaveCouponCreate = () => {
     align-items: center; /* 垂直居中 */
     left:50%;
     font-size: 4vmin; /* 字体大小 */
-    color:#583004;
+    color:#000000;
 }
 .choose{
     padding: 8px 8px;         /* 按钮内边距 */
     margin-right: 10px;         /* 按钮右边距 */
-    background-color: #f3a144;
+    background-color: #FFC0CB;
     font-size: 2.5vmin; /* 字体大小 */
     border-radius: 4px;
 }
 .choose:hover{
-    background-color: #eb732d;
+    background-color: #f7ced5;
 }
 .head2{
     margin-top:5%;
     display:flex;
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
-    color:#eb732d;
+    color:#2573f1;
 }
 .input{
     display:flex;
@@ -441,5 +461,14 @@ const leaveCouponCreate = () => {
     align-items: center; /* 垂直居中 */
    // width:100%;
     font-size: 3vmin;
+}
+.table{
+    margin-top:10px;
+    margin-left:0%;
+    height:100%;
+    width:100%;
+    border-radius: 20px;
+    //border: 2px solid #01042a;
+    table-layout: auto;
 }
 </style>
