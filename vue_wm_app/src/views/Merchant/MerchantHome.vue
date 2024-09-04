@@ -164,6 +164,7 @@ const cancelOrder = async() => {
         isOrderInfo.value = false;
         currentOrder.value = {};
         ElMessageBox.success('删除成功!');  
+        renewOrders();
     } catch (error) {  
         // 用户点击了"取消"，或者出现其他错误  
         if (error !== 'cancel') {  
@@ -247,7 +248,7 @@ provide('isMerchantHome', isMerchantHome);
     <div  v-if="isMerchantHome" class="content">
       <header>
         <!-- #Q# 考虑将MerchantId改为MerchantName -->
-        <span class="welcome-text">欢迎&nbsp;{{ merchant.merchantName }}!</span>
+        <span v-if="!isOrderInfo" class="welcome-text">欢迎&nbsp;{{ merchant.merchantName }}!</span>
         <!-- <span class="revenue-text">今日营收：{{ todayRevenue }}元    </span>-->
       </header>
       <!-- 当前订单 实际变量根据平台方订单结构调整 -->
@@ -346,7 +347,7 @@ provide('isMerchantHome', isMerchantHome);
         <p>优惠券：{{currentOrder.coupon?currentOrder.coupon.couponInfo.couponName:'无'}} &nbsp;{{currentOrder.coupon?'满'+currentOrder.coupon.couponInfo.minPrice+'减'+currentOrder.coupon.couponInfo.couponValue+'元':''}}</p>
         <p>总价：{{currentOrder.price}}元</p>
         <button @click="leaveOrderInfo()" class = "back">返回</button>
-        <button v-if="currentOrder.state===1||currentOrder.state===2" @click="cancelOrder()">取消订单</button>
+        <button v-if="currentOrder.state===1||currentOrder.state===2" @click="cancelOrder()" class = "cancel">取消订单</button>
       </div>
     </div>
 
