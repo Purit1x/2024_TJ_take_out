@@ -17,6 +17,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <button @click="gobackHome" class="return">返回</button>
   </div>
 </template>
 
@@ -85,6 +86,9 @@ const formatWallet = (row, column, cellValue, index) => {
 watch(searchQuery, () => {
   handleSearch();
 });
+const gobackHome = () => {
+    router.push('/platform-home');
+}
 </script>
 
 <style scoped>

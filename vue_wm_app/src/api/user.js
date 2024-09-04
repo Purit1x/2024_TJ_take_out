@@ -26,7 +26,7 @@ export const userLoginService = async(loginData) => {
 
 export const updateUser = async(data) => {  //更新用户信息
     try {  
-        const response = await axios.put(`${BASE_URL}/Users/userEdit`, data);  
+        const response = await axios.put(`${BASE_URL}/userEdit`, data);  
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   
@@ -34,12 +34,21 @@ export const updateUser = async(data) => {  //更新用户信息
 }
 export const getAllUsers = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/getAllUsers`);
-        return response.data; // 返回后端返回的数据
+      const response = await axios.get(`${BASE_URL}/Users/getAllUsers`);
+      // 这里假设后端返回的数据格式与您提供的响应体一致
+      if (response.data && response.data.data) {
+        // 直接返回用户列表
+        return response.data.data;
+      } else {
+        // 如果没有用户列表，可能需要根据实际情况处理
+        throw new Error('No users found');
+      }
     } catch (error) {
-        throw error; // 抛出错误
+      // 处理错误，可能是网络错误或者后端返回的错误信息
+      console.error('Error fetching users:', error);
+      throw error;
     }
-};
+  };
 export const userInfo = async(id) => {  //获取用户信息
     try {  
         const response = await axios.get(`${BASE_URL}/Users/userSearch?userId=${id}`);  
