@@ -139,7 +139,7 @@
             </div>
             <div class="moneytake">
                 <div class="moneyinfo">
-                    ￥&nbsp{{ riderInformation.Wallet}}
+                    ￥&nbsp;{{ riderInformation.Wallet}}
                 </div>
                 <el-button @click="isWithdraw=true">
                     提现
