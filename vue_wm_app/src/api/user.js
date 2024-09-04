@@ -48,6 +48,16 @@ export const userInfo = async(id) => {  //获取用户信息
         throw error;   
     }
 }
+export const deleteUser = async (userId) => {  // 删除用户
+    try {
+        const response = await axios.delete(`${BASE_URL}/deleteUser`, {
+            params: { userId }  // 将 userId 作为参数传递
+        });
+        return response.data; // 返回后端返回的数据
+    } catch (error) {
+        throw error;
+    }
+};
 export const walletRecharge=async(id,addMoney) => {  //充值
     try {  
         const response = await axios.put(`${BASE_URL}/Users/recharge?userId=${id}&addMoney=${addMoney}`);  
