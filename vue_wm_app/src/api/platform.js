@@ -174,3 +174,12 @@ export const getFinishedOrdersComment=async(id)=>{
         throw error;
     }
 }
+export const deleteOrdersComment=async(id)=>{
+    try{
+        const response=await axios.put(`${BASE_URL}/Platform/deleteOrdersComment?orderId=${id}`);
+        return response.data;
+    }catch(error)
+    {
+        throw error;
+    }
+}

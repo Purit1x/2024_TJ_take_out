@@ -629,6 +629,42 @@ namespace takeout_tj.Controllers
 			}
 		}
 
+        [HttpPut]
+        [Route("deleteOrdersComment")]
+        public async Task<IActionResult>DeleteOrdersComment(int orderId)
+        {
+			using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var orders = await _context.Orders
+                        .Where(or => or.OrderId == orderId)
+                        .ToListAsync();
+
+                    if (!orders.Any())
+                    {
+                        return Ok(new { data = 0, msg = "不存在该订单" });
+                    }
+
+                    foreach (var order in orders)
+                    {
+                        order.Comment = null; // 删除所有评论
+                    }
+
+                    await _context.SaveChangesAsync();
+                    // 提交事务
+                    transaction.Commit();
+                    return Ok(new { data = 1, msg = "删除成功" });
+                }catch(Exception ex)
+                {
+					// 回滚事务
+					transaction.Rollback();
+					return StatusCode(500, new { data = -1, msg = "服务器内部错误" });
+				}
+			}
+
+		}
+
 	}
 		
 }

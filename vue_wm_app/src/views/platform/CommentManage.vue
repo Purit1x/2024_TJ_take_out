@@ -3,7 +3,7 @@ import { useStore } from "vuex";
 import { ElMessage ,ElMessageBox} from "element-plus";
 import { ref, onMounted, watch, onBeforeMount, onBeforeUnmount } from 'vue';  
 import { useRouter } from 'vue-router';
-import { getFinishedOrders,getFinishedOrdersComment } from "@/api/platform";
+import { getFinishedOrders,getFinishedOrdersComment ,deleteOrdersComment} from "@/api/platform";
 const store = useStore();
 const router = useRouter();
 const gobackHome = () => {
@@ -14,7 +14,7 @@ const ordersComment=ref([]);
 let updateInterval=null;
 onMounted(async()=>{
     await renewOrders();
-    updateInterval=setInterval(renewOrdersComment,10000);
+    updateInterval=setInterval(renewOrdersComment,1000);
 })
 onBeforeUnmount(()=>{
     if (updateInterval) {
@@ -51,7 +51,22 @@ const renewOrdersComment=async()=>{
     }
     console.log('comment',ordersComment.value);
 }
+const handleDelete=async(Id)=>{
+    ElMessageBox.confirm('确认要删除该评论吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(()=>{
+        deleteOrdersComment(Id).then(res=>{
+            ElMessage.success('删除成功');
+            ordersComment.value[Id]=null;
+        }).catch(err => {
+            ElMessage.error('删除失败');
+            console.log("删除异常",err);
+        });
+    })
 
+}
 
 
 function displayOrdersComment(orderId) {
@@ -60,7 +75,7 @@ function displayOrdersComment(orderId) {
 
 </script>
 
-<template>
+<!-- <template>
     <div>
         <h2>评论管理</h2>
         <div class="order-item" v-for="(orderItem, index) in finishedOrders" :key="index">
@@ -68,5 +83,44 @@ function displayOrdersComment(orderId) {
             评论：{{ displayOrdersComment(orderItem.orderId) }}
         </div>
         <button @click="gobackHome">返回</button>
+    </div>
+</template> -->
+
+
+<template>
+    <div>
+        <h2>评论管理</h2>
+        <button @click="gobackHome">返回</button>
+        <el-table :data="finishedOrders" style="width:100%">
+            <el-table-column label="订单号" width="180">
+                <template #default="scope">
+                    <div style="display: flex; align-items: center">
+                        
+                        <span style="margin-left: 10px">{{ scope.row.orderId }}</span>
+                    </div>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="评论" width="180">
+                <template #default="scope">
+                    <div style="display: flex; align-items: center">
+                        
+                        <span style="margin-left: 10px">{{ displayOrdersComment(scope.row.orderId) }}</span>
+                    </div>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button
+                        size="small"
+                        type="danger"
+                        @click="handleDelete(scope.row.orderId)"
+                    >
+                    删除评论
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
     </div>
 </template>
