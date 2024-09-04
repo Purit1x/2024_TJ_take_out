@@ -254,6 +254,9 @@ const submitCreate = async() => {
 </template>
 
 <style scoped lang="scss">
+body {
+    background-color: #e59090; /* 选择你喜欢的颜色 */
+}
 .info{
     display:flex;
     width:30%;

@@ -349,35 +349,55 @@ const leaveEditAssign = () => {
         </div>
         <button @click="gobackHome" class="return">返回</button>
     </div>
-    <div v-if="isAssigning">
-        <div>请为骑手{{ currentRider.riderName }}分配站点：</div>
-        <div>
-            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()"/> 
-            <button @click="handleStationSearch()">搜索</button>
-            <span>&nbsp;<button @click="leaveAssign()">取消</button></span>
+    <div v-if="isAssigning"  class ="box">
+        <div class="head4">请为骑手{{ currentRider.riderName }}分配站点：</div>
+        <div class="top">
+            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()" class="inputtext"/> 
+            <button @click="handleStationSearch()" class="search">搜索</button>
+            <span>&nbsp;<button @click="leaveAssign()" class="choose">取消</button></span>
         </div>
-        <ul>  
-            <li v-for="station in showStationsInfo" :key="station.stationId">  
-                <span>{{ station.stationName }}</span> 
-                <span>&nbsp;&nbsp;{{ station.stationAddress }}</span>
-                <span>&nbsp;<button @click="handleChoose(station.stationId)">选择</button></span>
-            </li>  
-        </ul> 
+        <el-table :data="showStationsInfo" class="table" border>
+        <el-table-column prop="stationName" label="站点名称" width="300">
+            <template #default="{ row }">
+                {{ row.stationName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="stationAddress" label="站点地址" width="400">
+            <template #default="{ row }">
+                {{ row.stationAddress }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" width="300">
+            <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleChoose(row.stationId)">选择</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
     </div>
-    <div v-if="isEditAssigning">
-        <div>请为骑手{{ currentRider.riderName }}更换站点：</div>
-        <div>
-            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()" /> 
-            <button @click="handleStationSearch()">搜索</button>
-            <span>&nbsp;<button @click="leaveEditAssign()">取消</button></span>
+    <div v-if="isEditAssigning" class="box">
+        <div class="head4">请为骑手{{ currentRider.riderName }}更换站点：</div>
+        <div class="top">
+            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()" class="inputtext"/> 
+            <button @click="handleStationSearch()" class="search">搜索</button>
+            <span>&nbsp;<button @click="leaveEditAssign()" class="choose">取消</button></span>
         </div>
-        <ul>  
-            <li v-for="station in showStationsInfo" :key="station.stationId">  
-                <span>{{ station.stationName }}</span> 
-                <span>&nbsp;&nbsp;{{ station.stationAddress }}</span>
-                <span>&nbsp;<button @click="handleEditChoose(station.stationId)">选择</button></span>
-            </li>  
-        </ul> 
+        <el-table :data="showStationsInfo" class="table" border>
+        <el-table-column prop="stationName" label="站点名称" width="300">
+            <template #default="{ row }">
+                {{ row.stationName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="stationAddress" label="站点地址" width="400">
+            <template #default="{ row }">
+                {{ row.stationAddress }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" width="300">
+            <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleEditChoose(row.stationId)">选择</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
     </div>
 </template>
 <style scoped lang="scss">
@@ -428,6 +448,15 @@ const leaveEditAssign = () => {
     align-items: center; /* 垂直居中 */
     left:50%;
     font-size: 4.5vmin; /* 字体大小 */
+    color:#000000;
+    margin-bottom: 1%;
+}
+.head4{
+    display:flex;
+    justify-content:center; 
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 3.5vmin; /* 字体大小 */
     color:#000000;
     margin-bottom: 1%;
 }

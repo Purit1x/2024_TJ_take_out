@@ -223,13 +223,13 @@ const leaveCouponCreate = () => {
             <button @click="enterCouponCreate()" class="release">发布优惠券</button>
         </div>
         
-        <el-table :data="showCouponsInfo" style="width: 100%" class="table">
+        <el-table :data="showCouponsInfo" :border="parentBorder" style="width: 100%" class="table">
         <el-table-column prop="couponId" label="优惠券ID" width="180">
             <template #default="{ row }">
                 {{ row.couponId }}
             </template>
         </el-table-column>
-        <el-table-column prop="couponName" label="优惠券名称" width="180">
+        <el-table-column prop="couponName" label="优惠券名称" width="280">
             <template #default="{ row }">
                 {{ row.couponName }}
             </template>
@@ -241,7 +241,7 @@ const leaveCouponCreate = () => {
         </el-table-column>
         <el-table-column label="操作">
             <template #default="{ row }">
-                <button  type="danger" size="small" @click="enterCouponInfo(row)" class="info">详情</button>
+                <button  type="danger" size="small" @click="enterCouponInfo(row)" class="info"width="150">详情</button>
             </template>
         </el-table-column>
     </el-table>
@@ -464,11 +464,12 @@ const leaveCouponCreate = () => {
 }
 .table{
     margin-top:10px;
-    margin-left:0%;
-    height:100%;
-    width:100%;
-    border-radius: 20px;
-    //border: 2px solid #01042a;
+
+    height:70%;
+    width:80%;
+    border-radius: 10px;
+    border: 2px solid #01042a;
     table-layout: auto;
+    margin-top: 1%;
 }
 </style>
