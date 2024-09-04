@@ -320,6 +320,12 @@ function leaveWallet(){
     isOnlyShow.value=true;
 }
 function OpenRechargeWindow(){  //打开充值界面
+    if(isRecharge.value===true){
+        leaveRechargeWindow();
+        return;
+    }
+    leaveWithdrawWindow();
+    leaveWPWindow();
     editMerchant();
     isRecharge.value=true;
 }
@@ -327,6 +333,12 @@ function leaveRechargeWindow(){  //关闭充值界面
     isRecharge.value=false;
 }
 function OpenWithdrawWindow(){  //打开提现界面
+    if(isWithdraw.value===true){
+        leaveWithdrawWindow();
+        return;
+    }
+    leaveRechargeWindow();
+    leaveWPWindow();
     editMerchant();
     isWithdraw.value=true;
 }
@@ -335,6 +347,12 @@ function leaveWithdrawWindow(){  //关闭提现界面
     isWallet.value=true;
 }
 function OpenWPWindow(){  //打开修改支付密码界面
+    if(isChangeWP.value==true){
+        leaveWPWindow();
+        return;
+    }
+    leaveRechargeWindow();
+    leaveWithdrawWindow();
     editMerchant();
     isChangeWP.value=true;
 }
@@ -622,12 +640,12 @@ function displayTotalTurnoverWithinThisDay() {
   background-color: #ffd666;
   border: 2px solid #000000;
   border-radius: 20px;
-  margin-right: 30px;
+  margin-right: 40px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .margin-top {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 /* el-descriptions 样式 */
