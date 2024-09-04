@@ -256,7 +256,7 @@ provide('merchantsInfo', merchantsInfo);
       <div class="search-bar">
         <el-col :span="16">
           <el-input placeholder="搜索店名或类别" v-model="searchQuery" clearable @clear="handleSearch"
-            @keydown.enter.native="handleSearch">
+            @keydown.enter="handleSearch">
             <template #append>
               <el-button type="primary" @click="handleSearch" class="search-button">
                 <el-icon>

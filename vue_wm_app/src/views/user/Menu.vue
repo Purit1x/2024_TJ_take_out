@@ -338,9 +338,9 @@ watch(
 
         <div class="search-bar">
             <el-col :span="8">
-                <el-input  placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+                <el-input  placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter="handleSearch">
                 <template #append>
-                <el-button type="primary"@click="handleSearch"><el-icon><search /></el-icon></el-button>
+                <el-button type="primary" @click="handleSearch"><el-icon><search /></el-icon></el-button>
                 </template>
                 </el-input>
             </el-col>
