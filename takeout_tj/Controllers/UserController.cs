@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 using System.Transactions;
 using takeout_tj.Data;
 using takeout_tj.DTO;
@@ -318,6 +320,93 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+
+                [HttpGet]
+        [Route("merchantsAll")]  //查询个人信息
+        public async Task<IActionResult> GetAllMerchantsInfo(string a, string b)  //根据ID获取商家信息
+        {
+            try
+            {
+                var merchantOrder = await _context.OrderDishes.ToListAsync();
+
+                var orderInfo = await _context.Orders.ToListAsync();
+
+                var notGroup = from aM in merchantOrder
+                               join bM in orderInfo.Where(e => e.State == 3) on aM.OrderId equals bM.OrderId into bs
+                               from bModel in bs.DefaultIfEmpty()
+                               select new
+                               {
+                                   aM.MerchantId,
+                                   Price = bs.Sum(x => x.Price),
+                                   Count = bs.Count(),
+                                   MerchantRating = bs.Average(X => X.MerchantRating)
+                               };
+
+                var groupModel = notGroup.GroupBy(e => e.MerchantId).Select(e => new { e.Key, Price = e.Sum(s => s.Price), Count = e.Count(), MerchantRating = e.Average(s => s.MerchantRating) });
+
+                // 查询指定 MerchantId 的商户信息  
+                var merchant = (await _context.Merchants.ToListAsync()).GroupJoin(groupModel, merchant => merchant.MerchantId, group => group.Key,
+                    (merchant, group) => new
+                    {
+                        MerchantId = merchant.MerchantId,
+                        MerchantName = merchant.MerchantName,
+                        MerchantAddress = merchant.MerchantAddress,
+                        Contact = merchant.Contact,
+                        CouponType = merchant.CouponType,
+                        DishType = merchant.DishType,
+                        TimeforOpenBusiness = merchant.TimeforOpenBusiness,
+                        TimeforCloseBusiness = merchant.TimeforCloseBusiness,
+                        AllPrice = group.DefaultIfEmpty().Sum(g => g?.Price ?? 0M),
+                        AllCount = group.DefaultIfEmpty().Sum(g => g?.Count ?? 0),
+                        MerchantRating = group.DefaultIfEmpty().Average(g => g?.MerchantRating ?? 0)
+                    }
+                ).ToList();
+
+                switch (a)
+                {
+                    case "1":
+                        if (b == "1")
+                        {
+                            merchant = merchant.OrderBy(e => e.MerchantRating).ToList();
+                        }
+                        else
+                        {
+                            merchant = merchant.OrderByDescending(e => e.MerchantRating).ToList();
+                        }
+                        break;
+                    case "2":
+                        if (b == "1")
+                        {
+                            merchant = merchant.OrderBy(e => e.AllPrice).ToList();
+                        }
+                        else
+                        {
+                            merchant = merchant.OrderByDescending(e => e.AllPrice).ToList();
+                        }
+                        break;
+                    case "3":
+                        if (b == "1")
+                        {
+                            merchant = merchant.OrderBy(e => e.AllCount).ToList();
+                        }
+                        else
+                        {
+                            merchant = merchant.OrderByDescending(e => e.AllCount).ToList();
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                return Ok(new { data = merchant, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+        
         [HttpPost]
         [Route("CreateFM")]
         public IActionResult CreateFavouriteMerchant([FromBody] FavoriteMerchantDBDto dto)

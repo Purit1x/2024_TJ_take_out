@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using takeout_tj.Data;
 using takeout_tj.DTO;
 using takeout_tj.Models.Merchant;
 using takeout_tj.Models.Platform;
 using takeout_tj.Models.Rider;
 using takeout_tj.Service;
+using takeout_tj.Controllers;
 
 namespace takeout_tj.Controllers
 {
@@ -465,7 +467,7 @@ namespace takeout_tj.Controllers
         public async Task<IActionResult> GetStationRiders(int stationId)
         {
             var riders = await _context.RiderStations
-                .Where(rs => rs.StationId ==  stationId)
+                .Where(rs => rs.StationId == stationId)
                 .Select(rs => rs.RiderId)
                 .ToListAsync();
 
@@ -474,17 +476,197 @@ namespace takeout_tj.Controllers
 
             return Ok(new { data = riders });
         }
+        [HttpGet]
+        [Route("getEcoOrder")]//查找不需要餐具的订单比例
+        public IActionResult GetEcoOrder()
+        {
+            int totalOrders = _context.Set<OrderDB>().Count();
+
+            int ecoFriendlyOrders = _context.Set<OrderDB>()
+           .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
+
+            double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
+            return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
+        }
+        [HttpGet]
+        [Route("getMerAddrByOrderId")]
+        public async Task<string> GetMerAddrByOrderId(int orderId)
+        {
+            try
+            {
+                var orderDish = await _context.OrderDishes.FirstOrDefaultAsync(od => od.OrderId == orderId);
+                if (orderDish == null)
+                {
+                    return null;
+                }
+                var merchantId = orderDish.MerchantId;
+                var merchant = await _context.Merchants
+                    .FirstOrDefaultAsync(m => m.MerchantId == merchantId);
+                if (merchant == null)
+                {
+                    return null;
+                }
+                return merchant.MerchantAddress;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        private bool MerchantAddressContainsRegion(string merchantAddress, string region)
+        {
+            if (merchantAddress != null)
+            {
+                return merchantAddress.Contains(region);
+                // 假设merchantAddress是一个以逗号分隔的地区列表，我们可以用此方式来检查是否包含特定的地区
+                return merchantAddress.Split(',').Any(addrPart => addrPart.Trim().Equals(region, StringComparison.OrdinalIgnoreCase));
+            }
+            return false;
+        }
+        [HttpGet]
+        [Route("GetSalesByRegion")]
+        public async Task<IActionResult> GetSalesByRegion(string region)
+        {
+            try
+            {
+                // 使用LINQ查询指定地区（部分匹配）的销售额
+                var orders = await _context.Orders.ToListAsync();
+                var filteredOrders = orders
+                    .Where(order =>
+                    {
+                        string merchantAddress = GetMerAddrByOrderId(order.OrderId).Result;
+                        return MerchantAddressContainsRegion(merchantAddress, region);
+                    });
+                var totalSales = filteredOrders.Sum(order => order.Price);
+
+
+                if (totalSales >= 0)
+                {
+                    return Ok(new { Region = region, TotalSales = totalSales });
+                }
+                else
+                {
+                    return NotFound(new { errorCode = 404, msg = "没有找到包含指定地区的销售记录" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("GetQuantityByRegion")]
+        public async Task<IActionResult> GetQuantityByRegion(string region)
+        {
+            try
+            {
+                // 使用LINQ查询指定地区（部分匹配）的订单量
+                var orders = await _context.Orders.ToListAsync();
+                var filteredOrders = orders
+                    .Where(order =>
+                    {
+                        string merchantAddress = GetMerAddrByOrderId(order.OrderId).Result;
+                        return MerchantAddressContainsRegion(merchantAddress, region);
+                    })
+                    .ToList(); // 确保在这里调用 .ToList() 以执行查询
+
+                var orderCount = filteredOrders.Count; // 获取满足条件的订单数量
+
+                if (orderCount > 0)
+                {
+                    return Ok(new { Region = region, OrderCount = orderCount });
+                }
+                else
+                {
+                    return NotFound(new { errorCode = 404, msg = "没有找到包含指定地区的订单量" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, msg = $"查询异常: {ex.Message}" });
+            }
+        }
+        [HttpGet]
+        [Route("getFinishedOrders")]
+        public async Task<IActionResult>GetFinishedOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Where(or => or.State == 3)
+                    .ToListAsync();
+                if(orders.Count ==0)
+                {
+                    return Ok(new { data = 0, msg = "没有已完成订单" });
+                }
+                return Ok(new { data = orders, msg = "已找到" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
+            }
+        }
 		[HttpGet]
-		[Route("getEcoOrder")]//查找不需要餐具的订单比例
-		public IActionResult GetEcoOrder()
+		[Route("getFinishedOrdersComment")]
+		public async Task<IActionResult> GetFinishedOrderscomment(int orderId)
 		{
-			int totalOrders = _context.Set<OrderDB>().Count();
+			try
+			{
+				var orders = await _context.Orders
+					.Where(or => or.State == 3&&or.OrderId==orderId)
+					.Select(or => new { OrderId = or.OrderId, Comment = or.Comment })
+					.FirstOrDefaultAsync();
 
-			int ecoFriendlyOrders = _context.Set<OrderDB>()
-		   .Count(o => o.NeedUtensils == 0);  // 0 表示无需餐具
-
-			double ecoOrderRatio = totalOrders > 0 ? (double)ecoFriendlyOrders / totalOrders * 100 : 0;
-			return Ok(new { EcoOrderRatio = $"{ecoOrderRatio:F2}%" }); // 返回结果
+				if (orders == null)
+				{
+					return Ok(new { data = 0, msg = "没有已完成订单" });
+				}
+				return Ok(new { data = orders.Comment, msg = "已找到" });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
+			}
 		}
+
+        [HttpPut]
+        [Route("deleteOrdersComment")]
+        public async Task<IActionResult>DeleteOrdersComment(int orderId)
+        {
+			using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var orders = await _context.Orders
+                        .Where(or => or.OrderId == orderId)
+                        .ToListAsync();
+
+                    if (!orders.Any())
+                    {
+                        return Ok(new { data = 0, msg = "不存在该订单" });
+                    }
+
+                    foreach (var order in orders)
+                    {
+                        order.Comment = null; // 删除所有评论
+                    }
+
+                    await _context.SaveChangesAsync();
+                    // 提交事务
+                    transaction.Commit();
+                    return Ok(new { data = 1, msg = "删除成功" });
+                }catch(Exception ex)
+                {
+					// 回滚事务
+					transaction.Rollback();
+					return StatusCode(500, new { data = -1, msg = "服务器内部错误" });
+				}
+			}
+
+		}
+
 	}
+		
 }
+
+

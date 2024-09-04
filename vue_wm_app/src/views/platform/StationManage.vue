@@ -3,7 +3,7 @@ import { useStore } from "vuex";
 import { ElMessage,ElMessageBox } from "element-plus";
 import { ref, onMounted, computed } from 'vue';  
 import { useRouter } from 'vue-router';
-import { getStationIds, getStationsInfo,stationDeleteService,updateStation,addStation} from '@/api/platform';
+import { getStationIds, getStationsInfo,getQuantityByRegion,stationDeleteService,updateStation,addStation} from '@/api/platform';
 import { getMerchantIds,getMerchantsInfo} from '@/api/user';
 import { EditMerchantStation, assignStationToMerchant,AssignStation } from '@/api/merchant';
 const router = useRouter();
@@ -15,6 +15,8 @@ const currentStation = ref(null); // 当前选中的站点
 const isEdit= ref(false); // 是否编辑
 const isCreate= ref(false); // 是否创建
 const refForm = ref(null); // 表单
+const region = ref('');
+const orderCount = ref(null);
 const editRules = computed(() => {  
     const rules = {  
         stationName: [  
@@ -44,6 +46,21 @@ onMounted(() => {
         ElMessage.error('获取站点id失败'); 
     }); 
 });
+
+
+const fetchOrderCount = async () => {
+    try {
+        const response = await getQuantityByRegion(region.value);
+        console.log('Processed response:', response); // 增加日志输出以验证处理后的数据
+        orderCount.value = response.orderCount;
+        region.value = response.region; // 确保也更新了区域名称
+        ElMessage.success(`区域 ${response.region} 的订单量为: ${response.orderCount}`);
+    } catch (error) {
+        console.error('Error fetching order count:', error);
+        ElMessage.error('查询失败');
+    }
+};
+
 const reassignAllMerchantStationIds = async () => {  
     try {  
         // 1. 获取所有商户 ID  
@@ -193,6 +210,7 @@ const submitCreate = async() => {
             </li>  
         </ul> 
     </div>
+    
     <div v-if="isEdit">
         <h2>编辑站点</h2> 
         <el-form :rules="editRules" ref="refForm" :model="currentStation">

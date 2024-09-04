@@ -96,7 +96,7 @@ export const receiveOrder = async (data) => {  // 骑手接单
 export const getRiderPrice = async (id) => {
     try {
         const response = await axios.get(`${BASE_URL}/Rider/getRiderPrice?orderId=${id}`);
-        console.log('配送费',response.data.data);
+        // console.log('配送费',response.data.data);
         return response.data.data;  // 返回配送费的数值（单位：元）
     }
     catch (error) {
@@ -130,5 +130,4 @@ export const walletWithdraw= async(id,withdrawMoney) => {  //提现
         throw error;   
     }
 }
-
 

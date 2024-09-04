@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import { getOrdersWithinThisMonth, riderInfo, getRiderPrice, getFinishedOrders } from '@/api/rider';
+import dayjs from 'dayjs';
 
 const store = useStore();
 const router = useRouter();
@@ -19,7 +20,7 @@ onMounted(async () => {
         rider.value = riderData;
         const res = await riderInfo(rider.value.RiderId);
         rider.value = res.data;
-        console.log('骑手信息', rider.value);
+        // console.log('骑手信息', rider.value);
     }
     else {
         router.push('/login');  // 未登录，跳转至登陆界面
@@ -47,12 +48,12 @@ const renewFinishedOrders = async () => {
                 return {
                     orderId: orderItem.orderId,
                     deliveryFee: await getRiderPrice(orderItem.orderId) || "加载中",
-                    dateTime: orderItem.orderTimestamp
+                    dateTime: dayjs(orderItem.orderTimestamp).format('YYYY-MM-DD (+8)HH:mm')
                 };
             })
             finishedOrders.value = await Promise.all(promise);  // 等待所有映射完成
             finishedOrders.value.sort((a, b) => b.orderId - a.orderId);
-            console.log("处理后的数据为", finishedOrders.value);
+            // console.log("处理后的数据为", finishedOrders.value);
         }
     }
     catch (error) {
@@ -90,33 +91,52 @@ function displayTotalWageWithinThisMonth() {
 </script>
 
 <template>
-    <div>
-        <br><br>
-        <h2>您所在的位置：工资记录</h2>
-        <h3>您本月送单总量：{{ orderNum }} 您本月获得的总配送费为： {{ displayTotalWageWithinThisMonth() }}</h3>
-    </div>
-    <div class="fees-scroll">
-        <el-scrollbar max-height="500px">
-            <el-table :data="finishedOrders" border="true" style="width: 70%">
-                <el-table-column prop="orderId" label="订单号" width="200" />
-                <el-table-column prop="deliveryFee" label="配送费" width="200" />
-                <el-table-column prop="dateTime" label="订单时间" />
-            </el-table>
-        </el-scrollbar>
-    </div>
-    <!--显示工资详情-->
+    <div class="main_body">
+        <div class="person_body">
+            <div>
+                <h2>工资记录</h2>
+                <h3>您本月送单总量：{{ orderNum }} </h3>
+                <h3>您本月获得的总配送费为： {{ displayTotalWageWithinThisMonth() }}</h3>
+            </div>
+        
+            <div class="fees-scroll">
+                <el-table max-height="500px" :data="finishedOrders"     
+                :default-sort="{ prop: 'dateTime', order: 'descending' }"
+                border stripe>
+                    <el-table-column prop="orderId" sortable label="订单号"  />
+                    <el-table-column prop="deliveryFee" sortable label="配送费"  />
+                    <el-table-column prop="dateTime" sortable label="订单时间" />
+                </el-table>
+            </div>
+        </div>
+    </div>  
 </template>
 
 <style scoped>
-.fees-scroll {
-    max-height: 600px;
-    /* 设置订单区域的最大高度 */
+
+.main_body {
     display: flex;
-    flex-direction: column;
+    justify-self: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.fees-scroll {
     border: 1px solid transparent;
-    overflow-y: auto;
-    /* 使订单区域可以滚动 */
-    margin-left: 20px;
+    width: 100%;
+}
+
+.person_body {
+  padding: 20px;
+  background-color: #ffd666;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-left:20%;
+  width: 60%;
+  text-align: center;
+
 }
 
 .fee-item {

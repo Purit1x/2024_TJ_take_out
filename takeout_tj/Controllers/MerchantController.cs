@@ -134,6 +134,28 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("merchantAddrSearch")]  //查询商户的地址
+        private string GetMerchantAddress(int merchantId)
+        {
+            try
+            {
+                // 查询指定 MerchantId 的商户信息  
+                var merchant = _context.Merchants.FirstOrDefault(m => m.MerchantId == merchantId);
+
+                if (merchant == null)
+                {
+                    return null;
+                }
+
+                return merchant.MerchantAddress;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"无法获取商家地址: {ex.Message}", ex);
+            }
+        }
+
         [HttpPut]
         [Route("merchantEdit")]  //编辑个人信息
         public IActionResult EditMerchant([FromBody] MerchantDBDto dto)
@@ -1051,7 +1073,36 @@ namespace takeout_tj.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-		}
+        }
+        [HttpGet]
+        [Route("getFinishedMerOrders")]
+        public async Task<IActionResult>GetFinishedMerOrders(int merchantId)
+        {
+            try
+            {
+				var orderMerchant = await _context.OrderDishes
+					.Include(ou => ou.OrderDB)
+					.Where(ou => ou.MerchantId == merchantId)
+					.Select(ou => ou.OrderId)
+					.ToListAsync();//获取指定商家的所有订单；
+				if (!orderMerchant.Any())
+				{
+					return Ok(new { data = 0, msg = "指定商家无订单" });
+				}
+                var orders = await _context.Orders
+                    .Where(o => orderMerchant.Contains(o.OrderId) && o.State == 3)
+                    .ToListAsync();
+                if(!orders.Any())
+                {
+                    return Ok(new { data = 0, msg = "该商家尚无已送达订单" });
+                }
+                return Ok(new { data = orders, msg = "获取成功" });
+			}
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 		/*[HttpGet]
         [Route("getSortedMerchaants")]
         public IActionResult GetSortedMerchants()

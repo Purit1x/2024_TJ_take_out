@@ -74,6 +74,16 @@ export const getMerchantsInfo = async(id) => {  //获取商户信息
         throw error;   
     }
 }
+
+export const getAllMerchantsInfo = async(a,b) => {  //获取商户信息
+    try {  
+        const response = await axios.get(`${BASE_URL}/Users/merchantsAll?a=${a}&b=${b}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}
+
 export const createFavouriteMerchant=async(data) => {  //创建收藏商户
     try {  
         const response = await axios.post(`${BASE_URL}/Users/CreateFM`,data);  

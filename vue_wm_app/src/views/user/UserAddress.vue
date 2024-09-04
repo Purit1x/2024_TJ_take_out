@@ -5,6 +5,15 @@ import { useStore } from "vuex"
 import { ref, onMounted } from 'vue';
 import { submitAddressService, getAddressService, deleteAddressService,EditUserAddress,GetDefaultAddress,CreateDefaultAddress,DeleteDefaultAddress } from '@/api/user';  // 引入API接口
 import {cloneDeep} from 'lodash';
+
+import {
+  House,
+  Edit,
+  Delete,
+  FolderAdd,
+  Star,
+  StarFilled,
+} from '@element-plus/icons-vue'
 const refForm = ref(null);
 const router = useRouter();
 const store = useStore();
@@ -185,36 +194,195 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 </script>
 
 <template>
-
   <div v-if="!isEditing&&!isCreating" class="content">
-    <h2>我的地址
-      <button @click="enterCreate">新建</button>
-      <button @click="gobackHome">返回</button>
-    </h2>
-    <ul>
-      <li v-for="address in userAddresses" :key="address.addressId">
-        <span>{{ address.contactName }}&nbsp;&nbsp;</span>
-        <span>{{ address.phoneNumber }}&nbsp;&nbsp;</span>
-        <span>{{ address.userAddress }}&nbsp;&nbsp;</span>
-        <span>门牌号：{{ address.houseNumber }}&nbsp;&nbsp;</span>
-        <span><button @click="editAddress(address)">编辑</button></span>
-        <span><button @click="deleteAddress(address.addressId)">删除</button></span>
-        <button v-if="!hasDefaultAddress" @click="setDefaultAddress(address.addressId)">设为默认</button>
-        <button v-if="hasDefaultAddress&&DefaultAddressId===address.addressId" @click="deleteDA(address.addressId)">取消默认</button>
-    </li>
-    </ul>
+    <h2 class="header">我的地址</h2>
+
+    <table class="address-table">
+      <thead>
+        <tr>
+          <th>联系人</th>
+          <th>电话号码</th>
+          <th>详细地址</th>
+          <th>门牌号</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="address in userAddresses" :key="address.addressId">
+          <td>{{ address.contactName }}</td>
+          <td>{{ address.phoneNumber }}</td>
+          <td>{{ address.userAddress }}</td>
+          <td>{{ address.houseNumber }}</td>
+          <td>
+            <el-button-group class="editbutton">
+              <el-tooltip content="编辑" hide-after="0" placement="bottom">
+                <el-button class="primary-button" @click="editAddress(address)" :icon="Edit" />
+              </el-tooltip>
+              <el-tooltip content="删除" hide-after="0" placement="bottom">
+                <el-button class="primary-button" @click="deleteAddress(address.addressId)" :icon="Delete" />
+              </el-tooltip>
+              <el-tooltip content="设为默认" hide-after="0" placement="bottom">
+                <el-button class="primary-button" v-if="!hasDefaultAddress" @click="setDefaultAddress(address.addressId)" :icon="Star" />
+              </el-tooltip>
+              <el-tooltip content="取消默认" hide-after="0" placement="bottom">
+                <el-button class="primary-button" v-if="hasDefaultAddress&&DefaultAddressId===address.addressId" @click="deleteDA(address.addressId)" :icon="StarFilled" />
+              </el-tooltip>
+            </el-button-group>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="5" class="new-address-button-container">
+            <el-tooltip content="新建地址" hide-after="0" placement="top">
+              <el-button class="primary-button" @click="enterCreate" :icon="FolderAdd">
+                新建地址
+              </el-button>
+            </el-tooltip>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div v-if="isEditing|isCreating">
+
+  <div v-if="isEditing||isCreating" class="edit-container">
     <h2 v-if="isEditing">编辑地址</h2>
     <h2 v-if="isCreating">新建地址</h2>
     <el-form :rules="addressRules" ref="refForm" :model="currentAddress">
-      <el-form-item label="联系人" prop="contactName"><input v-model="currentAddress.contactName" placeholder="联系人" @blur="validateField('contactName')"/></el-form-item>  
-      <el-form-item label="电话号码" prop="phoneNumber"><input type="text" v-model="currentAddress.phoneNumber" placeholder="电话号码" @blur="validateField('phoneNumber')"/></el-form-item>  
-      <el-form-item label="详细地址" prop="userAddress"><input v-model="currentAddress.userAddress" placeholder="详细地址" @blur="validateField('userAddress')"/></el-form-item>  
-      <el-form-item label="门牌号" prop="houseNumber"><input type="text" v-model="currentAddress.houseNumber" placeholder="门牌号" @blur="validateField('houseNumber')"/></el-form-item>  
+      <el-form-item label="联系人" prop="contactName">
+        <input v-model="currentAddress.contactName" placeholder="联系人" @blur="validateField('contactName')" />
+      </el-form-item>  
+      <el-form-item label="电话号码" prop="phoneNumber">
+        <input type="text" v-model="currentAddress.phoneNumber" placeholder="电话号码" @blur="validateField('phoneNumber')" />
+      </el-form-item>  
+      <el-form-item label="详细地址" prop="userAddress">
+        <input v-model="currentAddress.userAddress" placeholder="详细地址" @blur="validateField('userAddress')" />
+      </el-form-item>  
+      <el-form-item label="门牌号" prop="houseNumber">
+        <input type="text" v-model="currentAddress.houseNumber" placeholder="门牌号" @blur="validateField('houseNumber')" />
+      </el-form-item>  
     </el-form>  
-    <button @click="leaveEditing">取消</button>
-    <button v-if="isEditing" @click="submitAddress">保存</button>
-    <button v-if="isCreating" @click="createAddress">创建</button>
+    <div class="button-group">
+      <el-button class="secondary-button" @click="leaveEditing">取消</el-button>
+      <el-button class="primary-button" v-if="isEditing" @click="submitAddress">保存</el-button>
+      <el-button class="primary-button" v-if="isCreating" @click="createAddress">创建</el-button>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* 页面整体样式 */
+.content {
+  padding: 20px;
+  background-color: transparent;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* 表格样式 */
+.address-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.address-table th {
+  background-color: #7BA7AB;
+  color: white;
+  padding: 12px;
+}
+
+.address-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.address-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.new-address-button-container {
+  text-align: center;
+  padding-top: 20px;
+}
+
+/* 按钮组样式 */
+.primary-button {
+  background-color: #ff69b4;
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.primary-button:hover {
+  background-color: #ff85c1;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+.secondary-button {
+  background-color: #ccc;
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.secondary-button:hover {
+  background-color: #ddd;
+  box-shadow: 0 0 8px rgba(204, 204, 204, 0.8);
+}
+
+.button-group {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.edit-container {
+  width: calc(1000% - 50px); /* 调整表格宽度，考虑侧边栏的宽度 */
+  margin: 0 auto;  /* 水平居中 */
+  margin-left: 600px;
+  margin-top: -150px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* 使用 transform 将其垂直和水平居中 */
+}
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.el-form-item input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;  /* 按钮组右对齐 */
+  gap: 10px;
+}
+
+</style>

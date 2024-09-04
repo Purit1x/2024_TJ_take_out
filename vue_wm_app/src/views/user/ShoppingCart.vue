@@ -1,48 +1,71 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, onMounted, computed, watch } from 'vue';
-import {addToShoppingCart,decrementDishInCart,removeFromShoppingCart,getShoppingCartItems} from '@/api/user';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { addToShoppingCart, decrementDishInCart, removeFromShoppingCart, getShoppingCartItems } from '@/api/user';
 import { GetMultiSpecialOffer } from '@/api/merchant';
 import { useStore } from "vuex";
 import { ElMessage } from 'element-plus';
 import gsap from 'gsap';
-const store = useStore();  
+const store = useStore();
 const router = useRouter();
-const user = ref({}); // 初始化用户信息对象
-const merchants = ref([]);  // 存储按商家分类后的购物车物品列表
-const specialOffers=ref([]);  //商家满减活动
+const user = ref({});
+const merchants = ref([]);
+const specialOffers = ref([]);
 
+const isScrolling = ref(true);  // 滚动开关
 
 onMounted(async () => {
-    const userData = store.state.user;
-    if (userData) {
-        user.value = userData;
-    } else {
-        router.push('/login');
-    }
+  const userData = store.state.user;
+  if (userData) {
+    user.value = userData;
+  } else {
+    router.push('/login');
+  }
 
-    const userId = user.value.userId;
-    const data = await getShoppingCartItems(userId);
-    if (data) {
-        merchants.value = data.data.map(merchant => ({
-            ...merchant,
-            checked: false, // 初始化商家复选框
-            dishes: merchant.dishes.map(dish => ({
-                ...dish,
-                checked: false, // 初始化菜品复选框
-            }))
-        }));
-        //console.log(merchants.value);
-    }
+  const userId = user.value.userId;
+  const data = await getShoppingCartItems(userId);
+  if (data) {
+    merchants.value = data.data.map(merchant => ({
+      ...merchant,
+      checked: false,
+      dishes: merchant.dishes.map(dish => ({
+        ...dish,
+        checked: false,
+      })),
+    }));
+  }
 
-    // 获取所有商家的满减数据
-    const merchantIds = merchants.value.map(merchant => merchant.merchantId);
-    const offers = await GetMultiSpecialOffer(merchantIds);
-    if(offers){
-      specialOffers.value = offers.data;
+  const merchantIds = merchants.value.map(merchant => merchant.merchantId);
+  const offers = await GetMultiSpecialOffer(merchantIds);
+  if (offers) {
+    specialOffers.value = offers.data;
+  }
+
+  const content = document.querySelector('.content');
+
+  // 添加鼠标滚轮控制
+  const handleScroll = (event) => {
+    if (isScrolling.value) {
+      content.scrollTop += event.deltaY;
     }
-    
-    //console.log(specialOffers.value); 
+  };
+
+  // 鼠标左键点击切换滚动状态
+  const handleMouseClick = (event) => {
+    if (event.button === 0) {
+      isScrolling.value = !isScrolling.value;
+    }
+  };
+
+  // 事件监听
+  content.addEventListener('wheel', handleScroll);
+  content.addEventListener('mousedown', handleMouseClick);
+
+  // 在组件卸载时移除事件监听器
+  onUnmounted(() => {
+    content.removeEventListener('wheel', handleScroll);
+    content.removeEventListener('mousedown', handleMouseClick);
+  });
 });
 
 // 商家复选框函数
@@ -242,51 +265,205 @@ const removeInCart = async(dish) => {
 </script>
 
 <template>
-    <div class="content">
-      <header>我的购物车</header>
-      <div v-for="merchant in merchants" :key="merchant.merchantId" class="cart-item">
-          <input type="checkbox" :checked="merchant.checked" @change="toggleMerchantSelection(merchant)" />
-          {{ merchant.merchantName }}
-          <button @click="goToMerchantPage(merchant.merchantId)">></button>
-          <ul>
-              <li v-for="item in merchant.dishes" :key="item.dishId">
-                  <input type="checkbox" :checked="item.checked" @change="toggleItemSelection(merchant, item)" />
-                  <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-                  {{item.dishName}}：{{item.dishPrice}}元
-                  <button @click="decrementInCart(item)">-</button>
-                  {{item.dishNum}}
-                  <button @click="addToCart(item)">+</button>
-                  <button @click="removeInCart(item)">x</button>
-              </li>
-          </ul>
+  <div class="content">
+    <header class="header">我的购物车</header>
+    <div v-for="merchant in merchants" :key="merchant.merchantId" class="cart-item">
+      <div class="merchant-header">
+        <input type="checkbox" class="checkbox" :checked="merchant.checked" @change="toggleMerchantSelection(merchant)" />
+        <span class="merchant-name">{{ merchant.merchantName }}</span>
+        <button class="merchant-button" @click="goToMerchantPage(merchant.merchantId)">></button>
       </div>
-
-        <!-- 显示总价 -->
-        <div>
-          <div><strong>总价: {{ finalTotalPrice }} 元</strong><span v-if="totalDiscount != 0">({{ totalPrice }}-{{ totalDiscount }})</span></div>
-        </div>
+      <ul class="dish-list">
+        <li v-for="item in merchant.dishes" :key="item.dishId" class="dish-item">
+          <input type="checkbox" class="checkbox" :checked="item.checked" @change="toggleItemSelection(merchant, item)" />
+          <img :src="item.imageUrl" alt="菜品图片" class="dish-img">
+          <span class="dish-name">{{item.dishName}}</span>
+          <span class="dish-price">{{item.dishPrice}}元</span>
+          <div class="quantity-control">
+            <button class="quantity-button" @click="decrementInCart(item)">-</button>
+            <span class="quantity">{{item.dishNum}}</span>
+            <button class="quantity-button" @click="addToCart(item)">+</button>
+          </div>
+          <button class="remove-button" @click="removeInCart(item)">x</button>
+        </li>
+      </ul>
     </div>
+
+    <!-- 显示总价 -->
+    <div class="total-price-container">
+      <strong class="total-price">总价: {{ finalTotalPrice }} 元</strong>
+      <span v-if="totalDiscount != 0" class="discount">({{ totalPrice }}-{{ totalDiscount }})</span>
+    </div>
+  </div>
 </template>
 
-
 <style scoped>
-.cart-item ul{
-  display: flex;
-  flex-direction: column;
-  font-size: 20px;
-  gap: 15px;
+/* 页面整体样式 */
+.content {
+  padding: 20px;
+  background-color: transparent;
+  font-family: Arial, sans-serif;
+  height: calc(100vh - 60px); /* 计算总高度，确保超出可视窗口大小 */
+  overflow-y: auto; /* 强制显示垂直滚动条 */
+  scrollbar-width: thin; /* 适用于 Firefox 的滚动条宽度设置 */
 }
 
-.cart_item-li{
+.content::-webkit-scrollbar {
+  width: 8px; /* 滚动条宽度 */
+}
+
+.content::-webkit-scrollbar-track {
+  background-color: #f9f9f9; /* 滚动条轨道颜色 */
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #ff69b4; /* 滚动条颜色 */
+  border-radius: 10px; /* 圆角滚动条 */
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background-color: #ff85c1; /* 悬停时滚动条的颜色 */
+}
+
+.header {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* 商家标题样式 */
+.merchant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ff69b4;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  color: white;
+  margin-right: 20px;
+}
+
+.merchant-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.merchant-button {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.merchant-button:hover {
+  background-color: #ff85c1;
+}
+
+/* 菜品列表样式 */
+.dish-list {
+  list-style: none;
+  padding: 0;
+  margin-right: 20px; /* 添加右侧距离 */
+}
+
+.dish-item {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+  margin-right: 20px; /* 添加右侧距离 */
+}
+
+.dish-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.checkbox {
+  margin-right: 10px;
+}
+
+.dish-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.dish-name {
+  flex: 1;
+  font-size: 18px;
+  color: #333;
+}
+
+.dish-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff69b4;
+  margin-right: 20px;
+}
+
+.quantity-control {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.cart-item-img {
-    align-content: center;
-    width: 60px; 
-    height: 60px;
+.quantity-button {
+  background-color: #ff69b4;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
+.quantity-button:hover {
+  background-color: #ff85c1;
+}
+
+.quantity {
+  font-size: 18px;
+  color: #333;
+}
+
+.remove-button {
+  background-color: transparent;
+  border: none;
+  color: #ff69b4;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.remove-button:hover {
+  color: #ff85c1;
+}
+
+/* 总价样式 */
+.total-price-container {
+  margin-top: 20px;
+  font-size: 22px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.total-price {
+  font-weight: bold;
+}
+
+.discount {
+  margin-left: 10px;
+  font-size: 18px;
+  color: #ff69b4;
+}
 </style>

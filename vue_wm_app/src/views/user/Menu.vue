@@ -331,10 +331,21 @@ watch(
       </div>
 
       <div>
-        <div>
+        <!-- <div>
           <input type="text" v-model="searchQuery" placeholder="搜索菜品或类别" v-on:keyup.enter="handleSearch()"/> 
           <button @click="handleSearch()">搜索</button>
+        </div> -->
+
+        <div class="search-bar">
+            <el-col :span="8">
+                <el-input  placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter="handleSearch">
+                <template #append>
+                <el-button type="primary" @click="handleSearch"><el-icon><search /></el-icon></el-button>
+                </template>
+                </el-input>
+            </el-col>
         </div>
+        
         <ul>
           <li v-for="dish in showDishes" :key="dish.dishId">
             <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
@@ -370,3 +381,10 @@ watch(
     <router-view />
     <ChildComponent /> 
 </template>
+
+<style scoped>
+.search-bar {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+</style>
