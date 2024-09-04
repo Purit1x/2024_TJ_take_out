@@ -131,19 +131,23 @@
 </script>
 
 <template>
-    <PersonInfo />
-    <div class="personDown">
-        <div class="personside">
-            <div class="headline">
-                工资钱包<el-icon class="el-icon--right"><Wallet /></el-icon>
-            </div>
-            <div class="moneytake">
-                <div class="moneyinfo">
-                    ￥&nbsp{{ riderInformation.Wallet}}
+    <div class="main_body">
+        <div class="person_body">
+            <PersonInfo />
+            <div class="personDown">
+                <div class="personside">
+                    <div class="headline">
+                        工资钱包<el-icon class="el-icon--right"><Wallet /></el-icon>
+                    </div>
+                    <div class="moneytake">
+                        <div class="moneyinfo">
+                            ￥&nbsp;{{ riderInformation.Wallet}}
+                        </div>
+                        <el-button type="primary" @click="isWithdraw=true">
+                            提现
+                        </el-button>
+                    </div>
                 </div>
-                <el-button @click="isWithdraw=true">
-                    提现
-                </el-button>
             </div>
         </div>
     </div>
@@ -165,6 +169,13 @@
 </template>
 
 <style scoped>
+.main_body {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 .moneytake {
     display: flex;
     justify-content: space-around;
@@ -177,7 +188,7 @@
 
 .personDown {
     display:flex;
-    color:white;
+    color:black;
     height: 65%;
 }
 
@@ -186,17 +197,20 @@
     text-align: center; 
     margin-left: 10px;
     margin-right: 10px;    
-    background-color: gray;
     padding: 20px; 
     border-radius: 15px; 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    background-color: #fff;
+  border: 2px solid #ffcc00;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .personInfo {
     flex: 2; 
     text-align: center; 
     margin-left: 10px;
     margin-right: 10px;    
-    background-color: gray;
     padding: 20px; 
     border-radius: 15px; 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
@@ -208,4 +222,14 @@
     justify-content: center;
     align-items: center;
 }
+
+.person_body {
+  padding: 20px;
+  background-color: #ffd666;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  margin-right: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 </style>    

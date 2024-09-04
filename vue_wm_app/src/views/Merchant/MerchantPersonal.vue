@@ -1,14 +1,10 @@
 <script setup>
-// 导入element-plus的提示组件
 import { ElMessage } from 'element-plus'
 import { ref, reactive, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
-import { inject } from 'vue';
 import store from '@/store';
 const router = useRouter();
-const merchant = ref({});
 import { merchantInfo, getMerPrice,updateMerchant, getMerOrdersWithinThisMonth,getMerOrdersWithinThisDay,walletRecharge,walletWithdraw,assignStationToMerchant,EditMerchantStation,AssignStation} from "@/api/merchant";
-import { useStore } from 'vuex';
 const isWallet=ref(false);  //是否是钱包界面
 const isRecharge=ref(false);  //是否是充值界面
 const isWithdraw=ref(false); //是否是提现页面
@@ -35,7 +31,6 @@ const merchantForm = ref({
     reWalletPassword:"",
 
 });
-
 const currentMerchant=ref({})
 let updateTurnoverInterval = null;
 
@@ -141,7 +136,6 @@ onBeforeUnmount(() => {
         clearInterval(updateTurnoverInterval);  // 清除定时器
     }
 })
-
 function editMerchant() {
     // 除去验证结果
     currentMerchant.value.MerchantId=merchantForm.value.MerchantId;
@@ -166,7 +160,6 @@ function editMerchant() {
 
     isOnlyShow.value = false;
 }
-
 const saveMerchant = async()=> {
     const isValid = await refForm.value.validate();  
         if (!isValid) {  
@@ -279,7 +272,6 @@ const SaveRecharge=async()=>{
             }  
     });     
 }
-
 const SaveWithdraw=async()=>{
     const isValid = await refForm.value.validate();   
     if (!isValid) return; // 如果不合法，提前退出
@@ -309,7 +301,6 @@ const SaveWithdraw=async()=>{
             }  
     });     
 }
-
 function cancelEdit() {
     isOnlyShow.value = true;
 }
@@ -371,22 +362,6 @@ function leaveWPWindow(){  //关闭修改支付密码界面
 function gobackHome(){
     router.push('/merchant-home');
 }
-// 跳转到菜单  
-const goToMenu = () => { 
-    router.push('/merchant-home/dish');  
-    isMerchantHome.value = false; // 进入菜单页面时隐藏欢迎信息和按钮  
-};  
-
-// 跳转到个人信息  
-const goToPersonal = () => { 
-    router.push('/merchant-home/personal');  
-    isMerchantHome.value = false; // 进入个人信息页面时隐藏欢迎信息和按钮  
-};  
-// 跳转到满减活动  
-const goToSpecialOffer = () => { 
-    router.push('/merchant-home/specialOffer');  
-    isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
-};  
 const renewTurnoverStat=async()=>{
     try{
         const ordersData=await getMerOrdersWithinThisMonth(merchantForm.value.MerchantId);

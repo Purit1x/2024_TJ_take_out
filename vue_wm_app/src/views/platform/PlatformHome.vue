@@ -6,6 +6,11 @@ const store = useStore()
 const router = useRouter();
 const isPlatformHome = ref(true); // 页面是否为用户主页 
 onMounted(() => {
+    const adminData = store.state.admin; 
+    if(adminData){
+    }else{
+        router.push('/login');
+    }
     if(router.currentRoute.value.path !== '/platform-home')
         isPlatformHome.value = false;
     else

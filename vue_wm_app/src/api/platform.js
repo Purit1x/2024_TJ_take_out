@@ -155,3 +155,31 @@ export const getSalesByRegion = async (region) => {
         throw error;
     }
 }
+
+export const getFinishedOrders=async()=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Platform/getFinishedOrders`);
+        return response.data;
+    }catch(error)
+    {
+        throw error;
+    }
+}
+export const getFinishedOrdersComment=async(id)=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Platform/getFinishedOrdersComment?orderId=${id}`);
+        return response.data.data;
+    }catch(error)
+    {
+        throw error;
+    }
+}
+export const deleteOrdersComment=async(id)=>{
+    try{
+        const response=await axios.put(`${BASE_URL}/Platform/deleteOrdersComment?orderId=${id}`);
+        return response.data;
+    }catch(error)
+    {
+        throw error;
+    }
+}
