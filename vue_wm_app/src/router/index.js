@@ -139,6 +139,10 @@ const routers = [
                 component: CommentManage,
             },
             {
+                path: 'user-manage',
+                component: UserManage,
+            },
+            {
                 path: 'station-manage',
                 component: StationManage,
             },

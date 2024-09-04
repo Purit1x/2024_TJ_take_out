@@ -32,7 +32,14 @@ export const updateUser = async(data) => {  //更新用户信息
         throw error;   
     } 
 }
-
+export const getAllUsers = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/getAllUsers`);
+        return response.data; // 返回后端返回的数据
+    } catch (error) {
+        throw error; // 抛出错误
+    }
+};
 export const userInfo = async(id) => {  //获取用户信息
     try {  
         const response = await axios.get(`${BASE_URL}/Users/userSearch?userId=${id}`);  
