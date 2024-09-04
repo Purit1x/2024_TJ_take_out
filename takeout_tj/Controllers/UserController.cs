@@ -163,6 +163,42 @@ namespace takeout_tj.Controllers
                 return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("getAllUsers")]  // 获取全部用户信息
+        public IActionResult GetAllUsers()
+        {
+            try
+            {
+                // 查询所有用户
+                var users = _context.Users.ToList();
+
+                // 如果用户列表为空，返回一个消息
+                if (users == null || users.Count == 0)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "没有找到任何用户" });
+                }
+
+                // 构建用户信息列表
+                var usersInfo = users.Select(user => new
+                {
+                    user.UserId,
+                    user.UserName,
+                    user.PhoneNumber,
+                    user.Wallet,
+                }).ToList();
+
+                // 返回成功响应，包含用户信息
+                return Ok(new { data = usersInfo, msg = "获取成功" });
+            }
+            catch (Exception ex)
+            {
+                // 如果发生异常，返回错误响应
+                return StatusCode(30000, new { errorCode = 30000, msg = ex.Message });
+            }
+        }
+
+
         [HttpPut]
         [Route("userEdit")]  //编辑个人信息
         public IActionResult EditMerchant([FromBody] UserDto dto)
@@ -198,6 +234,39 @@ namespace takeout_tj.Controllers
             {
                 tran.Rollback(); // 回滚事务  
                 return StatusCode(30000, new { errorCode = 30000, msg = $"更新异常: {ex.Message}" });
+            }
+        }
+        [HttpDelete]
+        [Route("deleteUser")]
+        public IActionResult DeleteUser(int userId)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务
+            try
+            {
+                // 查询要删除的用户
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "用户未找到" });
+                }
+                // 删除用户
+                _context.Users.Remove(user);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "用户删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
             }
         }
         [HttpPut]
