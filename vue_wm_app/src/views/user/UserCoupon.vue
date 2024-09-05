@@ -127,10 +127,11 @@ const leavePurchaseInfo = () => {
 <template>
   <div class="content">
     <div v-if="isUserCoupon&&!isShowCouponInfo&&!isPurchaseList&&!isPurchaseInfo">
-        <header>我的优惠券</header>
+        <header>我的优惠券
+            <el-button @click="gobackHome">返回</el-button>
+        </header>
         <el-button @click="enterCouponPurchase">购买优惠券</el-button>&nbsp;&nbsp;
         <el-button @click="enterPurchaseList">购买记录</el-button>&nbsp;&nbsp;
-        <el-button @click="gobackHome">返回</el-button>
 
         <div class="search-bar">
             <el-col :span="8">
@@ -141,28 +142,36 @@ const leavePurchaseInfo = () => {
                 </el-input>
             </el-col>
         </div> 
-        <div>
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>券名</th>
-                        <th>满减</th>
-                        <th>数量</th>
-                        <th>有效期</th>
-                        <th>类别</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="coupon in showUserCoupons" :key="coupon.couponId">
-                        <td>{{ coupon.coupon.couponName }}</td>
-                        <td>满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</td>
-                        <td>{{ coupon.amountOwned }}张</td>
-                        <td>{{ coupon.expirationDate }}</td>
-                        <td><el-tag size="large">{{ currentUserCoupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- <ul>  
+            <li v-for="coupon in showUserCoupons" :key="coupon.couponId">  
+                <span>{{ coupon.coupon.couponName }}</span> 
+                <span>&nbsp;&nbsp;满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</span> 
+                <span>&nbsp;&nbsp;有效期至{{ coupon.expirationDate }}</span> 
+                <span>&nbsp;&nbsp;&nbsp; × {{ coupon.amountOwned }}</span>
+                <span>&nbsp;&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
+            </li>  
+        </ul>  -->
+        
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>券名</th>
+                    <th>满减</th>
+                    <th>数量</th>
+                    <th>有效期</th>
+                    <th>类别</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="coupon in showUserCoupons" :key="coupon.couponId">
+                    <td>{{ coupon.coupon.couponName }}</td>
+                    <td>满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</td>
+                    <td>{{ coupon.amountOwned }}张</td>
+                    <td>{{ coupon.expirationDate }}</td>
+                    <td><el-tag size="large">{{ coupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <!-- <div v-if="isShowCouponInfo">
         <h2>优惠券详情</h2>
@@ -173,14 +182,10 @@ const leavePurchaseInfo = () => {
         <div>类型：{{ currentUserCoupon.coupon.couponType===0?'通用券':'特殊券' }}</div>
         <div><button @click="leaveCouponInfo()">返回</button></div>
     </div> -->
-    <div v-if="isPurchaseList&&!isPurchaseInfo">
-        <h2>购买记录
-            <button @click="leavePurchaseList()">返回</button>
-        </h2>
-        <!-- <div>
-            <input type="text" v-model="searchPurchaseQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handlePurchaseSearch()"/> 
-            <button @click="handlePurchaseSearch()">搜索</button>
-        </div> -->
+    <div v-if="isPurchaseList&!isPurchaseInfo">
+        <header>购买记录
+            <el-button @click="leavePurchaseList()">返回</el-button>
+        </header>
 
         <div class="search-bar">
             <el-col :span="8">
@@ -216,9 +221,9 @@ const leavePurchaseInfo = () => {
                     <tr v-for="coupon in showCouponPurchaseList" :key="coupon.couponPurchaseId">
                         <td>{{ coupon.coupon.couponName }}</td>
                         <td>满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</td>
-                        <td>{{ coupon.amountOwned }}张</td>
+                        <td>{{ coupon.purchasingAmount}}张</td>
                         <td>{{ coupon.purchasingTimestamp }}</td>
-                        <td><el-tag size="large">{{ currentUserCoupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
+                        <td><el-tag size="large">{{ coupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
                         <td><button @click="enterPurchaseInfo(coupon)">查看</button></td>
                     </tr>
                 </tbody>
@@ -226,7 +231,7 @@ const leavePurchaseInfo = () => {
         </div>
     </div>
     <div v-if="isPurchaseInfo">
-        <h2>购买详情</h2>
+        <!-- <h2>购买详情</h2>
         <div>订单号：{{ currentPurchase.couponPurchaseId }}</div>
         <div>券名：{{ currentPurchase.coupon.couponName }}</div>
         <div>满减：满{{ currentPurchase.coupon.minPrice }}减{{ currentPurchase.coupon.couponValue }}元</div>
@@ -236,74 +241,72 @@ const leavePurchaseInfo = () => {
         <div>单价：{{ currentPurchase.coupon.couponPrice }}</div>
         <div>总价：{{ currentPurchase.coupon.couponPrice * currentPurchase.purchasingAmount }}</div>
         <div>有效期：{{ currentPurchase.coupon.periodOfValidity }}天</div>
-        <div><button @click="leavePurchaseInfo()">返回</button></div>
-
-        <el-descriptions
-            class="margin-top"
-            title="购买详情"
-            :column="3"
-            :size="size"
-            border
-            style="margin-bottom: 20px;"
-        >
-            <template #extra>
-                <el-button type="primary" @click="leavePurchaseInfo()">返回</el-button>
-            </template>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">订单号</div>
-            </template>
-            {{ currentPurchase.couponPurchaseId }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">券名</div>
-            </template>
-            {{ currentPurchase.coupon.couponName }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">满减</div>
-            </template>
-            满{{ currentPurchase.coupon.minPrice }}减{{ currentPurchase.coupon.couponValue }}元
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">购买时间</div>
-            </template>
-            {{ currentPurchase.purchasingTimestamp }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">数量</div>
-            </template>
-            {{ currentPurchase.purchasingAmount }}张
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">类型</div>
-            </template>
-            {{ currentPurchase.coupon.couponType===0?'通用券':'特殊券' }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">单价</div>
-            </template>
-            {{ currentPurchase.coupon.couponPrice }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">总价</div>
-            </template>
-            {{ currentPurchase.coupon.couponPrice * currentPurchase.purchasingAmount }}
-            </el-descriptions-item>
-            <el-descriptions-item label-class-name="my-label">
-            <template #label>
-                <div class="cell-item">有效期</div>
-            </template>
-            {{ currentPurchase.coupon.periodOfValidity }}天
-            </el-descriptions-item>
-        </el-descriptions>
+        <div><button @click="leavePurchaseInfo()">返回</button></div> -->
+        <header>购买详情
+            <el-button @click="leavePurchaseInfo()">返回</el-button>
+        </header>
+        <div style="margin-bottom: 20px; margin-top:20px; width: 90%;display: flex;white-space: nowrap;justify-content: center;height: 100%;">
+            <el-descriptions
+                :column="3"
+                size="large"
+                border
+            >
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">订单号</div>
+                </template>
+                {{ currentPurchase.couponPurchaseId }}
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">券名</div>
+                </template>
+                {{ currentPurchase.coupon.couponName }}
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">满减</div>
+                </template>
+                满{{ currentPurchase.coupon.minPrice }}减{{ currentPurchase.coupon.couponValue }}元
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">购买时间</div>
+                </template>
+                {{ currentPurchase.purchasingTimestamp }}
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">数量</div>
+                </template>
+                {{ currentPurchase.purchasingAmount }}张
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">类型</div>
+                </template>
+                <el-tag size="large">{{ currentPurchase.coupon.couponType===0?'通用券':'特殊券' }}</el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">单价</div>
+                </template>
+                {{ currentPurchase.coupon.couponPrice }}元
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">总价</div>
+                </template>
+                {{ currentPurchase.coupon.couponPrice * currentPurchase.purchasingAmount }}元
+                </el-descriptions-item>
+                <el-descriptions-item label-class-name="my-label">
+                <template #label>
+                    <div class="cell-item">有效期</div>
+                </template>
+                {{ currentPurchase.coupon.periodOfValidity }}天
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
     </div>
   </div>
     <router-view />
@@ -322,6 +325,7 @@ const leavePurchaseInfo = () => {
   color: #fff;
   cursor: pointer;
   transition: background-color 0.3s, box-shadow 0.3s;
+  margin-right: 20px;
 }
 .el-button:hover {
   background-color: #D8BFD8;
@@ -376,5 +380,9 @@ const leavePurchaseInfo = () => {
   background: #7BA7AB !important;
   color:#ffffff !important;
   width: 16% !important;
+}
+.el-descriptions-item {
+  flex: 1; /* 使每个item均匀分布 */
+  min-width: 0; /* 防止内容溢出 */
 }
 </style>

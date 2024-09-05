@@ -11,7 +11,7 @@ const router = useRouter();
 const refForm =ref(null);
 
 const editPI=ref(false)  //编辑个人信息弹窗状态
-const isFavouriteMerchants=ref(false);  //是否展示收藏商户界面
+const isFavouriteMerchants=ref(true);  //是否展示收藏商户界面
 const isWallet=ref(true);  //是否是钱包界面
 const isRecharge=ref(false);  //充值弹窗状态
 const isWithdraw=ref(false); //提现弹窗状态
@@ -353,7 +353,6 @@ const SavedeleteFM=async(merchantId)=>{
     
 }
 const visitingCoupon=()=>{
-    setView();
     isUserPersonal.value=false;
     router.push('/user-home/personal/coupon');
 }
@@ -373,7 +372,7 @@ const enterDishes = (id) => {
 <template>
   <div class="content">
 
-    <div v-if="!editPI&isUserPersonal">
+    <div v-if="isUserPersonal">
         <header>
             {{userForm.UserName}}的个人中心
             <el-button @click="logout()">退出登录</el-button>
@@ -414,18 +413,63 @@ const enterDishes = (id) => {
             </template>
             {{userForm.Password}}
             </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">我的钱包</div>
+            </template>
+            <div style="display:flex;justify-content: space-between;align-items:center;">
+                ￥{{userForm.Wallet}}
+                <div style="text-align: right; gap:20px;">
+                    <button @click="OpenRechargeWindow">充值</button>
+                    <button @click="OpenWithdrawWindow">提现</button>
+                    <button @click="OpenWPWindow">修改支付密码</button>
+                </div>
+            </div>
+            </el-descriptions-item>
         </el-descriptions>
 
         <el-row :gutter="20">
-            <el-col :span="8"><el-button @click="enterFavouriteMerchants()" style="width:100%;">收藏</el-button></el-col>
-            <el-col :span="8"><el-button @click="visitingCoupon()" style="width:100%;">优惠券</el-button></el-col>
-            <el-col :span="8"><el-button @click="visitingMyOrder()" style="width:100%;">我的订单</el-button></el-col>
+            <!-- <el-col :span="8"><el-button @click="enterFavouriteMerchants()" style="width:100%;">收藏</el-button></el-col> -->
+            <el-col :span="12"><el-button @click="visitingCoupon()" style="width:100%;">优惠券</el-button></el-col>
+            <el-col :span="12"><el-button @click="visitingMyOrder()" style="width:100%;">我的订单</el-button></el-col>
             <!-- <el-col :span="6"><el-button @click="enterWallet()" style="width:100%;">钱包</el-button></el-col> -->
         </el-row>
     </div>
 
-    <!-- 编辑个人信息 -->
-    <div v-if="editPI">
+    <!-- 钱包充值弹窗 -->  
+    <el-dialog title="充值金额" :model-value="isRecharge" @close="leaveRechargeWindow">  
+        <div style="display:flex;flex-direction:row;">
+            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
+            <el-button @click="SaveRecharge" style="margin-left:30px;">充值</el-button>
+        </div>
+    </el-dialog>  
+    <!-- 钱包提现弹窗 -->  
+    <el-dialog title="提现金额" :model-value="isWithdraw" @close="leaveWithdrawWindow">  
+        <div style="display:flex;flex-direction:row;">
+            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入提现金额" @blur="validateField('recharge')"/></el-form-item>
+            <el-button @click="SaveRecharge" style="margin-left:30px;">提现</el-button>
+        </div>
+    </el-dialog> 
+    <!-- 修改支付密码弹窗 -->  
+    <el-dialog title="提现金额" :model-value="isChangeWP" @close="leaveWPWindow">  
+        <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentUser.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
+        <div style="display:flex;flex-direction:row;">
+            <div style="margin-right: 20px;">确认支付密码</div>
+            <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentUser.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
+            <el-button @click="SaveWalletPassword" style="margin-left:30px;">修改</el-button>
+        </div>
+    </el-dialog> 
+    <!-- 编辑个人信息弹窗 -->
+    <el-dialog title="修改个人信息" :model-value="editPI" @close="leaveEdit">  
+        <el-form ref="refForm" :model="currentUser" :rules="userRules" border>
+                <el-form-item label="用户名" prop="UserName"><input v-model="currentUser.UserName" placeholder="用户名" @blur="validateField('UserName')"/></el-form-item>
+                <el-form-item label="手机号" prop="PhoneNumber"><input type="number" v-model="currentUser.PhoneNumber" placeholder="手机号" @blur="validateField('PhoneNumber')"/></el-form-item>
+                <el-form-item label="密码" prop="Password"><input type="password" v-model="currentUser.Password" placeholder="密码" @blur="validateField('Password')"/></el-form-item>
+                <el-form-item label="确认密码" prop="rePassword"><input type="password" v-model="currentUser.rePassword" placeholder="确认密码" @blur="validateField('rePassword')"/></el-form-item>
+            </el-form>
+            <el-button @click="submitEdit()">提交</el-button>
+    </el-dialog> 
+    <!-- <div v-if="editPI">
         <div>
             <el-form ref="refForm" :model="currentUser" :rules="userRules">
                 <el-form-item label="用户名" prop="UserName"><input v-model="currentUser.UserName" placeholder="用户名" @blur="validateField('UserName')"/></el-form-item>
@@ -436,61 +480,33 @@ const enterDishes = (id) => {
             <button @click="submitEdit()">提交</button>
             <button @click="leaveEdit()">取消</button>
         </div>
-    </div>
+    </div> -->
 
-    <!-- 我的钱包 -->
-    <div v-if="!editPI&isWallet">
-        <div style="margin-top:20px;margin-bottom: 10px;font-weight: bold;">我的钱包</div>
-        <div style="width:40%;margin-bottom: 30px;;">
-            <el-row>
-                <el-col :span="24">
-                    <div class="el-col-item" style="font-size:30px;">余额: ￥{{userForm.Wallet}}</div>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="3">
-                    <div>
-                        <el-button @click="OpenRechargeWindow">充值</el-button>
-                    </div>
-                </el-col>
-                <el-col :span="3">
-                    <div>
-                        <el-button @click="OpenWithdrawWindow">提现</el-button>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div>
-                        <el-button @click="OpenWPWindow">修改支付密码</el-button>
-                    </div>
-                </el-col>
-            </el-row>
-        </div>
-    </div>
 
     <el-form :model="currentUser" :rules="userRules" ref="refForm">
-        <div class="recharge" v-if="isRecharge">  <!-- 充值 -->
+        <!-- <div class="recharge" v-if="isRecharge">
             <div>充值金额</div>
             <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
             <el-button @click="SaveRecharge">充值</el-button>
             <el-button @click="leaveRechargeWindow">返回</el-button>
         </div>
 
-        <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
+        <div class="withdraw" v-if="isWithdraw">
             <div>提现金额</div>
             <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
             <el-button @click="SaveWithdraw">提现</el-button>
             <el-button @click="leaveWithdrawWindow">返回</el-button>
         </div>
-        <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
+        <div class="changewp" v-if="isChangeWP">
             <div>支付密码</div>
             <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentUser.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
             <div>确认支付密码</div>
             <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentUser.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
             <el-button @click="SaveWalletPassword">修改</el-button>
             <el-button @click="leaveWPWindow">返回</el-button>
-        </div>
+        </div> -->
         <div class="favouritemerchant" v-if="isFavouriteMerchants">  <!-- 收藏商户 -->
-            <div style="margin-top:20px;margin-bottom: 20px;">收藏商户:</div>
+            <div style="margin-top:20px;margin-bottom: 20px;font-weight: bold;">收藏商户</div>
             <table class="styled-table">
                 <thead>
                     <tr>
