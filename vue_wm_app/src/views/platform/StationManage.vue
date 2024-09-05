@@ -1,5 +1,4 @@
 <script setup>
-import { useStore } from "vuex";
 import { ElMessage,ElMessageBox } from "element-plus";
 import { ref, onMounted, computed } from 'vue';  
 import { useRouter } from 'vue-router';
@@ -190,43 +189,224 @@ const submitCreate = async() => {
 </script>
 
 <template>
-    <div v-if="!isEdit&&!isCreate">
-        <div>
-            片区管理
-            <button @click="gobackHome">返回</button>
+    <div v-if="!isEdit&&!isCreate" class="box">
+        <div class="head">站点列表 </div>
+        <div class="top">
+            <input type="text" v-model="searchQuery" placeholder="搜索站点名或地址" v-on:keyup.enter="handleSearch()" class="inputtext"/> 
+            <button @click="handleSearch()" class="search">搜索</button>
+            <button @click="enterCreate()" class="release">创建</button>
         </div>
-        <h2>站点列表</h2>  
-        <div>
-            <input type="text" v-model="searchQuery" placeholder="搜索站点名或地址" v-on:keyup.enter="handleSearch()"/> 
-            <button @click="handleSearch()">搜索</button>
-            <button @click="enterCreate()">创建</button>
-        </div>
-        <ul>  
-            <li v-for="station in showStationsInfo" :key="station.stationId">  
-                <span>{{ station.stationName }}</span> 
-                <span>&nbsp;&nbsp;{{ station.stationAddress }}</span>
-                <span>&nbsp;<button @click="enterEdit(station)">编辑</button></span>
-                <span>&nbsp;<button @click="deleteStation(station.stationId)">删除</button></span>
-            </li>  
-        </ul> 
+        <el-table :data="showStationsInfo" class="table" border>
+        <el-table-column prop="stationName" label="站点名称" width=250>
+            <template #default="{ row }">
+                {{ row.stationName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="stationAddress" label="站点地址" width=500>
+            <template #default="{ row }">
+                {{ row.stationAddress }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" width=250>
+            <template #default="{ row }">
+                <el-button type="primary" size="small" @click="enterEdit(row)">编辑</el-button>
+                <el-button type="danger" size="small" @click="deleteStation(row.stationId)">删除</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+        <button @click="gobackHome" class="return">返回</button>
     </div>
     
-    <div v-if="isEdit">
-        <h2>编辑站点</h2> 
+    <div v-if="isEdit" class="box2">
+        <div class="head3">编辑站点</div> 
         <el-form :rules="editRules" ref="refForm" :model="currentStation">
-            <el-form-item label="站点名" prop="stationName"><input v-model="currentStation.stationName" placeholder="站点名" @blur="validateField('stationName')"/></el-form-item>
-            <el-form-item label="站点地址(建议详细到门牌号)" prop="stationAddress"><input v-model="currentStation.stationAddress" placeholder="地址" @blur="validateField('stationAddress')"/></el-form-item>
+            <el-form-item  prop="stationName">
+                <div class="info">*站点名</div>
+                <input v-model="currentStation.stationName" placeholder="站点名" @blur="validateField('stationName')" class="inputtext"/>
+            </el-form-item>
+            <el-form-item  prop="stationAddress">
+                <div class="info">*站点地址(建议详细到门牌号)</div>
+                <input v-model="currentStation.stationAddress" placeholder="地址" @blur="validateField('stationAddress')" class="inputtext"/>
+            </el-form-item>
         </el-form>  
-        <button @click="submitEdit">提交</button>  
-        <button @click="cancelEdit">取消</button>
+        <div class="bottom">
+        <button @click="submitEdit" class="choose2">提交</button>  
+        <button @click="cancelEdit" class="choose2">取消</button>
     </div>
-    <div v-if="isCreate">
-        <h2>创建站点</h2> 
+    </div>
+    <div v-if="isCreate" class="box2">
+        <div class="head3">创建站点</div> 
         <el-form :rules="editRules" ref="refForm" :model="currentStation">
-            <el-form-item label="站点名" prop="stationName"><input v-model="currentStation.stationName" placeholder="站点名" @blur="validateField('stationName')"/></el-form-item>
-            <el-form-item label="站点地址(建议详细到门牌号)" prop="stationAddress"><input v-model="currentStation.stationAddress" placeholder="地址" @blur="validateField('stationAddress')"/></el-form-item>
+                <el-form-item prop="stationName" >
+                    <div class="info">*站点名</div>
+                    <input v-model="currentStation.stationName" placeholder="站点名" @blur="validateField('stationName')" class="inputtext"/>
+                </el-form-item>
+                <el-form-item  prop="stationAddress" >
+                    <div class="info">*站点地址(建议详细到门牌号)</div>
+                    <input v-model="currentStation.stationAddress" placeholder="地址" @blur="validateField('stationAddress')" class="inputtext"/>
+                </el-form-item>
         </el-form>  
-        <button @click="submitCreate">提交</button>  
-        <button @click="cancelCreate">取消</button>
+        <div class="bottom">
+        <button @click="submitCreate" class="choose2">提交</button>  
+        <button @click="cancelCreate" class="choose2">取消</button>
+        </div>
     </div>
 </template>
+
+<style scoped lang="scss">
+body {
+    background-color: #e59090; /* 选择你喜欢的颜色 */
+}
+.info{
+    display:flex;
+    width:30%;
+    font-size: 18px;
+    margin-left: 5%;
+
+}
+
+.inputtext{
+    height: 30px;
+    width: 450px;
+    right:5%;
+    font-size: 2.8vmin;
+    border-radius: 9px;
+    margin-right: 2%;
+}
+.bottom{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-top: 5%;
+}
+.top{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+.box{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 60px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 70%;
+    height: 80%;
+}
+.box2{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 60px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 60%;
+    height: 70%;
+}
+.return{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+    font-size: 2.4vmin; 
+}
+.return:hover{
+    background-color: #f7ced5;
+}
+.head{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4.5vmin; /* 字体大小 */
+    color:#000000;
+
+}
+.head3{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4.5vmin; /* 字体大小 */
+    color:#000000;
+    margin-bottom: 5%;
+}
+.choose{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #f68396;
+    font-size: 2.5vmin; /* 字体大小 */
+}
+.choose:hover{
+    background-color: #FFC0CB;
+}
+.choose2{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #f68396;
+    font-size: 3vmin; /* 字体大小 */
+}
+.choose2:hover{
+    background-color: #FFC0CB;
+}
+.head2{
+    margin-top:4%;
+    margin-bottom: 3%;
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    color:#f56a81;
+}
+.input{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-left:30%;
+    margin-right:30%;
+    width:40%;
+    font-size: 3vmin;
+}
+.output{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-top:1%;
+   // width:100%;
+    font-size: 3vmin;
+    color:#583def;
+}
+.search{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
+}
+.release{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
+}
+.table{
+    margin-top:10px;
+    margin-left:5%;
+    height:77%;
+    width:90%;
+    border-radius: 20px;
+    border: 2px solid #01042a;
+    table-layout: auto;
+}
+</style>

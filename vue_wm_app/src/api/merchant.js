@@ -350,4 +350,12 @@ export const getFinishedMerOrders=async(id)=>{
         throw error;
     }
 }
-
+export const getMerRating=async(id)=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Merchant/getMerRating?orderId=${id}`);
+        return response.data.data;
+    }
+    catch(error){
+        throw error;
+    }
+}

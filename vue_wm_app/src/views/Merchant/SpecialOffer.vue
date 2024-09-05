@@ -172,7 +172,7 @@ const deleteSpecialOffer = async(offerId) => {
 <template>
     <div class="content">
         <header class="welcome-text">满减活动</header>
-        <div>
+        <div class = "offers-container">
             <ul class = "offers-list">
             <li v-for="offer in offers" :key="offer.offerId">
                 <div v-if="editingOfferId !== offer.offerId">
@@ -215,14 +215,17 @@ const deleteSpecialOffer = async(offerId) => {
 .offers-list {
   list-style: none;
   padding: 0;
-  margin-right: 30px;
+  
+  overflow-y: auto; /* 使订单区域可以滚动 */
 
   li {
     display: flex;
     align-items: center;
     padding: 10px;
-    margin: 0 30px;     // 修改左右外边距
+    margin-left: 30px;     // 修改左右外边距
+    margin-right:30px;
     margin-bottom: 10px;
+    margin-top:10px;
     border: 2px solid #ffee00;
     border-radius: 8px;
     background-color: #f9f9f9;
@@ -295,6 +298,39 @@ const deleteSpecialOffer = async(offerId) => {
       }
     }
   }
+}
+
+/* 隐藏滚动条 */
+.offers-list::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* 滚动条轨道 */
+.offers-list::-webkit-scrollbar-track {
+    background: #ffd666;
+}
+/* 滚动条滑块 */
+.offers-list::-webkit-scrollbar-thumb {
+    background-color: #ffd666;
+    border-radius: 10px;
+    border: 2px solid #000000;
+}
+
+.offers-container{
+    background-color: #ffd666;
+    border:2px solid black;
+    border-radius: 20px;
+    padding:5px;
+    
+    max-height: 320px; /* 设置订单区域的最大高度 */
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* 使订单区域可以滚动 */
+    
+    margin-left: 0px;
+    margin-right: 40px;
+    margin-bottom:10px;
 }
 
 /* 编辑区域的容器样式 */
