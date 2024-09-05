@@ -26,7 +26,7 @@ export const userLoginService = async(loginData) => {
 
 export const updateUser = async(data) => {  //更新用户信息
     try {  
-        const response = await axios.put(`${BASE_URL}/userEdit`, data);  
+        const response = await axios.put(`${BASE_URL}/Users/userEdit`, data);  
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   
