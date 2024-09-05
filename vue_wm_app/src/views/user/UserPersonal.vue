@@ -5,17 +5,19 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex"  
 import { onMounted, ref,watch } from 'vue';
 import { userInfo,updateUser,walletRecharge,walletWithdraw,searchFavouriteMerchant,getMerchantsInfo,deleteFavouriteMerchant} from "@/api/user";
+import { getQuantityByRegion } from '@/api/platform';
 const store = useStore();
 const router = useRouter();
 const refForm =ref(null);
-const personalInfo = ref(false);  // 个人信息弹窗状态
+
 const editPI=ref(false)  //编辑个人信息弹窗状态
-const isWallet=ref(false);  //是否是钱包界面
-const currentUser=ref({})  //编辑用户信息时需要用到
+const isFavouriteMerchants=ref(true);  //是否展示收藏商户界面
+const isWallet=ref(true);  //是否是钱包界面
 const isRecharge=ref(false);  //充值弹窗状态
 const isWithdraw=ref(false); //提现弹窗状态
 const isChangeWP=ref(false);  //修改钱包密码弹窗状态
-const isFavouriteMerchants=ref(false);  //收藏商户弹窗状态
+
+const currentUser=ref({})  //编辑用户信息时需要用到
 const favouriteMerchantIds=ref([]);  //收藏的商户Id列表
 const favouriteMerchantsInfo=ref([]);  //收藏的商户信息列表
 const isUserPersonal=ref(true);  //是否是用户主页
@@ -150,23 +152,32 @@ const logout=()=> {
     store.dispatch('clearUser'); 
     router.push('/login') 
 }
-const showPersonalInfo = () => {
-    personalInfo.value = true;
-
+const setView = () => {
+    editPI.value = false;
+    isFavouriteMerchants.value=false;
+    isWallet.value=false;
+    isRecharge.value=false;
+    isWithdraw.value=false;
+    isChangeWP.value=false;
 }
-const leavePersonalInfo = () => {
-    personalInfo.value = false;
-}
+// const showPersonalInfo = () => {
+//     personalInfo.value = true;
+// }
+// const leavePersonalInfo = () => {
+//     personalInfo.value = false;
+// }
 const editPersonalInfo = () => {
     currentUser.value = userForm.value;
-    personalInfo.value = false;
+    // personalInfo.value = false;
+    setView();
     editPI.value = true;
 }
 const leaveEdit= () => {
     editPI.value = false;
-    personalInfo.value = true;
+    // personalInfo.value = true;
 }
 const enterWallet=()=>{
+    setView();
     isWallet.value=true;
 }
 const leaveWallet=()=>{
@@ -174,34 +185,42 @@ const leaveWallet=()=>{
 }
 const OpenRechargeWindow=()=>{
     currentUser.value = userForm.value;
+    setView();
+    isWallet.value=true;
     isRecharge.value=true;
-    isWallet.value=false;
-    personalInfo.value = false;
+
+    // isWallet.value=false;
+    // personalInfo.value = false;
 }
 const leaveRechargeWindow=()=>{
     isRecharge.value=false;
-    isWallet.value=true;
+    // isWallet.value=true;
 }
 const OpenWithdrawWindow=()=>{
-    currentUser.value = userForm.value;
+    currentUser.value = userForm.value;   
+    setView();
+    isWallet.value=true;
     isWithdraw.value=true;
-    isWallet.value=false;
-    personalInfo.value = false;
+    // isWallet.value=false;
+    // personalInfo.value = false;
 }
 const leaveWithdrawWindow=()=>{
     isWithdraw.value=false;
-    isWallet.value=true;
+    // isWallet.value=true;
 }
 const OpenWPWindow=()=>{
     currentUser.value = userForm.value;
+    setView();
+    isWallet.value=true;
     isChangeWP.value=true;
-    isWallet.value=false;
+    // isWallet.value=false;
 }
 const leaveWPWindow=()=>{
     isChangeWP.value=false;
-    isWallet.value=true;
+    // isWallet.value=true;
 }
 const enterFavouriteMerchants=()=>{
+    setView();
     isFavouriteMerchants.value=true;
 }
 const leaveFavouriteMerchants=()=>{
@@ -215,7 +234,7 @@ const submitEdit = async () => {
     updateUser(currentUser.value).then(data=>{
             ElMessage.success('修改成功');
             editPI.value = false;
-            personalInfo.value = true;
+            // personalInfo.value = true;
             userForm.value = currentUser.value;
         }).catch(error => {
         if (error.response && error.response.data) {  
@@ -256,7 +275,6 @@ const SaveRecharge=async()=>{
             }  
     });     
 }
-
 const SaveWithdraw=async()=>{
     const isValid = await refForm.value.validate();   
     if (!isValid) return; // 如果不合法，提前退出
@@ -286,7 +304,6 @@ const SaveWithdraw=async()=>{
             }  
     });     
 }
-
 const SaveWalletPassword=async()=>{
     const isValid = await refForm.value.validate();   
     if (!isValid) return; // 如果不合法，提前退出
@@ -338,41 +355,121 @@ const SavedeleteFM=async(merchantId)=>{
 const visitingCoupon=()=>{
     isUserPersonal.value=false;
     router.push('/user-home/personal/coupon');
-
 }
 const visitingMyOrder=()=>{
+    setView();
     isUserPersonal.value=false;
     router.push('/user-home/personal/myOrder');
 }
+
+const enterDishes = (id) => {
+  isFavouriteMerchants.value = false;
+  router.push('/user-home/merchant/' + id);
+};
+
 </script>
 
 <template>
   <div class="content">
 
-    <div v-if="!personalInfo&!editPI&!isWallet&!isWithdraw&!isRecharge&!isChangeWP&!isFavouriteMerchants&isUserPersonal">
+    <div v-if="isUserPersonal">
+        <header>
+            {{userForm.UserName}}的个人中心
+            <el-button @click="logout()">退出登录</el-button>
+        </header>
+        
+        <el-descriptions
+            class="margin-top"
+            title="个人信息"
+            :column="2"
+            :size="size"
+            border
+            style="margin-bottom: 20px;"
+        >
+            <template #extra>
+            <el-button type="primary" @click="editPersonalInfo()">编辑</el-button>
+            </template>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item"><el-icon :style="iconStyle" style="margin-right:5px;"><star /></el-icon> 用户ID</div>
+            </template>
+            {{userForm.UserId}}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item"><el-icon :style="iconStyle" style="margin-right:5px;"><user /></el-icon> 用户名</div>
+            </template>
+            {{userForm.UserName}}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item"><el-icon :style="iconStyle" style="margin-right:5px;"><iphone /></el-icon> 联系电话</div>
+            </template>
+            {{userForm.PhoneNumber}}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item"><el-icon :style="iconStyle" style="margin-right:5px;"><lock /></el-icon> 密码</div>
+            </template>
+            {{userForm.Password}}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">我的钱包</div>
+            </template>
+            <div style="display:flex;justify-content: space-between;align-items:center;">
+                ￥{{userForm.Wallet}}
+                <div style="text-align: right; gap:20px;">
+                    <button @click="OpenRechargeWindow">充值</button>
+                    <button @click="OpenWithdrawWindow">提现</button>
+                    <button @click="OpenWPWindow">修改支付密码</button>
+                </div>
+            </div>
+            </el-descriptions-item>
+        </el-descriptions>
 
-        <header>{{userForm.UserName}}的个人中心</header>
-
-        <div><button @click="gobackHome()">返回</button></div>
-        <div><button @click="enterFavouriteMerchants()">收藏</button></div>
-        <div><button @click="visitingCoupon()">优惠券</button></div>
-        <div><button>积分与会员</button></div>
-        <div><button @click="visitingMyOrder()">我的订单</button></div>
-        <div><button @click="enterWallet()">钱包</button></div>
-        <div><button @click="showPersonalInfo()">个人信息</button></div>
-        <div><button @click="logout()">退出登录</button></div>
+        <el-row :gutter="20">
+            <!-- <el-col :span="8"><el-button @click="enterFavouriteMerchants()" style="width:100%;">收藏</el-button></el-col> -->
+            <el-col :span="12"><el-button @click="visitingCoupon()" style="width:100%;">优惠券</el-button></el-col>
+            <el-col :span="12"><el-button @click="visitingMyOrder()" style="width:100%;">我的订单</el-button></el-col>
+            <!-- <el-col :span="6"><el-button @click="enterWallet()" style="width:100%;">钱包</el-button></el-col> -->
+        </el-row>
     </div>
-    <div v-if="personalInfo&!editPI&!isWallet">
-        <div>用户ID: {{userForm.UserId}}</div>
-        <div>用户名: {{userForm.UserName}}</div>
-        <div>手机号: {{userForm.PhoneNumber}}</div>
-        <div>密码: {{userForm.Password}}</div>
-        <div>
-            <button @click="editPersonalInfo()">编辑</button>
-            <button @click="leavePersonalInfo()">返回</button>
+
+    <!-- 钱包充值弹窗 -->  
+    <el-dialog title="充值金额" :model-value="isRecharge" @close="leaveRechargeWindow">  
+        <div style="display:flex;flex-direction:row;">
+            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
+            <el-button @click="SaveRecharge" style="margin-left:30px;">充值</el-button>
         </div>
-    </div>
-    <div v-if="editPI&!isWallet">
+    </el-dialog>  
+    <!-- 钱包提现弹窗 -->  
+    <el-dialog title="提现金额" :model-value="isWithdraw" @close="leaveWithdrawWindow">  
+        <div style="display:flex;flex-direction:row;">
+            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入提现金额" @blur="validateField('recharge')"/></el-form-item>
+            <el-button @click="SaveRecharge" style="margin-left:30px;">提现</el-button>
+        </div>
+    </el-dialog> 
+    <!-- 修改支付密码弹窗 -->  
+    <el-dialog title="提现金额" :model-value="isChangeWP" @close="leaveWPWindow">  
+        <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentUser.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
+        <div style="display:flex;flex-direction:row;">
+            <div style="margin-right: 20px;">确认支付密码</div>
+            <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentUser.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
+            <el-button @click="SaveWalletPassword" style="margin-left:30px;">修改</el-button>
+        </div>
+    </el-dialog> 
+    <!-- 编辑个人信息弹窗 -->
+    <el-dialog title="修改个人信息" :model-value="editPI" @close="leaveEdit">  
+        <el-form ref="refForm" :model="currentUser" :rules="userRules" border>
+                <el-form-item label="用户名" prop="UserName"><input v-model="currentUser.UserName" placeholder="用户名" @blur="validateField('UserName')"/></el-form-item>
+                <el-form-item label="手机号" prop="PhoneNumber"><input type="number" v-model="currentUser.PhoneNumber" placeholder="手机号" @blur="validateField('PhoneNumber')"/></el-form-item>
+                <el-form-item label="密码" prop="Password"><input type="password" v-model="currentUser.Password" placeholder="密码" @blur="validateField('Password')"/></el-form-item>
+                <el-form-item label="确认密码" prop="rePassword"><input type="password" v-model="currentUser.rePassword" placeholder="确认密码" @blur="validateField('rePassword')"/></el-form-item>
+            </el-form>
+            <el-button @click="submitEdit()">提交</el-button>
+    </el-dialog> 
+    <!-- <div v-if="editPI">
         <div>
             <el-form ref="refForm" :model="currentUser" :rules="userRules">
                 <el-form-item label="用户名" prop="UserName"><input v-model="currentUser.UserName" placeholder="用户名" @blur="validateField('UserName')"/></el-form-item>
@@ -383,50 +480,170 @@ const visitingMyOrder=()=>{
             <button @click="submitEdit()">提交</button>
             <button @click="leaveEdit()">取消</button>
         </div>
-    </div>
-    <div v-if="isWallet">
-        <div>钱包金额：{{userForm.Wallet}}</div>
-        <button @click="OpenRechargeWindow">充值</button>
-        <button @click="OpenWithdrawWindow">提现</button>
-        <button @click="OpenWPWindow">修改支付密码</button>
-        <button @click="leaveWallet">返回</button>
-    </div>
-    <el-form :model="currentUser" :rules="userRules" ref="refForm">
-            <div class="recharge" v-if="isRecharge">  <!-- 充值 -->
-                <div>充值金额</div>
-                <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
-                <button @click="SaveRecharge">充值</button>
-                <button @click="leaveRechargeWindow">返回</button>
-            </div>
+    </div> -->
 
-            <div class="withdraw" v-if="isWithdraw">  <!-- 提现 -->
-                <div>提现金额</div>
-                <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
-                <button @click="SaveWithdraw">提现</button>
-                <button @click="leaveWithdrawWindow">返回</button>
-            </div>
-            <div class="changewp" v-if="isChangeWP">  <!-- 修改支付密码 -->
-                <div>支付密码</div>
-                <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentUser.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
-                <div>确认支付密码</div>
-                <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentUser.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
-                <button @click="SaveWalletPassword">修改</button>
-                <button @click="leaveWPWindow">返回</button>
-            </div>
-            <div class="favouritemerchant" v-if="isFavouriteMerchants">  <!-- 收藏商户 -->
-                <div>收藏商户:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button @click="leaveFavouriteMerchants()">返回</button>
-                </div>
-                <ul>
-                    <li v-for="item in favouriteMerchantsInfo" :key="item.merchantId">
-                        <span>{{item.merchantName}}&nbsp;</span>
-                        <span>{{ item.dishType }}&nbsp;</span>
-                        <button>></button>
-                        <button @click="SavedeleteFM(item.merchantId)">删除收藏</button>
-                    </li>
-                </ul>
-            </div>
+
+    <el-form :model="currentUser" :rules="userRules" ref="refForm">
+        <!-- <div class="recharge" v-if="isRecharge">
+            <div>充值金额</div>
+            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入充值金额" @blur="validateField('recharge')"/></el-form-item>
+            <el-button @click="SaveRecharge">充值</el-button>
+            <el-button @click="leaveRechargeWindow">返回</el-button>
+        </div>
+
+        <div class="withdraw" v-if="isWithdraw">
+            <div>提现金额</div>
+            <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
+            <el-button @click="SaveWithdraw">提现</el-button>
+            <el-button @click="leaveWithdrawWindow">返回</el-button>
+        </div>
+        <div class="changewp" v-if="isChangeWP">
+            <div>支付密码</div>
+            <el-form-item label="支付密码" prop="WalletPassword"><input type="password" v-model="currentUser.WalletPassword" placeholder="请输入支付密码" @blur="validateField('WalletPassword')"/></el-form-item>
+            <div>确认支付密码</div>
+            <el-form-item labal="确认支付密码" prop="reWalletPassword"><input type="password" v-model="currentUser.reWalletPassword" placeholder="请再次确认支付密码" @blur="validateField('reWalletPassword')"/></el-form-item>
+            <el-button @click="SaveWalletPassword">修改</el-button>
+            <el-button @click="leaveWPWindow">返回</el-button>
+        </div> -->
+        <div class="favouritemerchant" v-if="isFavouriteMerchants">  <!-- 收藏商户 -->
+            <div style="margin-top:20px;margin-bottom: 20px;font-weight: bold;">收藏商户</div>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th class="col-name">店名</th>
+                        <th class="col-type">类别</th>
+                        <!-- <th class="col-Rating">评分</th> -->
+                        <th class="col-enter">操作</th>
+                        <th class="col-favorite">删除收藏</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in favouriteMerchantsInfo" :key="item.merchantId">
+                        <td class="col-name">{{ item.merchantName }}</td>
+                        <td class="col-type">{{ item.dishType }}</td>
+                        <!-- <td class="col-Rating">{{ item.avgRating }}</td> -->
+                        <td class="col-enter"><button @click="enterDishes(item.merchantId)">查看</button></td>
+                        <td class="col-favorite"><button @click="SavedeleteFM(item.merchantId)">删除收藏</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </el-form>
   </div>
     <router-view />
 </template>
+
+<style scoped>
+.content header {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  height: 50px;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.el-button {
+  margin-right: 5vw;
+}
+
+.el-descriptions {
+  margin-top: 20px;
+}
+.cell-item {
+  display: flex;
+  align-items: center;
+}
+
+/* 表格样式 */
+.styled-table {
+  width: calc(100% - 80px);
+  /* 调整表格宽度，考虑侧边栏的宽度 */
+  border-collapse: collapse;
+  max-width: 1300px;
+  margin-left: 40px;
+  /* 调整表格左边距 */
+  margin-right: 40px;
+  /* 调整表格右边距 */
+  margin-bottom: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #7BA7AB;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #7BA7AB;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #7BA7AB;
+}
+
+
+.col-enter button,
+.col-favorite button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #DDA0DD;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.col-enter button:hover,
+.col-favorite button:hover {
+  background-color: #D8BFD8;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+.el-col-item{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 100%;
+    margin-bottom: 20px;
+}
+
+.el-button{
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #DDA0DD;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.el-button:hover {
+  background-color: #D8BFD8;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+:deep(.my-label) {
+  background: #7BA7AB !important;
+  color:#ffffff !important;
+  width: 16% !important;
+}
+</style>

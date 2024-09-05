@@ -137,8 +137,9 @@ const cancelPurchase = () => {
 <template>
     <div class="content">
     <div v-if="!isCouponInfo">
-        <header>购买优惠券</header>
-        <button @click="gobackHome()">返回</button>
+        <header>购买优惠券
+            <el-button @click="gobackHome()">返回</el-button>
+        </header>
 
         <!-- <div>
             <input type="text" v-model="searchQuery" placeholder="搜索优惠券名称" v-on:keyup.enter="handleSearch()"/> 
@@ -156,30 +157,29 @@ const cancelPurchase = () => {
         </div>
 
 
-        <div>  
-        <label>排序字段:</label>  
-        <select v-model="sortField" @change="sortCoupons">  
-            <option value="minPrice">使用额度</option>  
-            <option value="couponValue">券值</option>  
-            <option value="couponPrice">价格</option>  
-            <option value="quantitySold">销量</option>
-        </select>  
+    <div>  
+        <label>排序字段</label>  
+        <el-select v-model="sortField" @change="sortCoupons" style="width:120px;margin-left:10px;">  
+            <el-option value="minPrice" label="使用额度"></el-option>  
+            <el-option value="couponValue" label="券值"></el-option>  
+            <el-option value="couponPrice" label="价格"></el-option>  
+            <el-option value="quantitySold" label="销量"></el-option>
+        </el-select>  
         &nbsp;&nbsp;
-        <label>排序方式:</label>  
-        <select v-model="sortOrder" @change="sortCoupons">  
-            <option value="asc">升序</option>  
-            <option value="desc">降序</option>  
-        </select>  
+        <label>排序方式</label>  
+        <el-select v-model="sortOrder" @change="sortCoupons" style="width:120px;margin-left:10px;">  
+            <el-option value="asc" label="升序"></el-option>  
+            <el-option value="desc" label="降序"></el-option>  
+        </el-select>  
         &nbsp;&nbsp;
-        <label>筛选类型:</label>  
-        <select v-model="filterType" @change="sortCoupons">  
-            <option value="all">全部</option>  
-            <option value="general">通用券</option>  
-            <option value="special">特殊券</option>  
-        </select>  
-
-        </div>  
-        <ul>  
+        <label>筛选类别</label>  
+        <el-select v-model="filterType" @change="sortCoupons" style="width:120px;margin-left:10px;">  
+            <el-option value="all" label="全部">全部</el-option>  
+            <el-option value="general" label="通用券"></el-option>  
+            <el-option value="special" label="特殊券"></el-option>  
+        </el-select>  
+    </div>  
+        <!-- <ul>  
             <li v-for="coupon in filteredCoupons()" :key="coupon.couponId">  
                 <span>{{ coupon.couponName }}</span> 
                 <span>&nbsp;&nbsp;满{{ coupon.minPrice }}减{{ coupon.couponValue }}元</span> 
@@ -188,27 +188,97 @@ const cancelPurchase = () => {
                 <span>&nbsp;&nbsp;销量：{{ coupon.quantitySold }}张</span> 
                 <span>&nbsp;&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
             </li>  
-        </ul> 
+        </ul>  -->
+
+        <table class="styled-table" style="margin-top: 20px;">
+        <thead>
+          <tr>
+            <th>券名</th>
+            <th>满减</th>
+            <th>类别</th>
+            <th>价格</th>
+            <th>销量</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="coupon in filteredCoupons()" :key="coupon.couponId">
+            <td>{{ coupon.couponName }}</td>
+            <td>满{{ coupon.minPrice }}减{{ coupon.couponValue }}元</td>
+            <td><el-tag size="large">{{ coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
+            <td>{{ coupon.couponPrice }}元/张</td>
+            <td>{{ coupon.quantitySold }}张</td>
+            <td><el-button @click="enterCouponInfo(coupon)">查看</el-button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div v-if="isCouponInfo">
-        <h2>优惠券详情</h2>
-        <div>券名：{{ currentCoupon.couponName }}</div>
+        <header>优惠券详情
+            <el-button @click="leaveCouponInfo()">返回</el-button>
+        </header>
+        <!-- <div>券名：{{ currentCoupon.couponName }}</div>
         <div>价值：满{{ currentCoupon.minPrice }}减{{ currentCoupon.couponValue }}元</div>
         <div>类型：{{ currentCoupon.couponType===0?'通用券':'特殊券' }}</div>
         <div>价格：{{ currentCoupon.couponPrice }}元/张</div>
         <div>销量：{{ currentCoupon.quantitySold }}张</div>
-        <div>有效期：{{ currentCoupon.periodOfValidity }}天</div>
+        <div>有效期：{{ currentCoupon.periodOfValidity }}天</div> -->
+
+        <el-descriptions
+            column="3"
+            size="large"
+            border
+            style="margin-bottom: 20px; width:80%;"
+        >
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">券名</div>
+            </template>
+            {{ currentCoupon.couponName }}
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">价值</div>
+            </template>
+            满{{ currentCoupon.minPrice }}减{{ currentCoupon.couponValue }}元
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">类型</div>
+            </template>
+            <el-tag size="large">{{ currentCoupon.couponType===0?'通用券':'特殊券' }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">价格</div>
+            </template>
+            {{ currentCoupon.couponPrice }}元/张
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">销量</div>
+            </template>
+            {{ currentCoupon.quantitySold }}张
+            </el-descriptions-item>
+            <el-descriptions-item label-class-name="my-label">
+            <template #label>
+                <div class="cell-item">有效期</div>
+            </template>
+            {{ currentCoupon.periodOfValidity }}天
+            </el-descriptions-item>
+        </el-descriptions>
+
         <div>
-                <button @click="isPurchasing=true">购买</button>
+          <el-button @click="isPurchasing=true" style="margin-bottom: 20px;">购买</el-button>
             <div v-if="isPurchasing">
                 数量：
-                <button @click="subCount()">-</button>
+                <el-input-number v-model="countOfCoupon" style="margin-left: 10px; margin-right: 10px;" />
+                <!-- <el-button @click="subCount()">-</el-button>
                 <input type="text" v-model="countOfCoupon" size="2"/>
-                <button @click="addCount()">+</button>
+                <el-button @click="addCount()">+</el-button> -->
                 总价：{{ currentCoupon.couponPrice * countOfCoupon }}元
-                <button @click="submitPurchase()">提交</button>
+                <el-button @click="submitPurchase()" style="margin-left: 10px;">提交</el-button>
             </div>
-            <button @click="leaveCouponInfo()">返回</button>
         </div>
         <!-- 弹窗 -->  
         <el-dialog title="输入支付密码" :model-value="isDialogVisible" @close="cancelPurchase">  
@@ -232,5 +302,74 @@ const cancelPurchase = () => {
 .buy-search-bar {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.el-button{
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #DDA0DD;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-right: 20px;
+}
+.el-button:hover {
+  background-color: #D8BFD8;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
+}
+
+/* 表格样式 */
+.styled-table {
+  width: calc(100% - 80px);
+  /* 调整表格宽度，考虑侧边栏的宽度 */
+  border-collapse: collapse;
+  max-width: 1300px;
+  margin-left: 40px;
+  /* 调整表格左边距 */
+  margin-right: 40px;
+  /* 调整表格右边距 */
+  margin-bottom: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #7BA7AB;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #7BA7AB;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #7BA7AB;
+}
+
+:deep(.my-label) {
+  background: #7BA7AB !important;
+  color:#ffffff !important;
+  width: 16% !important;
+}
+.el-descriptions-item {
+  flex: 1; /* 使每个item均匀分布 */
+  min-width: 0; /* 防止内容溢出 */
 }
 </style>
