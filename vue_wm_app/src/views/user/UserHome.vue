@@ -206,7 +206,7 @@ const filteredMerchants = async () => {
     showMerchantsInfo.value = merchantsInfo.value.filter(merchant => {
       const addressMatch = !query_address || (merchant.merchantAddress && merchant.merchantAddress.includes(query_address));
       const coupontypeMatch = !query_couponType || (merchant.couponType === 0);
-      const specialOfferMatch = !query_specialOffer || (merchant.merchantId in filteredmerchantIds);
+      const specialOfferMatch = !query_specialOffer || (filteredmerchantIds.includes(merchant.merchantId));
       return addressMatch && coupontypeMatch && specialOfferMatch;
     });
   } else {
