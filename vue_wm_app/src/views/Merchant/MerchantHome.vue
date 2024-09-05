@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router';
 import { provide } from 'vue';
 import { useStore } from "vuex"  
 import { getOrderCoupon,getOrderDishes,GetAddressByAddressId,getMerchantsInfo,GetCouponInfo,userInfo,PurchaseOrder,deleteOrder } from '@/api/user'
-import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder ,getFinishedMerOrders,getMerRating} from '@/api/merchant'
-import { getFinishedOrdersComment } from '@/api/platform';
+import { getDishInfo,getOrdersToHandle,merchantInfo,deletePaidOrder ,getFinishedMerOrders} from '@/api/merchant'
+
 const store = useStore()    
 const router = useRouter()
 const merchant = ref({}); // 初始化商家信息对象  
@@ -18,7 +18,6 @@ const deliveringOrders = ref([]);  //派送中订单
 const completedOrders = ref([]);  //已完成订单
 const currentOrder = ref({});  //当前订单
 const isOrderInfo = ref(false);   //订单详情是否显示
-const OrdersComment=ref([]);
 let updateInterval = null; // 定时器  
 
 const hover = ref(false); // 添加 hover 状态
@@ -77,7 +76,6 @@ const renewOrders = async() => {  //更新order信息
                 break; // 找到一个新订单后可以退出循环  
             }  
         }  
-
         for(let i=0;i<orders.value.length;i++){
             const addressData= await GetAddressByAddressId(orders.value[i].addressId);
             orders.value[i].address=addressData.data;
@@ -85,13 +83,7 @@ const renewOrders = async() => {  //更新order信息
             orders.value[i].dishes=orderDishesData.data;
             const orderCouponData = await getOrderCoupon(orders.value[i].orderId);
             orders.value[i].coupon=orderCouponData.data;
-            const ordersComment=await getFinishedOrdersComment(orders.value[i].orderId);
-            orders.value[i].comment=ordersComment;
-            // console.log('进入renewOrders');
-            const ordersMerRating=await getMerRating(orders.value[i].orderId);
-            orders.value[i].MerchantRating=ordersMerRating;
         }
-
         pendingOrders.value = orders.value
             .filter(order => order.state === 1)
             .map(order => {  
@@ -124,7 +116,6 @@ const renewOrders = async() => {  //更新order信息
         }
     }
 }
-
 // 语音朗读功能  
 const speak = (text) => {  
     const utterance = new SpeechSynthesisUtterance(text);  
@@ -355,8 +346,6 @@ provide('isMerchantHome', isMerchantHome);
         </ul>
         <p>优惠券：{{currentOrder.coupon?currentOrder.coupon.couponInfo.couponName:'无'}} &nbsp;{{currentOrder.coupon?'满'+currentOrder.coupon.couponInfo.minPrice+'减'+currentOrder.coupon.couponInfo.couponValue+'元':''}}</p>
         <p>总价：{{currentOrder.price}}元</p>
-        <p>用户评价：{{ currentOrder.comment ? currentOrder.comment : "无评论" }}</p>
-        <p>用户评分：{{ currentOrder.MerchantRating }}</p>
         <button @click="leaveOrderInfo()" class = "back">返回</button>
         <button v-if="currentOrder.state===1||currentOrder.state===2" @click="cancelOrder()" class = "cancel">取消订单</button>
       </div>
