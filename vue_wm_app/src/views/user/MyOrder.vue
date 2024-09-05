@@ -258,6 +258,20 @@ const cancelOrder = async() => {
         ElMessage.error('取消订单失败，请稍后再试');  
     }  
 }
+function formatDateTime(time) { 
+    const date = new Date(time); 
+    if (isNaN(date.getTime())) { 
+        return null; // 或者处理无效日期的逻辑  
+    } 
+    const year = date.getFullYear(); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0'); 
+    const seconds = String(date.getSeconds()).padStart(2, '0'); 
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; 
+}
 </script>
 
 <template>
@@ -279,7 +293,7 @@ const cancelOrder = async() => {
                     <li v-for="(order,index) in nopayedOrders" :key="index" class="order-item">
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{order.price}}元</p>
-                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
                         <p>支付剩余时间:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
                         <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
@@ -293,7 +307,7 @@ const cancelOrder = async() => {
                     <li v-for="(order,index) in pendingOrders" :key="index" class="order-item">
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{order.price}}元</p>
-                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
                         <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
                         <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
@@ -309,7 +323,7 @@ const cancelOrder = async() => {
 
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{ order.price }}元</p>
-                        <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
                         <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
                 </ul>
@@ -333,7 +347,7 @@ const cancelOrder = async() => {
 
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
-                    <p>订单创建时间：{{ order.orderTimestamp }}</p>
+                    <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
                     <button class="enter-button" @click="enterOrderInfo(order)">></button>
                 </li>
             </ul>

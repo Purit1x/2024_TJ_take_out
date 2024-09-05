@@ -287,6 +287,20 @@ const confirmPurchase = async () => {
         }  
     }  
 };  
+function formatDateTime(time) { 
+    const date = new Date(time); 
+    if (isNaN(date.getTime())) { 
+        return null; // 或者处理无效日期的逻辑  
+    } 
+    const year = date.getFullYear(); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0'); 
+    const seconds = String(date.getSeconds()).padStart(2, '0'); 
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; 
+}
 </script>
 
 <template>
@@ -370,7 +384,7 @@ const confirmPurchase = async () => {
       <div>
         <ul>
           <li v-for="coupon in coupons" :key="coupon.couponId" @click="selectCoupon(coupon)">
-            {{ coupon.couponName }} 满{{coupon.minPrice}}减{{ coupon.couponValue }}元 过期时间：{{ coupon.expirationDate }}
+            {{ coupon.couponName }} 满{{coupon.minPrice}}减{{ coupon.couponValue }}元 过期时间：{{ formatDateTime(coupon.expirationDate) }}
             &nbsp;&nbsp;&nbsp;×{{ coupon.amountOwned }}
             <button class="select-button" @click="selectCoupon(coupon)">选择</button>
           </li>

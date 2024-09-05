@@ -213,6 +213,20 @@ const goToSpecialOffer = () => {
 // 提供 merchant 对象 给其它子网页 
 provide('merchant', merchant); 
 provide('isMerchantHome', isMerchantHome); 
+function formatDateTime(time) { 
+    const date = new Date(time); 
+    if (isNaN(date.getTime())) { 
+        return null; // 或者处理无效日期的逻辑  
+    } 
+    const year = date.getFullYear(); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0'); 
+    const seconds = String(date.getSeconds()).padStart(2, '0'); 
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; 
+}
 </script>  
 
 <template>
@@ -282,7 +296,7 @@ provide('isMerchantHome', isMerchantHome);
             >
               <div>订单号：{{order.orderId}}</div>
               <div>订单总价：{{order.price}}元</div>
-              <div>订单创建时间：{{ order.orderTimestamp }}</div>
+              <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
               <div>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</div>
             </div>
           </div>
@@ -298,7 +312,7 @@ provide('isMerchantHome', isMerchantHome);
             >
               <div>订单号：{{order.orderId}}</div>
               <div>订单总价：{{order.price}}元</div>
-              <div>订单创建时间：{{ order.orderTimestamp }}</div>
+              <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
               <!--<div>预计送达时间: {{ order.expectedTimeOfArrival }}</div>-->
               
             </div>
@@ -316,8 +330,8 @@ provide('isMerchantHome', isMerchantHome);
             >
               <div>订单号：{{order.orderId}}</div>
               <div>订单总价：{{order.price}}元</div>
-              <div>订单创建时间：{{ order.orderTimestamp }}</div>
-              <div>送达时间:{{ order.realTimeOfArrival }}</div>
+              <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
+              <div>送达时间:{{ formatDateTime(order.realTimeOfArrival) }}</div>
             </div>
           </div>
         </div>
@@ -390,9 +404,9 @@ h2 {
 }
 
 .sidebar {
-  width: 50px;
+  width: 5vw;
   background: linear-gradient(to bottom, #ffcc00, #69b1f848);
-  padding: 20px;
+  padding: 15px;
   height: 100vh;
   position: fixed;
   top: 0;
