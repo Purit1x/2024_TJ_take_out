@@ -51,14 +51,8 @@ const renewOrders=async()=>{
 </script>
 
 <template>
-    <div>
-        <h2>
-            订单管理
-
-            <button @click="gobackHome">返回</button>
-        </h2>            
-        <p> 环保订单比例： {{ecoInfo.ecoOrderRatio}}</p>
-        <h2>已完成订单</h2>
+    <div class="box">         
+        <div class="head">已完成订单</div>
         <div class="orders-scroll">
             <div
                 class="order-item"
@@ -73,14 +67,24 @@ const renewOrders=async()=>{
             </div>
 
         </div>
-       
+        <div class="bottom"> 环保订单比例： <div class="text">{{ecoInfo.ecoOrderRatio}}</div></div>
+        <button @click="gobackHome" class="return">返回</button>    
     </div>
 </template>
 
 
 <style scoped>
+.text{
+    color: green;
+}
+.bottom{
+    margin-top: 1%;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
 .orders-scroll {
-  max-height: 600px; /* 设置订单区域的最大高度 */
+  max-height: calc(85vh * 0.75  ); /* 设置订单区域的最大高度 */
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* 使订单区域可以滚动 */
@@ -104,5 +108,41 @@ const renewOrders=async()=>{
   font-size: 16px;
   flex:1 1 50%;
   box-sizing: border-box;
+}
+.box{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 60px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 70%;
+    height: 85%;
+
+}
+.head{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4vmin; /* 字体大小 */
+    color:#000000;
+    margin-bottom: 3%;
+}
+.return{
+    padding: 10px 15px;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+}
+.return:hover{
+    background-color: #f7ced5;
 }
 </style>
