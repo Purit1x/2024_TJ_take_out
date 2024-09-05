@@ -9,10 +9,10 @@
                 <el-icon><Files /></el-icon> 订单管理
             </el-menu-item>
             <el-menu-item index="/rider-home/wage">
-                <el-icon><Files /></el-icon> 工资记录
+                <el-icon><Coin /></el-icon> 工资记录
             </el-menu-item>
             <el-menu-item index="/rider-home/information">
-                <el-icon><Files /></el-icon> 个人主页
+                <el-icon><User /></el-icon> 个人主页
             </el-menu-item>
         </el-menu>
     </div>
@@ -20,7 +20,7 @@
 
 <style scoped>
 .side {
-    width: 200px;
+    width: 150px;
     background: #545c64;
 }
 

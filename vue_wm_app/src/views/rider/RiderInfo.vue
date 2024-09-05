@@ -174,7 +174,19 @@
     justify-content: center;
     align-items: center;
     height: 100%;
+    width: 100%;
 }
+
+.person_body {
+    width: 60%;
+    height: 60%;
+    padding: 20px;
+    background-color: #ffd666;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 
 .moneytake {
     display: flex;
@@ -189,22 +201,20 @@
 .personDown {
     display:flex;
     color:black;
-    height: 65%;
+    height: 30%;
 }
 
 .personside {
-    flex: 1; 
+    width:100%;
+    height: 100%;
     text-align: center; 
     margin-left: 10px;
     margin-right: 10px;    
-    padding: 20px; 
-    border-radius: 15px; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-    background-color: #fff;
-  border: 2px solid #ffcc00;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border: 2px solid #ffcc00;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .personInfo {
     flex: 2; 
@@ -223,13 +233,6 @@
     align-items: center;
 }
 
-.person_body {
-  padding: 20px;
-  background-color: #ffd666;
-  border: 2px solid #000000;
-  border-radius: 20px;
-  margin-right: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+
 
 </style>    
