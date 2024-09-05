@@ -380,14 +380,11 @@ const handleScroll = (event) => {
             <img :src="item.imageUrl" alt="菜品图片" class="cart-img">
             <div class="cart-info">
               <span>{{ item.dishName }}: {{ item.dishPrice }}元</span>
-              <!-- 两种按钮样式 -->
-              <!-- <div class="quantity-controls">
+              <div class="quantity-controls">
                 <button @click="decrementInCart(item)" class="quantity-button">-</button>
                 {{ item.dishNum }}
                 <button @click="addToCart(item)" class="quantity-button">+</button>
-              </div> -->
-              <el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px;width: 10%;" />
-              
+              </div>
              </div>
             <button @click="removeInCart(item)" class="remove-button">x</button>
           </li>
