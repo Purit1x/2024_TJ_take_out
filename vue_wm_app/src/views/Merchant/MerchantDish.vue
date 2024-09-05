@@ -5,6 +5,7 @@ import { inject } from 'vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import store from '@/store';
+
 const router = useRouter();
 const merchant =inject('merchant');
 const dishes = ref([]);  // 用于存储菜品列表 
@@ -251,7 +252,7 @@ const cancelCreate = () => {
 <template>  
     <slot name="sidebar"></slot>
     <div class="content"> 
-        <header class = "welcome-text">这里是菜单页面，{{ merchant.merchantName }}</header>  
+        <header class = "welcome-text">这里是菜单页面&nbsp;{{ merchant.merchantName }}</header>  
 
         <div class="search-bar" v-if="!isEditing&!isCreating">
             <el-col :span="8">
@@ -275,19 +276,23 @@ const cancelCreate = () => {
             <button @click="startCreatingDish">新建菜单项</button> 
         </div>  
 -->
-        <ul class = "dish-list" v-if="!isEditing&!isCreating">  
-            <li v-for="dish in displayedDishes" :key="dish.dishId">
-                <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">    
-                <span>&nbsp;&nbsp;{{ dish.dishName }}&nbsp;&nbsp;</span>  
-                <span>价格: {{ dish.dishPrice }}&nbsp;&nbsp;</span>  
-                <span>类别描述: {{ dish.dishCategory }}&nbsp;&nbsp;</span>
-                <span>库存：{{ dish.dishInventory }}&nbsp;&nbsp;</span> 
-                <div class = "right-group">
-                    <button @click="editDish(dish)" class="button edit-btn">编辑</button>
-                    <button @click="deleteDish(dish.dishId)" class="button delete-btn">删除</button>
-                </div>
-            </li>  
-        </ul>  
+        <div v-if="!isEditing&!isCreating" class = "dishes-container">
+            <div class = "dishes-scroll" >
+                <ul class = "dish-list" >  
+                    <li v-for="dish in displayedDishes" :key="dish.dishId">
+                        <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">    
+                        <span>&nbsp;&nbsp;{{ dish.dishName }}&nbsp;&nbsp;</span>  
+                        <span>价格: {{ dish.dishPrice }}&nbsp;&nbsp;</span>  
+                        <span>类别描述: {{ dish.dishCategory }}&nbsp;&nbsp;</span>
+                        <span>库存：{{ dish.dishInventory }}&nbsp;&nbsp;</span> 
+                        <div class = "right-group">
+                            <button @click="editDish(dish)" class="button edit-btn">编辑</button>
+                            <button @click="deleteDish(dish.dishId)" class="button delete-btn">删除</button>
+                        </div>
+                    </li>  
+                </ul>              
+            </div>
+        </div>
         <button @click="startCreatingDish" class = "normal-button" v-if="!isEditing&!isCreating">新建菜单项</button>
         <!-- 编辑表单 -->  
         <div v-if="isEditing" class="edit-container">  
@@ -322,7 +327,7 @@ const cancelCreate = () => {
 .dish-list {
   list-style: none;
   padding: 0;
-  margin-right: 30px;
+  margin-right: 0px;
 
   li {
     display: flex;
@@ -464,6 +469,50 @@ const cancelCreate = () => {
   }
 }
 
+.dishes-container{
+    background-color: #ffd666;
+    border:2px solid black;
+    border-radius: 20px;
+    padding:5px;
+    
+    max-height: 450px; /* 设置订单区域的最大高度 */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* 使订单区域可以滚动 */
+    
+    margin-right: 40px;
+    margin-bottom:10px;
+}
+
+.dishes-scroll {
+    
+    background-color: #ffd666;
+    
+    max-height: 430px; /* 设置订单区域的最大高度 */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* 使订单区域可以滚动 */
+    margin-top:5px;
+    margin-bottom: 10px;
+
+}
+
+/* 隐藏滚动条 */
+.dishes-scroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* 滚动条轨道 */
+.dishes-scroll::-webkit-scrollbar-track {
+    background: #ffd666;
+}
+/* 滚动条滑块 */
+.dishes-scroll::-webkit-scrollbar-thumb {
+    background-color: #ffd666;
+    border-radius: 10px;
+    border: 2px solid #000000;
+}
+
 .normal-button {
     margin-left: 5px;
     margin-right: 5px;
@@ -479,7 +528,7 @@ const cancelCreate = () => {
 
 .search-bar {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-top: 5px;
 }
 

@@ -209,30 +209,48 @@ const leaveCouponCreate = () => {
 </script>
 
 <template>
+    <div class="box">
+        <div class="body">
     <div v-if="!isCouponInfo&&!isCouponCreate">
-        优惠券管理
-        <button @click="gobackHome">返回</button>
-        <h2>优惠券列表</h2>
-        <labal @click="showIsOnShelves">上架中</labal>&nbsp;&nbsp;
-        <labal @click="showNotOnShelves">已下架</labal>
-        <div>
-            <input type="text" v-model="searchQuery" placeholder="搜索Id或名称" v-on:keyup.enter="handleSearch()"/> 
-            <button @click="handleSearch()">搜索</button>
-            <button @click="enterCouponCreate()">发布优惠券</button>
+        <div class="head">优惠券列表</div>
+        <div class="main-choice">
+            <labal @click="showIsOnShelves" class="choose">上架中</labal>&nbsp;&nbsp;
+            <labal @click="showNotOnShelves" class="choose">已下架</labal>
         </div>
-        <ul>  
-            <li v-for="coupon in showCouponsInfo" :key="coupon.couponId">  
-                <span>{{ coupon.couponId }}</span> 
-                <span>&nbsp;&nbsp;{{ coupon.couponName }}</span> 
-                <span>&nbsp;&nbsp;销量:{{ coupon.quantitySold }}</span> 
-                <span>&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
-            </li>  
-        </ul> 
+        <div class="top">
+            <input type="text" v-model="searchQuery" placeholder="搜索Id或名称" v-on:keyup.enter="handleSearch()" class="inputtext"/> 
+            <button @click="handleSearch()" class="search">搜索</button>
+            <button @click="enterCouponCreate()" class="release">发布优惠券</button>
+        </div>
+        
+        <el-table :data="showCouponsInfo" :border="parentBorder" style="width: 100%" class="table">
+        <el-table-column prop="couponId" label="优惠券ID" width="180">
+            <template #default="{ row }">
+                {{ row.couponId }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="couponName" label="优惠券名称" width="280">
+            <template #default="{ row }">
+                {{ row.couponName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="quantitySold" label="销量" width="150">
+            <template #default="{ row }">
+                {{ row.quantitySold }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作">
+            <template #default="{ row }">
+                <button  type="danger" size="small" @click="enterCouponInfo(row)" class="info"width="150">详情</button>
+            </template>
+        </el-table-column>
+    </el-table>
+        
     </div>
 
     <div v-if="isCouponInfo&&!isCouponCreate">
         <h2>优惠券详情</h2>
-        <div>
+        <div class="texttype">
             <p>优惠券Id:&nbsp;&nbsp;&nbsp;{{ currentCoupon.couponId }}</p>
             <p>优惠券名称:&nbsp;&nbsp;&nbsp;{{ currentCoupon.couponName }}</p>
             <p>优惠券抵扣金额:&nbsp;&nbsp;&nbsp;{{ currentCoupon.couponValue }}元</p>
@@ -252,39 +270,206 @@ const leaveCouponCreate = () => {
                 </label>  
             </div>  
         <div>
-            <button @click="leaveCouponInfo()">返回</button>
-            <button v-if="!isEditing" @click="editCoupon()">编辑</button>
-            <button v-if="isEditing" @click="updateCoupon()">保存</button>
-            <button v-if="isEditing" @click="cancelEditCoupon()">取消编辑</button>
+            <button @click="leaveCouponInfo()" class="choose">返回</button>
+            <button v-if="!isEditing" @click="editCoupon()" class="choose">编辑</button>
+            <button v-if="isEditing" @click="updateCoupon()" class="choose">保存</button>
+            <button v-if="isEditing" @click="cancelEditCoupon()" class="choose">取消编辑</button>
         </div>
     </div>
     <div v-if="isCouponCreate">
         <h2>创建优惠券</h2>
         <el-form ref="refForm" :rules="couponRules" :model="currentCoupon">  
-        <el-form-item label="优惠券名称" prop="CouponName">  
+        <el-form-item label="优惠券名称" prop="CouponName" class="texttype">  
             <input v-model="currentCoupon.CouponName" placeholder="请输入优惠券名称" @blur="validateField('CouponName')" />  
         </el-form-item>  
-        <el-form-item label="优惠券抵扣金额" prop="CouponValue">  
+        <el-form-item label="优惠券抵扣金额" prop="CouponValue" class="texttype">  
             <input v-model="currentCoupon.CouponValue" placeholder="请输入优惠券抵扣金额" @blur="validateField('CouponValue')" />  
         </el-form-item>  
-        <el-form-item label="优惠券价格" prop="CouponPrice">  
+        <el-form-item label="优惠券价格" prop="CouponPrice" class="texttype">  
             <input v-model="currentCoupon.CouponPrice" placeholder="请输入优惠券价格" @blur="validateField('CouponPrice')" />  
         </el-form-item>  
-        <el-form-item label="优惠券类型" prop="CouponType">  
+        <el-form-item label="优惠券类型" prop="CouponType" class="texttype">  
             <el-radio-group v-model="currentCoupon.CouponType">  
                 <el-radio label="0">通用优惠券</el-radio>  
                 <el-radio label="1">特殊优惠券</el-radio>  
             </el-radio-group>  
         </el-form-item>  
-        <el-form-item label="优惠券使用门槛" prop="MinPrice">  
+        <el-form-item label="优惠券使用门槛" prop="MinPrice" class="texttype">  
             <input v-model="currentCoupon.MinPrice" placeholder="请输入优惠券使用门槛" @blur="validateField('MinPrice')" />  
         </el-form-item>  
-        <el-form-item label="优惠券有效天数" prop="PeriodOfValidity">  
+        <el-form-item label="优惠券有效天数" prop="PeriodOfValidity" class="texttype">  
             <input type="number" v-model="currentCoupon.PeriodOfValidity" placeholder="请输入优惠券有效天数" @blur="validateField('PeriodOfValidity')" />  
         </el-form-item>  
         </el-form>  
-        <button @click="submitCouponCreate()">发布优惠券</button>&nbsp;&nbsp;
-        <button @click="leaveCouponCreate()">取消</button>
+        <button @click="submitCouponCreate()" class="choose">发布优惠券</button>&nbsp;&nbsp;
+        <button @click="leaveCouponCreate()" class="choose">取消</button>
     </div>
-
+    </div>
+    <button @click="gobackHome" class="return">返回</button>
+    </div>
 </template>
+<style scoped lang="scss">
+.top{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+.search{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
+}
+.release{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #FFC0CB;
+    font-size: 2.2vmin; /* 字体大小 */
+}
+.body{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:10%;
+}
+.main-choice{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    margin-bottom: 2%;
+}
+.inputtext{
+    height: 30px;
+    width: 250px;
+    right:5%;
+    font-size: 2.8vmin;
+    border-radius: 9px;
+    margin-right: 2%;
+}
+.show{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    height: 45px;
+}
+.info{
+    padding: 4px 20px;         /* 按钮内边距 */
+    //margin-right: 10px;         /* 按钮右边距 */
+    background-color: #f8a6b3;
+    right: 10px;
+}
+.info:hover{
+    background-color: #f7ced5;
+
+}
+.texttype{
+    font-size: 2.5vmin;
+}
+.couponID{
+    display:block;
+    width:10%;
+    position:absolute;
+    left:330px;
+}
+.couponName{
+    display:block;
+    width:30%;
+    position:absolute;
+    left:360px;
+}
+.quantitySold{
+    display:block;
+    width:20%;
+    position:absolute;
+    left:560px;
+
+}
+.infoButton{
+    display:block;
+    width:20%;
+    position:absolute;
+    left:690px;
+}
+
+.box{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 40px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 70%;
+    height: 90%;
+}
+
+.return{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+}
+.return:hover{
+    background-color: #f7ced5;
+}
+.head{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4vmin; /* 字体大小 */
+    color:#000000;
+}
+.choose{
+    padding: 8px 8px;         /* 按钮内边距 */
+    margin-right: 10px;         /* 按钮右边距 */
+    background-color: #FFC0CB;
+    font-size: 2.5vmin; /* 字体大小 */
+    border-radius: 4px;
+}
+.choose:hover{
+    background-color: #f7ced5;
+}
+.head2{
+    margin-top:5%;
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    color:#2573f1;
+}
+.input{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-left:30%;
+    margin-right:30%;
+    width:40%;
+    font-size: 3vmin;
+}
+.output{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+   // width:100%;
+    font-size: 3vmin;
+}
+.table{
+    margin-top:10px;
+
+    height:70%;
+    width:80%;
+    border-radius: 10px;
+    border: 2px solid #01042a;
+    table-layout: auto;
+    margin-top: 1%;
+}
+</style>

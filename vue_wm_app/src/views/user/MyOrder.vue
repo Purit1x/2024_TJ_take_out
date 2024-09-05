@@ -263,26 +263,25 @@ const cancelOrder = async() => {
 <template>
     <div class="content">
     <div v-if="!isOrderInfo">
-        <h2>
+        <h2 class="header">
             我的订单
-            <button @click="gobackHome">返回</button>
+            <button class="action-button" @click="gobackHome">返回</button>
         </h2>
-        <div>
-            <br />
-            <button @click="showState=0">未支付</button>&nbsp;&nbsp;
-            <button @click="showState=1">待处理</button>&nbsp;&nbsp;
-            <button @click="showState=2">派送中</button>&nbsp;&nbsp;
-            <button @click="showState=3">已完成</button>&nbsp;&nbsp;
+        <div class="state-buttons">
+            <button class="state-button" @click="showState=0">未支付</button>
+            <button class="state-button" @click="showState=1">待处理</button>
+            <button class="state-button" @click="showState=2">派送中</button>
+            <button class="state-button" @click="showState=3">已完成</button>
         </div>
         <div v-if="showState===0">
             <el-scrollbar max-height="500px">
-                <ul>
-                    <li v-for="(order,index) in nopayedOrders" :key="index">
+                <ul class="order-list">
+                    <li v-for="(order,index) in nopayedOrders" :key="index" class="order-item">
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{order.price}}元</p>
                         <p>订单创建时间：{{ order.orderTimestamp }}</p>
                         <p>支付剩余时间:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
-                        <button @click="enterOrderInfo(order)">></button>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
                 </ul>
             </el-scrollbar>
@@ -290,13 +289,13 @@ const cancelOrder = async() => {
         
         <div v-if="showState===1">
             <el-scrollbar max-height="500px">
-                <ul>
-                    <li v-for="(order,index) in pendingOrders" :key="index">
+                <ul class="order-list">
+                    <li v-for="(order,index) in pendingOrders" :key="index" class="order-item">
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{order.price}}元</p>
                         <p>订单创建时间：{{ order.orderTimestamp }}</p>
                         <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
-                        <button @click="enterOrderInfo(order)">></button>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
                 </ul>
             </el-scrollbar>
@@ -304,12 +303,14 @@ const cancelOrder = async() => {
         
         <div v-if="showState===2">
             <el-scrollbar max-height="500px">
-                <ul>
-                    <li v-for="(order,index) in deliveringOrders":key ="inkey">
+
+                <ul class="order-list">
+                    <li v-for="(order,index) in deliveringOrders":key ="index" class="order-item">
+
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{ order.price }}元</p>
                         <p>订单创建时间：{{ order.orderTimestamp }}</p>
-                        <button @click="enterOrderInfo(order)">></button>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
                     </li>
                 </ul>
             </el-scrollbar>
@@ -326,12 +327,14 @@ const cancelOrder = async() => {
                 </li>
             </ul> -->
             <el-scrollbar max-height="500px">
-                <ul>
-                <li v-for="(order,index) in completedOrders":key ="inkey">
+
+                <ul class="order-list">
+                <li v-for="(order,index) in completedOrders":key ="index" class="order-item">
+
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
                     <p>订单创建时间：{{ order.orderTimestamp }}</p>
-                    <button @click="enterOrderInfo(order)">></button>
+                    <button class="enter-button" @click="enterOrderInfo(order)">></button>
                 </li>
             </ul>
             </el-scrollbar>
@@ -339,38 +342,40 @@ const cancelOrder = async() => {
 
     </div>
     <div v-else>
-        <h2>订单详情</h2>
+        <h2 class="header">订单详情</h2>
         <p>订单号：{{currentOrder.orderId}}</p>
         <p>状态：{{ currentOrder.state===0?'未支付':currentOrder.state===1?'待处理':currentOrder.state===2?'派送中':currentOrder.state===3?'已完成':'未知状态' }}</p>
-        <div>
+        <div class="address-info">
             <p>{{ currentOrder.address.contactName }}&nbsp;&nbsp;{{ currentOrder.address.phoneNumber }}</p>
              {{ currentOrder.address.userAddress }}&nbsp;{{ currentOrder.address.houseNumber}}
         </div>
         <p>{{currentMerchant.merchantName}}：</p>
         <p>联系电话：{{ currentMerchant.contact }}</p>
         <p>商家地址：{{ currentMerchant.merchantAddress }}</p>
-        <ul>
-            <li v-for="(dish,index) in currentOrder.dishes" :key="index">
-                <p><img :src="dish.dishInfo.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
+        <ul class="dish-list">
+            <li v-for="(dish,index) in currentOrder.dishes" :key="index" class="dish-item">
+                <p><img :src="dish.dishInfo.imageUrl" alt="菜品图片"  class="dish-image">
                     {{ dish.dishInfo.dishName }} ×{{dish.dishNum}}
                 </p>
             </li>
         </ul>
         <p>优惠券：{{currentOrder.coupon?currentOrder.coupon.couponInfo.couponName:'无'}} &nbsp;{{currentOrder.coupon?'满'+currentOrder.coupon.couponInfo.minPrice+'减'+currentOrder.coupon.couponInfo.couponValue+'元':''}}</p>
         <p>总价：{{currentOrder.price}}元</p>
-        <button @click="leaveOrderInfo()">返回</button>
-        <button v-if="currentOrder.state===0" @click="enterPayOrder()">支付</button>
-        <button v-if="currentOrder.state===0" @click="cancelOrder()">取消订单</button>
+        <div class="order-actions">
+            <button class="action-button" @click="leaveOrderInfo()">返回</button>
+            <button v-if="currentOrder.state===0" class="action-button" @click="enterPayOrder()">支付</button>
+            <button v-if="currentOrder.state===0" class="action-button" @click="cancelOrder()">取消订单</button>
+        </div>
 
         <!--添加评价表单-->
-        <div v-if="currentOrder.state===3">
+        <div v-if="currentOrder.state===3" class="comment-section">
             <h3>添加评价</h3>
             <el-form :rules="newOrderComment" ref="refForm" :model="currentOrder">
                 <el-form-item label="商家评分" prop="merchantRating"><input v-model="currentOrder.merchantRating" placeholder="商家评分" @blur="validateField('merchantRating')"/></el-form-item> 
                 <el-form-item label="骑手评分" prop="riderRating"><input v-model="currentOrder.riderRating" placeholder="骑手评分" @blur="validateField('riderRating')"/></el-form-item>   
                 <el-form-item label="评价" prop="comment"><input v-model="currentOrder.comment" placeholder="评价" /></el-form-item>   
             </el-form>
-            <button @click="submitComment(currentOrder.orderId)">提交评价</button>
+            <button class="action-button" @click="submitComment(currentOrder.orderId)">提交评价</button>
         </div>
 
     </div>
@@ -382,7 +387,7 @@ const cancelOrder = async() => {
             placeholder="请输入6位支付密码"   
             clearable   
         />  
-        <div v-if="paymentError" style="color: red;">{{ paymentError }}</div>  
+        <div v-if="paymentError"  class="payment-error">{{ paymentError }}</div>  
         <template #footer>  
             <el-button @click="cancelPurchase()">取消</el-button>  
             <el-button type="primary" @click="confirmPurchase()">确认</el-button>  
@@ -390,3 +395,118 @@ const cancelOrder = async() => {
     </el-dialog>  
     </div>
 </template>
+
+<style scoped lang="scss">
+.content {
+  padding: 20px;
+  background-color: transparent;
+  margin-left: 120px; /* 考虑侧边栏的宽度 */
+}
+
+.header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.state-buttons {
+  padding: 10px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #dda0dd !important; /* 强制应用粉色背景 */
+  width: auto; /* 去掉 fit-content, 使用 auto */
+  margin-bottom: 20px;
+}
+
+.state-button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border-radius: 20px;
+  background-color: #dda0dd;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.state-button:hover {
+  background-color: #d8bfd8;
+}
+
+
+.order-list {
+  padding: 0;
+  list-style: none;
+}
+
+.order-item {
+  padding: 15px;
+  background-color: #fff;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.enter-button {
+  padding: 8px 12px;
+  background-color: #dda0dd;
+  color: #fff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.enter-button:hover {
+  background-color: #d8bfd8;
+}
+
+.dish-list {
+  list-style: none;
+  padding: 0;
+}
+
+.dish-item {
+  margin-bottom: 10px;
+}
+
+.dish-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.address-info {
+  margin-bottom: 20px;
+}
+
+.order-actions {
+  margin-top: 20px;
+}
+
+.action-button {
+  padding: 10px 15px;
+  background-color: #dda0dd;
+  color: #fff;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.action-button:hover {
+  background-color: #d8bfd8;
+}
+
+.comment-section {
+  margin-top: 30px;
+}
+
+.payment-error {
+  color: red;
+}
+</style>

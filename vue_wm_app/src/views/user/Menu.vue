@@ -1,5 +1,5 @@
 <script setup>
-import { ref,onMounted, inject,watch,computed,provide} from 'vue';
+import { ref,onMounted,onUnmounted,inject,watch,computed,provide} from 'vue';
 import { useRouter,onBeforeRouteLeave } from 'vue-router'
 import { searchDishes, GetSpecialOffer } from '@/api/merchant';
 import {addToShoppingCart, getMerchantIds, getMerchantsInfo, getShoppingCartinMerchant,decrementDishInCart,removeFromShoppingCart } from '@/api/user';
@@ -70,6 +70,14 @@ onMounted (async() => {
   if (offerData) {  
       specialOffers.value = offerData.data; // 假设后端返回的offer数据是一个数组
   }  
+
+
+  // 添加鼠标滚轮监听器
+  window.addEventListener('wheel', handleScroll);
+});
+onUnmounted(() => {
+      // 在组件卸载时移除监听器
+      window.removeEventListener('wheel', handleScroll);
 });
 const gobackHome = () => {
   router.push('/user-home');
@@ -302,89 +310,322 @@ watch(
     isMenu.value = !newPath.includes('/order');  
   }  
 );  
+
+// 监听滚动事件的处理器
+const handleScroll = (event) => {
+      const delta = event.deltaY || event.detail || event.wheelDelta;
+      // 实现滚动的逻辑，可以控制页面的垂直滚动
+      document.querySelector('.content').scrollBy(0, delta); // 使内容区域进行滚动
+};
 </script>
 
-
 <template>
-    <div v-if="MerchantInfo && MerchantInfo.merchantName&& isMenu" class="content">
-      <header>{{MerchantInfo.merchantName}}的菜单</header>
-      <button @click="gobackHome()">&nbsp;&nbsp;返回主页</button>
-      <div>地址：{{MerchantInfo.merchantAddress}}</div>
+  <div v-if="MerchantInfo && MerchantInfo.merchantName && isMenu" class="content" id="app">
+    <header class="merchant-header">{{ MerchantInfo.merchantName }} 的菜单</header>
+    
+    <div class="merchant-info">
+      <div>地址：{{ MerchantInfo.merchantAddress }}</div>
       <div>营业时间：{{ MerchantInfo.timeforOpenBusiness }} - {{ MerchantInfo.timeforCloseBusiness }}</div>
-      <div>联系电话：{{MerchantInfo.contact}}</div>
-      <div>是否可以使用通用优惠券：{{MerchantInfo.couponType ? '否' : '是'}}</div>
+      <div>联系电话：{{ MerchantInfo.contact }}</div>
+      <div>是否可以使用通用优惠券：{{ MerchantInfo.couponType ? '否' : '是' }}</div>
+    </div>
 
-      <div v-if="specialOffers.length">
-        <button @click="toggleOffersExpand">
-          {{ isOffersExpanded ? '收起满减活动' : '正在进行满减活动' }}
-        </button>
-        <div v-if="isOffersExpanded">
-          <ul>
-              <li v-for="offer in specialOffers" :key="offer.offerId">
-                  满 {{ offer.minPrice }} 元&nbsp;&nbsp;减 {{ offer.amountRemission }} 元
-              </li>
-          </ul>
-        </div>
-      </div>
-      <div v-else>
-        <p>暂无满减活动</p>
-      </div>
-
-      <div>
-        <!-- <div>
-          <input type="text" v-model="searchQuery" placeholder="搜索菜品或类别" v-on:keyup.enter="handleSearch()"/> 
-          <button @click="handleSearch()">搜索</button>
-        </div> -->
-
-        <div class="search-bar">
-            <el-col :span="8">
-                <el-input  placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
-                <template #append>
-                <el-button type="primary"@click="handleSearch"><el-icon><search /></el-icon></el-button>
-                </template>
-                </el-input>
-            </el-col>
-        </div>
-        
+    <div v-if="specialOffers.length" class="offers-section">
+      <button class="offers-button" @click="toggleOffersExpand">
+        {{ isOffersExpanded ? '收起满减活动' : '正在进行满减活动' }}
+      </button>
+      <div v-if="isOffersExpanded" class="offers-list">
         <ul>
-          <li v-for="dish in showDishes" :key="dish.dishId">
-            <img :src="dish.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-            {{dish.dishName}}：{{dish.dishPrice}}元 &nbsp;&nbsp;{{dish.dishCategory}} &nbsp;&nbsp;库存：{{dish.dishInventory}}
-            <button @click="addToCart(dish)">加入购物车</button>
+          <li v-for="offer in specialOffers" :key="offer.offerId" class="offer-item">
+            满 {{ offer.minPrice }} 元&nbsp;&nbsp;减 {{ offer.amountRemission }} 元
           </li>
         </ul>
       </div>
+    </div>
+    <div v-else>
+      <p class="no-offers">暂无满减活动</p>
+    </div>
 
-      <div v-if="cartItems.length > 0">
-        <button @click="toggleCart">{{ cartExpanded ? '收回购物车' : '购物车' }}（{{cartItems.length}}）</button>
-        <div v-if="cartExpanded">
-          <ul>
-            <li v-for="item in cartItems" :key="item.dishId">
-              <img :src="item.imageUrl" alt="菜品图片" style="width: 50px; height: 50px;">
-              {{item.dishName}}：{{item.dishPrice}}元 &nbsp;&nbsp;
-              <button @click="decrementInCart(item)">-</button>
-              {{item.dishNum}}  <!-- 显示商品数量 -->
-              <button @click="addToCart(item)">+</button>
-              <button @click="removeInCart(item)">x</button>
-            </li>
-          </ul>
+    <div class="search-section">
+      <el-col :span="8">
+        <el-input placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+          <template #append>
+            <el-button type="primary" @click="handleSearch" class="search-button">
+              <el-icon><search /></el-icon>
+            </el-button>
+          </template>
+        </el-input>
+      </el-col>
+    </div>
+
+    <ul class="dish-list">
+      <li v-for="dish in showDishes" :key="dish.dishId" class="dish-item">
+        <img :src="dish.imageUrl" alt="菜品图片" class="dish-img">
+        <div class="dish-info">
+          <span>{{ dish.dishName }}：{{ dish.dishPrice }}元</span>
+          <span>{{ dish.dishCategory }} &nbsp;&nbsp;库存：{{ dish.dishInventory }}</span>
         </div>
-      </div>
-      <div v-else>购物车为空</div>
+        <button @click="addToCart(dish)" class="add-cart-button">加入购物车</button>
+      </li>
+    </ul>
 
-      <div>
-        <strong>总价: {{ finalPrice }} 元</strong><span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
-        <button @click="gotoOrder()">结算</button>
+    <div v-if="cartItems.length > 0" class="cart-section">
+      <button class="cart-button" @click="toggleCart">
+        {{ cartExpanded ? '收回购物车' : '购物车' }}({{cartItems.length}})
+      </button>
+      <div v-if="cartExpanded" class="cart-items">
+        <ul>
+          <li v-for="item in cartItems" :key="item.dishId" class="cart-item">
+            <img :src="item.imageUrl" alt="菜品图片" class="cart-img">
+            <div class="cart-info">
+              <span>{{ item.dishName }}: {{ item.dishPrice }}元</span>
+              <div class="quantity-controls">
+                <button @click="decrementInCart(item)" class="quantity-button">-</button>
+                {{ item.dishNum }}
+                <button @click="addToCart(item)" class="quantity-button">+</button>
+              </div>
+             </div>
+            <button @click="removeInCart(item)" class="remove-button">x</button>
+          </li>
+        </ul>
       </div>
-      <router-view />
+    </div>
+    <div v-else class="empty-cart">购物车为空</div>
+
+    <div class="total-section">
+      <strong>总价: {{ finalPrice }} 元</strong>
+      <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
+      <button @click="gotoOrder()" class="checkout-button">结算</button>
     </div>
     <router-view />
-    <ChildComponent /> 
+  </div>
+  <router-view />
+  <ChildComponent />
 </template>
 
 <style scoped>
-.search-bar {
-  margin-top: 10px;
-  margin-bottom: 10px;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;  /* 确保全局允许滚动 */
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  background: linear-gradient(135deg, #f3f4f6, #fff);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 20px); /* 计算总高度，确保超出可视窗口大小 */
+  overflow-y: auto;
+  justify-content: flex-start; /* 确保内容从顶部开始 */
+  scrollbar-width: thin;
+  background: transparent;
+}
+
+router-view {
+  flex-grow: 1;
+}
+
+.merchant-header {
+  font-size: 26px;
+  font-weight: bold;
+  color: #4A4A4A;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.merchant-info {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.offers-section {
+  margin-bottom: 20px;
+}
+
+.offers-button {
+  background-color: #DDA0DD;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.offers-button:hover {
+  background-color: #D8BFD8;
+}
+
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #D8BFD8;
+}
+
+.dish-list {
+  list-style: none;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.dish-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.dish-img {
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.dish-info {
+  flex-grow: 1;
+}
+
+.add-cart-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-cart-button:hover {
+  background-color: #D8BFD8;
+}
+
+.cart-section {
+  margin-top: 20px;
+}
+
+.cart-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cart-button:hover {
+  background-color: #D8BFD8;
+}
+
+.cart-items {
+  margin-top: 20px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-img {
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.cart-info {
+  flex-grow: 1;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.quantity-button:hover {
+  background-color: #D8BFD8;
+}
+
+.remove-button {
+  background-color: #ff6961;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+  background-color: #ff7f7f;
+}
+
+.empty-cart {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #888;
+}
+
+.total-section {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.checkout-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-left: 100px;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+  background-color: #D8BFD8;
 }
 </style>

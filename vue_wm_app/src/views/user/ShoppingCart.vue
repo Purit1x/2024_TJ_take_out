@@ -1,48 +1,71 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, onMounted, computed, watch } from 'vue';
-import {addToShoppingCart,decrementDishInCart,removeFromShoppingCart,getShoppingCartItems} from '@/api/user';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { addToShoppingCart, decrementDishInCart, removeFromShoppingCart, getShoppingCartItems } from '@/api/user';
 import { GetMultiSpecialOffer } from '@/api/merchant';
 import { useStore } from "vuex";
 import { ElMessage } from 'element-plus';
 import gsap from 'gsap';
-const store = useStore();  
+const store = useStore();
 const router = useRouter();
-const user = ref({}); // 初始化用户信息对象
-const merchants = ref([]);  // 存储按商家分类后的购物车物品列表
-const specialOffers=ref([]);  //商家满减活动
+const user = ref({});
+const merchants = ref([]);
+const specialOffers = ref([]);
 
+const isScrolling = ref(true);  // 滚动开关
 
 onMounted(async () => {
-    const userData = store.state.user;
-    if (userData) {
-        user.value = userData;
-    } else {
-        router.push('/login');
-    }
+  const userData = store.state.user;
+  if (userData) {
+    user.value = userData;
+  } else {
+    router.push('/login');
+  }
 
-    const userId = user.value.userId;
-    const data = await getShoppingCartItems(userId);
-    if (data) {
-        merchants.value = data.data.map(merchant => ({
-            ...merchant,
-            checked: false, // 初始化商家复选框
-            dishes: merchant.dishes.map(dish => ({
-                ...dish,
-                checked: false, // 初始化菜品复选框
-            }))
-        }));
-        //console.log(merchants.value);
-    }
+  const userId = user.value.userId;
+  const data = await getShoppingCartItems(userId);
+  if (data) {
+    merchants.value = data.data.map(merchant => ({
+      ...merchant,
+      checked: false,
+      dishes: merchant.dishes.map(dish => ({
+        ...dish,
+        checked: false,
+      })),
+    }));
+  }
 
-    // 获取所有商家的满减数据
-    const merchantIds = merchants.value.map(merchant => merchant.merchantId);
-    const offers = await GetMultiSpecialOffer(merchantIds);
-    if(offers){
-      specialOffers.value = offers.data;
+  const merchantIds = merchants.value.map(merchant => merchant.merchantId);
+  const offers = await GetMultiSpecialOffer(merchantIds);
+  if (offers) {
+    specialOffers.value = offers.data;
+  }
+
+  const content = document.querySelector('.content');
+
+  // 添加鼠标滚轮控制
+  const handleScroll = (event) => {
+    if (isScrolling.value) {
+      content.scrollTop += event.deltaY;
     }
-    
-    //console.log(specialOffers.value); 
+  };
+
+  // 鼠标左键点击切换滚动状态
+  const handleMouseClick = (event) => {
+    if (event.button === 0) {
+      isScrolling.value = !isScrolling.value;
+    }
+  };
+
+  // 事件监听
+  content.addEventListener('wheel', handleScroll);
+  content.addEventListener('mousedown', handleMouseClick);
+
+  // 在组件卸载时移除事件监听器
+  onUnmounted(() => {
+    content.removeEventListener('wheel', handleScroll);
+    content.removeEventListener('mousedown', handleMouseClick);
+  });
 });
 
 // 商家复选框函数
@@ -280,6 +303,26 @@ const removeInCart = async(dish) => {
   padding: 20px;
   background-color: transparent;
   font-family: Arial, sans-serif;
+  height: calc(100vh - 60px); /* 计算总高度，确保超出可视窗口大小 */
+  overflow-y: auto; /* 强制显示垂直滚动条 */
+  scrollbar-width: thin; /* 适用于 Firefox 的滚动条宽度设置 */
+}
+
+.content::-webkit-scrollbar {
+  width: 8px; /* 滚动条宽度 */
+}
+
+.content::-webkit-scrollbar-track {
+  background-color: #f9f9f9; /* 滚动条轨道颜色 */
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: #ff69b4; /* 滚动条颜色 */
+  border-radius: 10px; /* 圆角滚动条 */
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background-color: #ff85c1; /* 悬停时滚动条的颜色 */
 }
 
 .header {
@@ -294,11 +337,12 @@ const removeInCart = async(dish) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 15px;
   color: white;
+  margin-right: 20px;
 }
 
 .merchant-name {
@@ -316,13 +360,14 @@ const removeInCart = async(dish) => {
 }
 
 .merchant-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
 }
 
 /* 菜品列表样式 */
 .dish-list {
   list-style: none;
   padding: 0;
+  margin-right: 20px; /* 添加右侧距离 */
 }
 
 .dish-item {
@@ -334,6 +379,7 @@ const removeInCart = async(dish) => {
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s;
+  margin-right: 20px; /* 添加右侧距离 */
 }
 
 .dish-item:hover {
@@ -360,7 +406,7 @@ const removeInCart = async(dish) => {
 .dish-price {
   font-size: 18px;
   font-weight: bold;
-  color: #ff69b4;
+  color: #DDA0DD;
   margin-right: 20px;
 }
 
@@ -371,7 +417,7 @@ const removeInCart = async(dish) => {
 }
 
 .quantity-button {
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: white;
   padding: 5px 10px;
@@ -381,7 +427,7 @@ const removeInCart = async(dish) => {
 }
 
 .quantity-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
 }
 
 .quantity {
@@ -392,14 +438,14 @@ const removeInCart = async(dish) => {
 .remove-button {
   background-color: transparent;
   border: none;
-  color: #ff69b4;
+  color: #DDA0DD;
   font-size: 18px;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 .remove-button:hover {
-  color: #ff85c1;
+  color: #D8BFD8;
 }
 
 /* 总价样式 */
@@ -418,6 +464,6 @@ const removeInCart = async(dish) => {
 .discount {
   margin-left: 10px;
   font-size: 18px;
-  color: #ff69b4;
+  color: #DDA0DD;
 }
 </style>

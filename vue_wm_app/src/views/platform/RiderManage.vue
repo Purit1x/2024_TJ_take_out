@@ -241,14 +241,11 @@ const leaveEditAssign = () => {
 </script>
 
 <template>
-    <div v-if="!isAssigning&&!isEditAssigning">
-        <div>
+    <div v-if="!isAssigning&&!isEditAssigning" class="box">
+        <div class="head">
             骑手管理
-            <button @click="gobackHome">返回</button>
         </div>
-        <label @click="isUnAssigned = true">未分配站点</label>&nbsp;&nbsp;
-        <label @click="isUnAssigned = false">已分配站点</label>
-        <div>
+        <div class="top">
             <label>排序字段:</label>
             <select v-model="sortField" @change="sortRiders">
                 <option value="deliveredOrdersCount">送达订单量</option>
@@ -262,71 +259,257 @@ const leaveEditAssign = () => {
             </select>
         </div>
         <div v-if="isUnAssigned">
-            <div>
-                <input type="text" v-model="searchQuery" placeholder="搜索Id或姓名" v-on:keyup.enter="handleUnSearch()"/> 
-                <button @click="handleUnSearch()">搜索</button>
+            <div class="top">
+                <input type="text" v-model="searchQuery" placeholder="搜索Id、姓名" v-on:keyup.enter="handleUnSearch()" class="inputtext"/> 
+                <button @click="handleUnSearch()" class="search">搜索</button>
+                <label @click="isUnAssigned = true" class="choose">未分配站点</label>&nbsp;&nbsp;
+                <label @click="isUnAssigned = false" class="choose">已分配站点</label>
             </div>
             
-            <ul>  
-                <li v-for="rider in showUnRidersInfo" :key="rider.riderId">  
-                    <span>Id: {{ rider.riderId }}</span>
-                    <span>&nbsp;&nbsp;{{ rider.riderName }}</span> 
-                    <span>&nbsp;&nbsp;{{ rider.phoneNumber }}</span>
-                    <!--显示接单数与评分-->
-                    <span>&nbsp;&nbsp;送单量：{{ rider.deliveredOrdersCount }}</span>
-                    <span>&nbsp;&nbsp;评分：{{ rider.averageRating }}</span>
-                    <button @click="enterAssign(rider)">分配站点</button>
-                </li>  
-            </ul>  
+            <el-table :data="showUnRidersInfo" class="table" border>
+                <el-table-column prop="riderId" label="骑手ID" width="150">
+                    <template #default="{ row }">
+                        Id: {{ row.riderId }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="riderName" label="骑手姓名" width="200">
+                    <template #default="{ row }">
+                        {{ row.riderName }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="phoneNumber" label="电话号码" width="200">
+                    <template #default="{ row }">
+                        {{ row.phoneNumber }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="送单量" width="150">
+                    <template #default="{ row }">
+                        {{ row.deliveredOrdersCount }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="评分" width="130">
+                    <template #default="{ row }">
+                        {{ row.averageRating }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="150">
+                    <template #default="{ row }">
+                        <el-button type="primary" size="small" @click="enterAssign(row)">分配站点</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </div>
         <div v-if="!isUnAssigned">
-            <div>
-                <input type="text" v-model="searchQuery" placeholder="搜索Id、姓名或站点名" v-on:keyup.enter="handleAsSearch()"/> 
-                <button @click="handleAsSearch()">搜索</button>
+            <div class="top">
+                <input type="text" v-model="searchQuery" placeholder="搜索Id、姓名或站点名" v-on:keyup.enter="handleAsSearch()" class="inputtext"/> 
+                <button @click="handleAsSearch()" class="search">搜索</button>
+                <label @click="isUnAssigned = true" class="choose">未分配站点</label>&nbsp;&nbsp;
+                <label @click="isUnAssigned = false" class="choose">已分配站点</label>
+        
             </div>
             
-            <ul>  
-                <li v-for="rider in showAsRidersInfo" :key="rider.riderId">  
-                    <span>Id: {{ rider.riderId }}</span>
-                    <span>&nbsp;&nbsp;{{ rider.riderName }}</span> 
-                    <span>&nbsp;&nbsp;{{ rider.phoneNumber }}</span>
-                    <span>&nbsp;&nbsp;{{ rider.stationName}}</span>
-                    <span>&nbsp;&nbsp;送单量：{{ rider.deliveredOrdersCount }}</span>
-                    <span>&nbsp;&nbsp;评分：{{ rider.averageRating }}</span>
-                    <button @click="enterEditAssign(rider)">更改分配</button>
-                    <button @click="deleteAssign(rider)">删除分配</button>
-                </li>  
-            </ul>  
+            <el-table :data="showAsRidersInfo" class="table" border>
+                <el-table-column prop="riderId" label="骑手ID" width="110">
+                    <template #default="{ row }">
+                        Id: {{ row.riderId }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="riderName" label="骑手姓名" width="130">
+                    <template #default="{ row }">
+                        {{ row.riderName }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="phoneNumber" label="电话号码" width="150">
+                    <template #default="{ row }">
+                        {{ row.phoneNumber }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="stationName" label="所属站点" width="120">
+                    <template #default="{ row }">
+                        {{ row.stationName }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="送单量" width="120">
+                    <template #default="{ row }">
+                        {{ row.deliveredOrdersCount }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="评分" width="120">
+                    <template #default="{ row }">
+                        {{ row.averageRating }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="200">
+                    <template #default="{ row }">
+                        <el-button type="primary" size="small" @click="enterEditAssign(row)">更改分配</el-button>
+                        <el-button type="danger" size="small" @click="deleteAssign(row)">删除分配</el-button>
+                    </template>
+                </el-table-column>
+            </el-table> 
         </div>
+        <button @click="gobackHome" class="return">返回</button>
     </div>
-    <div v-if="isAssigning">
-        <div>请为骑手{{ currentRider.riderName }}分配站点：</div>
-        <div>
-            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()"/> 
-            <button @click="handleStationSearch()">搜索</button>
-            <span>&nbsp;<button @click="leaveAssign()">取消</button></span>
+    <div v-if="isAssigning"  class ="box">
+        <div class="head4">请为骑手{{ currentRider.riderName }}分配站点：</div>
+        <div class="top">
+            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()" class="inputtext"/> 
+            <button @click="handleStationSearch()" class="search">搜索</button>
+            <span>&nbsp;<button @click="leaveAssign()" class="choose">取消</button></span>
         </div>
-        <ul>  
-            <li v-for="station in showStationsInfo" :key="station.stationId">  
-                <span>{{ station.stationName }}</span> 
-                <span>&nbsp;&nbsp;{{ station.stationAddress }}</span>
-                <span>&nbsp;<button @click="handleChoose(station.stationId)">选择</button></span>
-            </li>  
-        </ul> 
+        <el-table :data="showStationsInfo" class="table" border>
+        <el-table-column prop="stationName" label="站点名称" width="300">
+            <template #default="{ row }">
+                {{ row.stationName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="stationAddress" label="站点地址" width="400">
+            <template #default="{ row }">
+                {{ row.stationAddress }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" width="300">
+            <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleChoose(row.stationId)">选择</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
     </div>
-    <div v-if="isEditAssigning">
-        <div>请为骑手{{ currentRider.riderName }}更换站点：</div>
-        <div>
-            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()"/> 
-            <button @click="handleStationSearch()">搜索</button>
-            <span>&nbsp;<button @click="leaveEditAssign()">取消</button></span>
+    <div v-if="isEditAssigning" class="box">
+        <div class="head4">请为骑手{{ currentRider.riderName }}更换站点：</div>
+        <div class="top">
+            <input type="text" v-model="searchStation" placeholder="搜索站点名或地址" v-on:keyup.enter="handleStationSearch()" class="inputtext"/> 
+            <button @click="handleStationSearch()" class="search">搜索</button>
+            <span>&nbsp;<button @click="leaveEditAssign()" class="choose">取消</button></span>
         </div>
-        <ul>  
-            <li v-for="station in showStationsInfo" :key="station.stationId">  
-                <span>{{ station.stationName }}</span> 
-                <span>&nbsp;&nbsp;{{ station.stationAddress }}</span>
-                <span>&nbsp;<button @click="handleEditChoose(station.stationId)">选择</button></span>
-            </li>  
-        </ul> 
+        <el-table :data="showStationsInfo" class="table" border>
+        <el-table-column prop="stationName" label="站点名称" width="300">
+            <template #default="{ row }">
+                {{ row.stationName }}
+            </template>
+        </el-table-column>
+        <el-table-column prop="stationAddress" label="站点地址" width="400">
+            <template #default="{ row }">
+                {{ row.stationAddress }}
+            </template>
+        </el-table-column>
+        <el-table-column label="操作" width="300">
+            <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleEditChoose(row.stationId)">选择</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
     </div>
 </template>
+<style scoped lang="scss">
+.table{
+    margin-top:10px;
+    margin-left:5%;
+    height:77%;
+    width:90%;
+    border-radius: 10px;
+    border: 2px solid #01042a;
+    table-layout: auto;
+    margin-top: 1%;
+}
+.top{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+.box{
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin; /* 字体大小 */
+    position: fixed; /* 固定定位 */
+    top: 60px; /* 贴近顶部 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    width: 70%;
+    height: 80%;
+}
+
+.return{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+}
+.return:hover{
+    background-color: #f7ced5;
+}
+.head{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 4.5vmin; /* 字体大小 */
+    color:#000000;
+    margin-bottom: 1%;
+}
+.head4{
+    display:flex;
+    justify-content:center; 
+    align-items: center; /* 垂直居中 */
+    left:50%;
+    font-size: 3.5vmin; /* 字体大小 */
+    color:#000000;
+    margin-bottom: 1%;
+}
+.choose{
+    padding: 5px 8px;         /* 按钮内边距 */
+    margin-right: 1px;         /* 按钮右边距 */
+    background-color: #f190a0;
+    font-size: 2.5vmin; /* 字体大小 */
+    border-radius: 9px;
+}
+.choose:hover{
+    background-color: #FFC0CB;
+}
+.head2{
+    margin-top:4%;
+    margin-bottom: 3%;
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    color:#f56a81;
+}
+.inputtext{
+    height: 25px;
+    width: 450px;
+    right:5%;
+    font-size: 2.2vmin;
+    border-radius: 9px;
+    margin-right: 0%;
+}
+.input{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-left:30%;
+    margin-right:30%;
+    width:40%;
+    font-size: 3vmin;
+}
+.output{
+    display:flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin-top:1%;
+   // width:100%;
+    font-size: 3vmin;
+    color:#583def;
+}
+.search{
+    padding: 6px 9px;         /* 按钮内边距 */
+    margin-right: 8px;         /* 按钮右边距 */
+    background-color: #f3adb8;
+    font-size: 2.5vmin; /* 字体大小 */
+    border-radius: 9px;
+    margin-left: 10px;
+}
+</style>

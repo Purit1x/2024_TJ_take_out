@@ -25,6 +25,7 @@ import RiderManage from '@/views/platform/RiderManage.vue'
 import OrderManage from '@/views/platform/OrderManage.vue'
 import CouponManage from '@/views/platform/CouponManage.vue'
 import CommentManage from '@/views/platform/CommentManage.vue'
+import UserManage from '@/views/platform/UserManage.vue'
 import StationManage from '@/views/platform/StationManage.vue'
 import StatisticManage from '@/views/platform/StatisticManage.vue'
 import UserCoupon from '@/views/user/UserCoupon.vue'
@@ -137,6 +138,10 @@ const routers = [
             {
                 path: 'comment-manage',
                 component: CommentManage,
+            },
+            {
+                path: 'user-manage',
+                component: UserManage,
             },
             {
                 path: 'station-manage',

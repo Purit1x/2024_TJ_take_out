@@ -6,6 +6,11 @@ const store = useStore()
 const router = useRouter();
 const isPlatformHome = ref(true); // 页面是否为用户主页 
 onMounted(() => {
+    const adminData = store.state.admin; 
+    if(adminData){
+    }else{
+        router.push('/login');
+    }
     if(router.currentRoute.value.path !== '/platform-home')
         isPlatformHome.value = false;
     else
@@ -35,6 +40,10 @@ const gotoRider = () => {
 const gotoComment = () => {
     isPlatformHome.value = false;
     router.push('/platform-home/comment-manage');
+}
+const gotoUser = () => {
+    isPlatformHome.value = false;
+    router.push('/platform-home/user-manage');
 }
 const gotoStation = () => {
     isPlatformHome.value = false;
@@ -78,6 +87,7 @@ watch(
         </div>
         <div class="quarter-div"><a  @click="gotoOrder">订单管理</a></div>
         <div class="quarter-div"><a  @click="gotoMerchant">商家管理</a></div>
+        <div class="quarter-div"><a  @click="gotoUser">用户管理</a></div>
         <div class="quarter-div"><a  @click="gotoCoupon">优惠券管理</a></div>
         <div class="quarter-div"><a  @click="gotoStation">片区管理</a></div>
         <div class="quarter-div"><a  @click="gotoRider">骑手管理</a></div>

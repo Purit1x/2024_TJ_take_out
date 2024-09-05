@@ -26,7 +26,10 @@ const loginInfo=ref({
 
 
 //定义数据模型
-const adminData = ref({});
+const adminData = ref({
+    AdminId:null,
+    Password:'',
+})
 const userRegisterData = ref({
     userId:null,
     username:'',
@@ -453,6 +456,7 @@ const login = () =>{  //登录
                     ElMessage.success('登录成功');
                     // 将用户信息保存到管理器
                     store.dispatch('setAdmin', adminData.value); // 设置用户状态
+                    console.log(store.state.admin);
                     router.push('/platform-home');
                 }
             }).catch(error => {
@@ -539,7 +543,7 @@ const mySwitch = () => {
                         <el-input :prefix-icon="User" placeholder="请输入菜品类型" v-model="merchantRegisterData.DishType"></el-input>  
                     </el-form-item>
                     <div class="startandend">
-                        <el-form-item class="starttime"v-if="roleType === 'merchant'" prop="TimeforOpenBusiness">  
+                        <el-form-item class="starttime" v-if="roleType === 'merchant'" prop="TimeforOpenBusiness">  
                             <el-time-picker placeholder="请选择营业开始时间" v-model="merchantRegisterData.TimeforOpenBusiness" :picker-options="{ selectableRange: '00:00:00 - 23:59:59' }"></el-time-picker>  
                         </el-form-item>  
                         <el-form-item class="endtime" v-if="roleType === 'merchant'" prop="TimeForCloseBusiness">  

@@ -572,7 +572,7 @@ namespace takeout_tj.Controllers
 
                 var orderCount = filteredOrders.Count; // 获取满足条件的订单数量
 
-                if (orderCount > 0)
+                if (orderCount >= 0)
                 {
                     return Ok(new { Region = region, OrderCount = orderCount });
                 }
