@@ -336,8 +336,7 @@ th {
 
 /* 侧边栏样式 */
 .sidebar {
-  width: 80px;
-  /* 调整侧边栏宽度为50px */
+  width: 7vw;
   background: linear-gradient(to bottom, #f0d6f2, #f77dd048);
   padding: 20px 0;
   /* 调整为顶部和底部填充 */
@@ -351,10 +350,11 @@ th {
 }
 
 .sidebar-img {
-  width: 80%;
+  width: 90%;
   /* 根据新宽度调整logo大小 */
   height: auto;
   margin-bottom: 15px;
+  justify-self: center;
 }
 
 .sidebar-button {
@@ -373,7 +373,7 @@ th {
 }
 
 .sidebar-button img {
-  width: 30px;
+  width: 50%;
   /* 调整按钮图片大小 */
   height: auto;
 }

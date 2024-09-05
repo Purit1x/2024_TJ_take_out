@@ -382,7 +382,6 @@ const enterDishes = (id) => {
             class="margin-top"
             title="个人信息"
             :column="2"
-            :size="size"
             border
             style="margin-bottom: 20px;"
         >
@@ -505,7 +504,7 @@ const enterDishes = (id) => {
             <el-button @click="SaveWalletPassword">修改</el-button>
             <el-button @click="leaveWPWindow">返回</el-button>
         </div> -->
-        <div class="favouritemerchant" v-if="isFavouriteMerchants">  <!-- 收藏商户 -->
+        <div class="favouritemerchant" v-if="isUserPersonal">  <!-- 收藏商户 -->
             <div style="margin-top:20px;margin-bottom: 20px;font-weight: bold;">收藏商户</div>
             <table class="styled-table">
                 <thead>

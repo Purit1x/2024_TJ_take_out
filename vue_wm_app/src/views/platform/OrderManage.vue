@@ -56,7 +56,20 @@ const renewOrders=async()=>{
     }
 }
 
+function formatDateTime(time) { 
+    const date = new Date(time); 
+    if (isNaN(date.getTime())) { 
+        return null; // 或者处理无效日期的逻辑  
+    } 
+    const year = date.getFullYear(); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0'); 
+    const seconds = String(date.getSeconds()).padStart(2, '0'); 
 
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; 
+}
 
 </script>
 
@@ -85,7 +98,7 @@ const renewOrders=async()=>{
                 >
                     <div>订单号：{{order.orderId}}</div>
                     <div>订单总价：{{order.price}}元</div>
-                    <div>订单创建时间：{{ order.orderTimestamp }}</div>
+                    <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
                     
                 </div>
             </div>
@@ -98,15 +111,15 @@ const renewOrders=async()=>{
                 >
                     <div>订单号：{{order.orderId}}</div>
                     <div>订单总价：{{order.price}}元</div>
-                    <div>订单创建时间：{{ order.orderTimestamp }}</div>
+                    <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
                     
                 </div>
             </div>
         </div>
-        <div class="bottom">
+        <!-- <div class="bottom">
             <span style="font-size:15px"> 环保订单比例： {{ecoInfo.ecoOrderRatio}}</span>
             <button @click="gobackHome" class = "return">返回</button>
-        </div>
+        </div> -->
         <div class="bottom"> 环保订单比例： <div class="text">{{ecoInfo.ecoOrderRatio}}</div></div>
         <button @click="gobackHome" class="return">返回</button>    
     </div>
