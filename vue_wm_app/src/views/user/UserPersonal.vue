@@ -446,8 +446,8 @@ const enterDishes = (id) => {
     <!-- 钱包提现弹窗 -->  
     <el-dialog title="提现金额" :model-value="isWithdraw" @close="leaveWithdrawWindow">  
         <div style="display:flex;flex-direction:row;">
-            <el-form-item label="充值金额" prop="recharge"><input type="number" v-model="currentUser.recharge" placeholder="请输入提现金额" @blur="validateField('recharge')"/></el-form-item>
-            <el-button @click="SaveRecharge" style="margin-left:30px;">提现</el-button>
+            <el-form-item label="提现金额" prop="withdrawAmount"><input type="number" v-model="currentUser.withdrawAmount" placeholder="请输入提现金额" @blur="validateField('withdrawAmount')"/></el-form-item>
+            <el-button @click="SaveWithdraw" style="margin-left:30px;">提现</el-button>
         </div>
     </el-dialog> 
     <!-- 修改支付密码弹窗 -->  

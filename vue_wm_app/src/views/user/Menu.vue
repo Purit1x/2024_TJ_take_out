@@ -49,7 +49,8 @@ onMounted (async() => {
   }); 
 
   MerchantId.value=router.currentRoute.value.params.id;
-  MerchantInfo.value=merchantsInfo.value[MerchantId.value-1];
+  // MerchantInfo.value=merchantsInfo.value[MerchantId.value-1];
+  MerchantInfo.value=merchantsInfo.value.find(item=>item.merchantId===Number(MerchantId.value));
   MerchantInfo.value.timeforOpenBusiness=formatTime(MerchantInfo.value.timeforOpenBusiness);  //时间转换
   MerchantInfo.value.timeforCloseBusiness=formatTime(MerchantInfo.value.timeforCloseBusiness);
 
