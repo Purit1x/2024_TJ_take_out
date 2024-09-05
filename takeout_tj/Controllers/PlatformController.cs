@@ -606,7 +606,29 @@ namespace takeout_tj.Controllers
                 return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
             }
         }
-		[HttpGet]
+
+        [HttpGet]
+        [Route("getUnfinishedOrders")]
+        public async Task<IActionResult> GetUnfinishedOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Where(or => or.State != 3)
+                    .ToListAsync();
+                if (orders.Count == 0)
+                {
+                    return Ok(new { data = 0, msg = "没有未完成订单" });
+                }
+                return Ok(new { data = orders, msg = "已找到" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { errorCode = 500, mag = "查询异常" });
+            }
+        }
+
+        [HttpGet]
 		[Route("getFinishedOrdersComment")]
 		public async Task<IActionResult> GetFinishedOrderscomment(int orderId)
 		{

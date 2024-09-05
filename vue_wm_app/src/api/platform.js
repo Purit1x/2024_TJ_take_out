@@ -165,6 +165,17 @@ export const getFinishedOrders=async()=>{
         throw error;
     }
 }
+
+export const getUnfinishedOrders=async()=>{
+    try{
+        const response=await axios.get(`${BASE_URL}/Platform/getUnfinishedOrders`);
+        return response.data;
+    }catch(error)
+    {
+        throw error;
+    }
+}
+
 export const getFinishedOrdersComment=async(id)=>{
     try{
         const response=await axios.get(`${BASE_URL}/Platform/getFinishedOrdersComment?orderId=${id}`);

@@ -230,25 +230,26 @@ provide('isMerchantHome', isMerchantHome);
           <img src="@\assets\merchant_menu.png" alt="菜单"/>
           <span>本店菜单</span>
         </button>
+
+        <button class="sidebar-button" @click="goToSpecialOffer">
+          <img src="@\assets\merchant_specialOffer.png" alt="满减活动"/>
+          <span>满减活动</span>
+        </button>
         
         <button class="sidebar-button" @click="goToPersonal">
           <img src="@\assets\merchant_personal.png" alt="个人信息"/>
           <span>个人信息</span>
         </button>
 
-        <button class="sidebar-button" @click="goToSpecialOffer">
-          <img src="@\assets\merchant_specialOffer.png" alt="满减活动"/>
-          <span>满减活动</span>
-        </button>
       </slot>
       <router-view /> <!-- 渲染子路由 -->
     </nav>
 
     <!-- 页面内容区域 #Q# 营收尚不确定是否需要添加，根据后续进度调整-->
     <div  v-if="isMerchantHome" class="content">
-      <header>
+      <header v-if="!isOrderInfo">
         <!-- #Q# 考虑将MerchantId改为MerchantName -->
-        <span v-if="!isOrderInfo" class="welcome-text">欢迎&nbsp;{{ merchant.merchantName }}!</span>
+        <span class="welcome-text">欢迎&nbsp;{{ merchant.merchantName }}!</span>
         <!-- <span class="revenue-text">今日营收：{{ todayRevenue }}元    </span>-->
       </header>
       <!-- 当前订单 实际变量根据平台方订单结构调整 -->
@@ -298,7 +299,7 @@ provide('isMerchantHome', isMerchantHome);
               <div>订单号：{{order.orderId}}</div>
               <div>订单总价：{{order.price}}元</div>
               <div>订单创建时间：{{ order.orderTimestamp }}</div>
-              <div>预计送达时间: {{ order.expectedTimeOfArrival }}</div>
+              <!--<div>预计送达时间: {{ order.expectedTimeOfArrival }}</div>-->
               
             </div>
           </div>
@@ -439,7 +440,10 @@ h2 {
 label {
   cursor: pointer;
   color: #000000; /* 默认颜色 */
-  border-radius:20px;
+  background-color: #ffcc00; /* 选中时的颜色 */
+  border:2px,solid,#ffcc00;
+  padding:10px;
+  border-radius:40px;
 }
 
 .normal-button {
@@ -525,13 +529,6 @@ label.active {
   font-size: 35px;
   margin-left: 15px;
   color: #000000;
-  font-weight: bold;
-}
-
-.revenue-text {
-  font-size: 30px;
-  color: #666;
-  margin-right: 40px;
   font-weight: bold;
 }
 
