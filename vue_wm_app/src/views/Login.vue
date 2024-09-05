@@ -16,14 +16,14 @@ const router = useRouter()
 //控制注册与登录表单的显示， 默认显示用户登录
 const isRegister = ref(true)
 const roleType = ref("user")
-const refForm =ref(null);
+const loginForm = ref(null)
+const registerForm = ref(null)
 //控制全局登录
 const loginInfo=ref({
     loginType:'',  //用户类型：用户，商家，骑手
     loginId:null,
     loginPassword:'',
 })
-
 
 //定义数据模型
 const adminData = ref({
@@ -68,8 +68,9 @@ const riderRegisterData = ref({
 
 
 const clearLoginData = () =>{
-    refForm.value.clearValidate('loginId');
-    refForm.value.clearValidate('loginPassword');
+    loginForm.value.clearValidate('loginId');
+    loginForm.value.clearValidate('loginPassword');
+    loginForm.value.clearValidate('loginType');
     loginInfo.value.loginId = null;
     loginInfo.value.loginPassword = '';
 }
@@ -77,7 +78,7 @@ const clearLoginData = () =>{
 //定义函数，清空数据模型
 const clearRegisterData = () =>{
     // 除去验证结果
-    refForm.value.clearValidate();
+    registerForm.value.clearValidate();
     
     userRegisterData.value = {
         userId:null,
@@ -114,11 +115,11 @@ const clearRegisterData = () =>{
         WalletPassword:'',
         reWalletPassword:'',
     },
-    loginInfo.value = {
-        loginType:'',  
-        loginId:null,
-        loginPassword:'',
-    },
+    // loginInfo.value = {
+    //     loginType:'',  
+    //     loginId:null,
+    //     loginPassword:'',
+    // },
     adminData.value={}
 }
 
@@ -255,10 +256,14 @@ import {riderRegisterService, riderLoginService} from '@/api/rider.js'
 import {adminLoginService} from '@/api/platform.js'
 const register = ()=> {
      // 先验证数据
-    refForm.value.validate((valid) => {
+
+    registerForm.value.validate((valid,fields) => {
+        console.log(1);
         if (!valid) {
+            console.log(fields);
             return false;
         }
+        console.log(2);
         if (roleType.value === 'merchant') {
             // 转换时间为秒数
             const openTime = merchantRegisterData.value.TimeforOpenBusiness;  
@@ -354,7 +359,7 @@ const register = ()=> {
 
 const login = () =>{  //登录
     // 先验证数据
-    refForm.value.validate((valid) => {
+    loginForm.value.validate((valid) => {
         if (!valid) {
             return false;
         }
@@ -486,12 +491,12 @@ const mySwitch = () => {
     if (isRegister.value) {
         pre_box.style.transform = "translateX(100%)"
         pre_box.style.backgroundColor = "#c9e0ed"
-
+        clearRegisterData()
     }
     else {
         pre_box.style.transform = "translateX(0%)"
         pre_box.style.backgroundColor = "#edd4dc"
-
+        clearLoginData()
     }
     isRegister.value = !isRegister.value
 }
@@ -520,7 +525,7 @@ const mySwitch = () => {
 
 
                 <!-- 输入框 -->
-                <el-form ref="refForm" size="large" autocomplete="off" 
+                <el-form ref="registerForm" size="large" autocomplete="off" 
                      :model="roleType === 'merchant' ? merchantRegisterData : roleType === 'rider' ? riderRegisterData : userRegisterData"   
                      :rules="roleType === 'merchant' ? merchantRules : roleType === 'rider' ? riderRules : userRules">        
                     <!-- 选项框 -->
@@ -618,7 +623,7 @@ const mySwitch = () => {
                     <h1>登录</h1>
                 </div>
                 <!-- 输入框盒子 -->
-                <el-form ref="refForm"  autocomplete="off" :model="loginInfo" :rules="loginRules">
+                <el-form ref="loginForm"  autocomplete="off" :model="loginInfo" :rules="loginRules">
                     <el-form-item prop="loginType">  
                         <el-select v-model="loginInfo.loginType" placeholder="选择用户类型" @change="clearLoginData();">  
                             <el-option label="用户" value="user"></el-option>  
