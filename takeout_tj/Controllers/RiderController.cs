@@ -473,7 +473,7 @@ namespace takeout_tj.Controllers
 
         [HttpPut]
         [Route("withdraw")]
-        public IActionResult WalletWithdraw(int riderId, int withdrawMoney)
+        public IActionResult WalletWithdraw(int riderId, decimal withdrawMoney)
         {
             var tran = _context.Database.BeginTransaction(); // 开始事务 
             try
