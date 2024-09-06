@@ -284,7 +284,22 @@ provide('merchantsInfo', merchantsInfo);
         <el-button type="primary" @click="filteredMerchants()" class="filter-button">筛选</el-button>
       </div>
 
-
+      <div>
+        <label style="font-size: 14px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;排序字段:</label>
+        <el-select v-model="sortField" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="评分"></el-option>
+          <el-option value="2" label="销售额"></el-option>
+          <el-option value="3" label="销量"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+        <label style="font-size: 14px;">排序方式:</label>
+        <el-select v-model="sortOrder" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="升序"></el-option>
+          <el-option value="2" label="降序"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+      </div>
+      <br />
       <table class="styled-table">
         <thead>
           <tr>
@@ -355,7 +370,7 @@ th {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width:80px;
+  max-width: 80px;
 }
 
 .sidebar-img {
