@@ -349,7 +349,7 @@ const handleScroll = (event) => {
 
     <div class="search-section">
       <el-col :span="8">
-        <el-input placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter.native="handleSearch">
+        <el-input placeholder="搜索菜品或类别" v-model="searchQuery" clearable @clear="handleSearch" @keydown.enter="handleSearch">
           <template #append>
             <el-button type="primary" @click="handleSearch" class="search-button">
               <el-icon><search /></el-icon>

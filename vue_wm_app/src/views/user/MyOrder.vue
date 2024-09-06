@@ -319,7 +319,7 @@ function formatDateTime(time) {
             <el-scrollbar max-height="500px">
 
                 <ul class="order-list">
-                    <li v-for="(order,index) in deliveringOrders":key ="index" class="order-item">
+                    <li v-for="(order,index) in deliveringOrders" :key ="index" class="order-item">
 
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{ order.price }}元</p>
@@ -343,7 +343,7 @@ function formatDateTime(time) {
             <el-scrollbar max-height="500px">
 
                 <ul class="order-list">
-                <li v-for="(order,index) in completedOrders":key ="index" class="order-item">
+                <li v-for="(order,index) in completedOrders" :key ="index" class="order-item">
 
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
