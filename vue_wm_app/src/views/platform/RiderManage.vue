@@ -357,22 +357,22 @@ const leaveEditAssign = () => {
             <span>&nbsp;<button @click="leaveAssign()" class="choose">取消</button></span>
         </div>
         <el-table :data="showStationsInfo" class="table" border>
-        <el-table-column prop="stationName" label="站点名称" width="300">
-            <template #default="{ row }">
-                {{ row.stationName }}
-            </template>
-        </el-table-column>
-        <el-table-column prop="stationAddress" label="站点地址" width="400">
-            <template #default="{ row }">
-                {{ row.stationAddress }}
-            </template>
-        </el-table-column>
-        <el-table-column label="操作" width="300">
-            <template #default="{ row }">
-                <el-button type="primary" size="small" @click="handleChoose(row.stationId)">选择</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
+            <el-table-column prop="stationName" label="站点名称" width="300">
+                <template #default="{ row }">
+                    {{ row.stationName }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="stationAddress" label="站点地址" width="400">
+                <template #default="{ row }">
+                    {{ row.stationAddress }}
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="300">
+                <template #default="{ row }">
+                    <el-button type="primary" size="small" @click="handleChoose(row.stationId)">选择</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
     </div>
     <div v-if="isEditAssigning" class="box">
         <div class="head4">请为骑手{{ currentRider.riderName }}更换站点：</div>
@@ -381,7 +381,7 @@ const leaveEditAssign = () => {
             <button @click="handleStationSearch()" class="search">搜索</button>
             <span>&nbsp;<button @click="leaveEditAssign()" class="choose">取消</button></span>
         </div>
-        <el-table :data="showStationsInfo" class="table" border>
+        <el-table :data="showStationsInfo" class="table"border="parentBorder" >
         <el-table-column prop="stationName" label="站点名称" width="300">
             <template #default="{ row }">
                 {{ row.stationName }}
@@ -404,12 +404,13 @@ const leaveEditAssign = () => {
 .table{
     margin-top:10px;
     margin-left:5%;
-    height:77%;
+    height:400px;
     width:90%;
     border-radius: 10px;
     border: 2px solid #01042a;
     table-layout: auto;
     margin-top: 1%;
+    overflow: auto;
 }
 .top{
     display:flex;
@@ -431,6 +432,10 @@ const leaveEditAssign = () => {
     transform: translateX(-50%); /* 修正水平居中 */
     width: 70%;
     height: 80%;
+    .el-table {
+        max-height: 100%; // 确保表格的最大高度不超过其父元素
+        overflow: auto; // 表格内部也启用滚动条
+    }
 }
 
 .return{

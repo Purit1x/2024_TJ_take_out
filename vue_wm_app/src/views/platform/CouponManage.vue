@@ -451,6 +451,10 @@ const leaveCouponCreate = () => {
     /* 修正水平居中 */
     width: 70%;
     height: 90%;
+    .el-table {
+        max-height: 100%; // 确保表格的最大高度不超过其父元素
+        overflow: auto; // 表格内部也启用滚动条
+    }
 }
 
 .return {
@@ -526,11 +530,12 @@ const leaveCouponCreate = () => {
 .table {
     margin-top: 10px;
 
-    height: 70%;
+    height: 350px;
     width: 80%;
     border-radius: 10px;
     border: 2px solid #01042a;
     table-layout: auto;
     margin-top: 1%;
+    overflow: auto;
 }
 </style>
