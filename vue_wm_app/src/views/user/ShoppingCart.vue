@@ -279,13 +279,11 @@ const removeInCart = async(dish) => {
           <img :src="item.imageUrl" alt="菜品图片" class="dish-img">
           <span class="dish-name">{{item.dishName}}</span>
           <span class="dish-price">{{item.dishPrice}}元</span>
-          <!-- 这里是两种不同的按钮样式 -->
-          <!-- <div class="quantity-control">
+          <div class="quantity-control">
             <button class="quantity-button" @click="decrementInCart(item)">-</button>
             <span class="quantity">{{item.dishNum}}</span>
             <button class="quantity-button" @click="addToCart(item)">+</button>
-          </div> -->
-          <el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px;width: 10%;" />
+          </div>
           
           <button class="remove-button" @click="removeInCart(item)">x</button>
         </li>
@@ -417,14 +415,15 @@ const removeInCart = async(dish) => {
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: rgb(243, 235, 243);
 }
 
 .quantity-button {
-  background-color: #DDA0DD;
+  background-color: #dbb8db;
   border: none;
   color: white;
   padding: 5px 10px;
-  border-radius: 50%;
+  border-radius: 20%;
   cursor: pointer;
   transition: background-color 0.3s;
 }

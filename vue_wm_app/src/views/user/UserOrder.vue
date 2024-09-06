@@ -20,6 +20,7 @@ const Addresses=ref([]);  //用户的所有地址
 const choosedAddress=ref({});  //用户选择的地址
 const showAddressDialog=ref(false);  //是否显示地址选择弹出框
 const showCouponDialog=ref(false);  //是否显示优惠券选择弹出框
+const isCouponChoosed =ref(false);  //是否选择了优惠券
 const choosedCoupon=ref({});  //用户选择的优惠券
 const totalPrice=ref(0);  //总价
 const discountAmount=ref(0);  //满减优惠金额
@@ -184,11 +185,13 @@ const selectCoupon = (coupon) => {
     choosedCoupon.value = coupon; // 更新选择的优惠券  
     FinalPrice.value=MerchantPrice.value-choosedCoupon.value.couponValue+packetPrice.value+riderPrice.value;
     showCouponDialog.value = false; // 关闭弹出框  
+    isCouponChoosed.value=true;
 };  
 const noCoupon = () => {  
-    choosedCoupon.value = null; // 取消选择优惠券  
+    // choosedCoupon.value = null; // 取消选择优惠券  
     FinalPrice.value=MerchantPrice.value+packetPrice.value+riderPrice.value;
     showCouponDialog.value = false; // 关闭弹出框  
+    isCouponChoosed.value=false;
 };  
 const selectBestCoupon=async()=>{
     // 过滤出符合条件的优惠券  
@@ -308,12 +311,12 @@ function formatDateTime(time) {
     <div>
       <h2 class="order-header">
         下单
-        <button class="action-button" @click="gobackHome">返回</button>
+        <el-button class="action-button" @click="gobackHome">返回</el-button>
       </h2>
       <div class="address-section">
-        <div class="address-info">
-          联系人与地址：&nbsp;&nbsp;
-          <button class="action-button" @click="showAddressDialog=true">更换</button>
+        <div class="address-info" style="display: flex;justify-content:space-between;align-items: center;">
+          联系人与地址：
+          <el-button class="action-button" @click="showAddressDialog=true">更换</el-button>
         </div>
         <div v-if="hasDefaultAddress" class="default-address">
           {{ choosedAddress.contactName }}&nbsp;&nbsp;
@@ -336,7 +339,7 @@ function formatDateTime(time) {
         </div>
       </div>
       <div class="order-details">
-        <p>订单：</p>
+        订单：
         <ul>
           <li v-for="item in shoppingCart" :key="item.dishId" class="order-item">
             <img :src="item.imageUrl" alt="菜品图片" class="dish-image">
@@ -346,10 +349,11 @@ function formatDateTime(time) {
         <strong>总价: {{ MerchantPrice }} 元</strong>
         <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
       </div>
-      <div class="coupon-section">
+      <div class="coupon-section" style="display: flex;justify-content:space-between;align-items: center;">
         优惠券：
-        {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }}
-        <button class="action-button" @click="showCouponDialog=true">更换</button>
+        {{ isCouponChoosed ? (choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元"): (choosedCoupon ? "有可用优惠券" : "无可用优惠券") }}
+        <!-- {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }} -->
+        <el-button class="action-button" @click="showCouponDialog=true">更换</el-button>
       </div>
       <div>打包费：{{ packetPrice }}元</div>
       <div>骑手配送费：{{ choosedAddress.userAddress ? riderPrice+"元" : "请选择地址" }}</div>
@@ -370,7 +374,7 @@ function formatDateTime(time) {
         <ul>
           <li v-for="address in Addresses" :key="address.id" @click="selectAddress(address)">
             {{ address.contactName }} - {{ address.userAddress }} {{ address.houseNumber }}
-            <button class="select-button" @click="selectAddress(address)">选择</button>
+            <el-button class="select-button" @click="selectAddress(address)">选择</el-button>
           </li>
         </ul>
       </div>
