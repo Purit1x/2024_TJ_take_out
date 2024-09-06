@@ -367,10 +367,12 @@ const onMouseDown = (event) => {
           <div class="dish-list-container">
             <ul class="dish-list">
               <li v-for="dish in showDishes" :key="dish.dishId" class="dish-item">
-                <img :src="dish.imageUrl" alt="菜品图片" class="dish-img">
-                <div class="dish-info">
-                  <span>{{ dish.dishName }}：{{ dish.dishPrice }}元</span>
-                  <span> &nbsp;&nbsp;库存：{{ dish.dishInventory }}</span>
+                <div style="display:flex; flex-direction: row; align-items: center;">
+                  <img :src="dish.imageUrl" alt="菜品图片" class="dish-img">
+                  <div class="dish-info">
+                    <span>{{ dish.dishName }}：{{ dish.dishPrice }}元</span>
+                    <span> &nbsp;&nbsp;库存：{{ dish.dishInventory }}</span>
+                  </div>
                 </div>
                 <button @click="addToCart(dish)" class="add-cart-button">加入购物车</button>
               </li>
@@ -397,28 +399,25 @@ const onMouseDown = (event) => {
           <!-- 购物车框 -->
           <div class="cart-section">
             <button class="cart-button" @click="toggleCart">
-              {{ cartExpanded ? '收回购物车' : '购物车' }}({{cartItems.length}})
+              <!-- {{ cartExpanded ? '收回购物车' : '购物车' }}({{cartItems.length}}) -->
+                购物车
             </button>
-            <div v-if="cartExpanded" class="cart-items-container">
+            <div class="cart-items-container">
               <ul>
                 <li v-for="item in cartItems" :key="item.dishId" class="cart-item">
+                  <div class="cart-info" style="display:flex; flex-direction: row;align-items: center;">
                   <img :src="item.imageUrl" alt="菜品图片" class="cart-img">
-                  <div class="cart-info">
                     <span>{{ item.dishName }}: {{ item.dishPrice }}元</span>
-                    <!-- 两种按钮样式 -->
-                      <div class="quantity-controls">
-                      <button @click="decrementInCart(item)" class="quantity-button">-</button>
-                      {{ item.dishNum }}
-                      <button @click="addToCart(item)" class="quantity-button">+</button>
-                    </div>
-                    <!-- <div class="quantity-controls"></div>
-                    <el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px; width: 10%;" /> -->
                   </div>
-                  <button @click="removeInCart(item)" class="remove-button">x</button>
+                  <div class="quantity-controls">
+                    <button @click="decrementInCart(item)" class="quantity-button">-</button>
+                    {{ item.dishNum }}
+                    <button @click="addToCart(item)" class="quantity-button">+</button>
+                    <button @click="removeInCart(item)" class="remove-button" style="margin-left: 10px;">x</button>
+                  </div>
                 </li>
               </ul>
             </div>
-            <div v-else class="empty-cart">购物车为空</div>
           </div>
         </div>
       </div>
@@ -558,6 +557,7 @@ html, body {
 .dish-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 15px;
   padding: 15px;
   border-radius: 10px;
@@ -625,6 +625,8 @@ html, body {
   margin-bottom: 15px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .cart-img {
@@ -635,19 +637,21 @@ html, body {
   object-fit: cover;
 }
 
-.quantity-controls {
+.quantity-control {
   display: flex;
   align-items: center;
+  gap: 10px;
+  background-color: rgb(243, 235, 243);
 }
 
 .quantity-button {
-  background-color: #DDA0DD;
+  background-color: #dbb8db;
   border: none;
   color: white;
-  padding: 6px 12px;
-  border-radius: 50%;
+  padding: 5px 10px;
+  border-radius: 20%;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .quantity-button:hover {
@@ -659,7 +663,7 @@ html, body {
   border: none;
   color: white;
   padding: 6px 12px;
-  border-radius: 50%;
+  border-radius: 20%;
   cursor: pointer;
 }
 
