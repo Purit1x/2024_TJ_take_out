@@ -30,6 +30,7 @@ const store = createStore({
       merchant:null,
       rider:null,
       admin:null,
+      checkedItems: [], // 新增 checkedItems 状态，代表购物车中的勾选项
   },
   mutations: {  
     SET_USER(state, user) {  
@@ -56,6 +57,13 @@ const store = createStore({
     CLEAR_ADMIN(state) {  
         state.admin = null;  
     },  
+    // 新增 mutations 处理 checkedItems
+    SET_CHECKED_ITEMS(state, items) {
+        state.checkedItems = items;
+    },
+    CLEAR_CHECKED_ITEMS(state) {
+        state.checkedItems = [];
+    },
 },  
 actions: {  
     setUser({ commit }, user) {  
@@ -86,6 +94,13 @@ actions: {
     clearAdmin({ commit }) {  
         commit('CLEAR_ADMIN');  
     },  
+    // 新增 actions 处理 checkedItems
+    setCheckedItems({ commit }, items) {
+        commit('SET_CHECKED_ITEMS', items);
+    },
+    clearCheckedItems({ commit }) {
+        commit('CLEAR_CHECKED_ITEMS');
+    }, 
   },  
   plugins: [vuexPersistedState.plugin] // 使用持久化插件  
 })

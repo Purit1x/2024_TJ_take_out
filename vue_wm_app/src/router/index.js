@@ -33,6 +33,7 @@ import CouponPurchase from '@/views/user/CouponPurchase.vue'
 import SpecialOffer from '@/views/Merchant/SpecialOffer.vue'
 import UserOrder from '@/views/user/UserOrder.vue'
 import MyOrder from '@/views/user/MyOrder.vue'
+import UserCartOrder from '@/views/user/UserCartOrder.vue'
 
 // 默认路由，所有用户共享
 const routers = [
@@ -94,6 +95,14 @@ const routers = [
             {
                 path: 'cart',
                 component: ShoppingCart,
+                props: true,
+                children:[
+                    {
+                        path: 'cartorder',// 购物车结算页面
+                        component: UserCartOrder,
+                        meta: { hideParentContent: true }, // 子路由的元信息
+                    },
+                ]
             },
             {
                 path: 'address',

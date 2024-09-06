@@ -85,9 +85,6 @@ const gobackHome = () => {
       <el-table-column prop="userName" label="用户名" />
       <el-table-column prop="phoneNumber" label="电话号码" />
       <el-table-column prop="wallet" label="钱包余额" :formatter="formatWallet" />
-      
-        
-      
     </el-table>
     <button @click="gobackHome" class="return">返回</button>
   </div>
@@ -110,11 +107,19 @@ const gobackHome = () => {
     transform: translateX(-50%); /* 修正水平居中 */
     width: 70%;
     height: 85%;
-
+    overflow: auto;
     .el-table {
         max-height: 100%; 
         overflow-y: auto; 
     }
+}
+/* 添加滚动条样式 */
+.box::-webkit-scrollbar {
+    width: 8px; /* 滚动条宽度 */
+}
+
+.box::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* 滚动条轨道颜色 */
 }
 .user-manage {
   padding: 20px;
@@ -170,11 +175,20 @@ const gobackHome = () => {
 
 .table {
   width: 90%;
+  height:70%;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-top: 2%;
+  overflow-y: auto; /* 使订单区域可以滚动 */
+  overflow: auto;
+}
+.table::-webkit-scrollbar {
+    width: 8px; /* 滚动条宽度 */
 }
 
+.table::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* 滚动条轨道颜色 */
+}
 .el-button {
   margin-right: 10px;
 }

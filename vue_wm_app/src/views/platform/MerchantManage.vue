@@ -120,6 +120,7 @@ const gobackHome = () => {
                 <template #default="props">
                     <div m="4" style="margin-left: 10%;">
                         <p m="t-0 b-2"> 商家信息</p>
+                        <p m="t-0 b-2"> ID：{{ props.row.merchantId }}</p>
                         <p m="t-0 b-2"> 地址：{{ props.row.merchantAddress }}</p>
                         <p m="t-0 b-2"> 营业时间：{{ formatTime(props.row.timeforOpenBusiness) }}-{{
                             formatTime(props.row.timeforCloseBusiness) }}</p>

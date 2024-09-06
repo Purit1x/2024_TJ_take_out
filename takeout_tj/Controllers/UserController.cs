@@ -737,10 +737,15 @@ namespace takeout_tj.Controllers
                     .Include(cart => cart.DishDB)  // 通过 Include 方法加载 DishDB 相关数据
                     .ToList();
 
-                // 获取所有相关商户信息
+                // 获取所有相关商户信息，包括营业时间
                 var merchantInfo = _context.Merchants
                     .Where(m => cartItems.Select(ci => ci.MerchantId).Contains(m.MerchantId))
-                    .ToDictionary(m => m.MerchantId, m => m.MerchantName);
+                    .ToDictionary(m => m.MerchantId, m => new
+                    {
+                        m.MerchantName,
+                        m.TimeforOpenBusiness,
+                        m.TimeforCloseBusiness
+                    });
 
                 // 按商户分组
                 var groupedResult = cartItems
@@ -748,7 +753,9 @@ namespace takeout_tj.Controllers
                     .Select(group => new
                     {
                         MerchantId = group.Key,
-                        MerchantName = merchantInfo[group.Key], // 从 merchantInfo 中获取商家名称
+                        MerchantName = merchantInfo[group.Key].MerchantName, // 从 merchantInfo 中获取商家名称
+                        TimeforOpenBusiness = merchantInfo[group.Key].TimeforOpenBusiness, // 获取营业时间
+                        TimeforCloseBusiness = merchantInfo[group.Key].TimeforCloseBusiness, // 获取打烊时间
                         Dishes = group.Select(cart => new
                         {
                             cart.ShoppingCartId,

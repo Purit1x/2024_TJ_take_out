@@ -53,7 +53,6 @@
         </div>
 
         <div>
-
             <div class="head2">按照区域查询销售额:</div>
             <div class="input">
             <input v-model="region_s" placeholder="输入区域名称">
