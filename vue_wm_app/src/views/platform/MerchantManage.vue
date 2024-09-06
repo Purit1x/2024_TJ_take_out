@@ -106,84 +106,27 @@ const gobackHome = () => {
 }
 </script>
 
-<!-- <template>
-    <div v-if="!isMerchantInfo">
-        <div>
-            商家管理
-            <button @click="gobackHome">返回</button>
-        </div>
-        <h2>商家列表</h2>  
-        <div>
-            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"/> 
-            <button @click="handleSearch()">搜索</button>
-        </div>
-        <div>
-              <label>排序字段:</label>  
-                <select v-model="sortField" @change="sortCoupons">  
-                  <option value="1">评分</option>  
-                    <option value="2">销售额</option>  
-                    <option value="3">销量</option>
-                </select>  
-                &nbsp;&nbsp;
-                <label>排序方式:</label>  
-                <select v-model="sortOrder" @change="sortCoupons">  
-                    <option value="1">升序</option>  
-                    <option value="2">降序</option>  
-                </select>  
-                &nbsp;&nbsp;
-            </div>
-
-        <ul>  
-            <li v-for="merchant in showMerchantsInfo" :key="merchant.merchantId">  
-                <span>{{ merchant.merchantName }}</span> 
-                <span>&nbsp;&nbsp;{{ merchant.dishType }}</span>
-                <span>&nbsp;&nbsp;{{ merchant.allPrice }}</span>
-                <span>&nbsp;&nbsp;{{ merchant.allCount }}</span>
-                <span>&nbsp;&nbsp;{{ merchant.merchantRating }}</span>
-                <span>&nbsp;<button @click="enterMerchantInfo(merchant.merchantId)">></button></span>
-            </li>  
-        </ul> 
-    </div> 
-    <div v-if="isMerchantInfo">
-        <div>商家信息</div>
-        <div>地址：{{MerchantInfo.merchantAddress}}</div>
-        <div>营业时间：{{ MerchantInfo.timeforOpenBusiness }} - {{ MerchantInfo.timeforCloseBusiness }}</div>
-        <div>联系电话：{{MerchantInfo.contact}}</div>
-        <div>是否可以使用通用优惠券：{{MerchantInfo.couponType ? '否' : '是'}}</div>
-        <div>
-            <button @click="deleteMerchant(currentMerchantId)">销号</button>
-            <button @click="isMerchantInfo=false">返回</button>
-        </div>
-    </div>
-</template> -->
-
-
-
-
 <template>
-    <div v-if="!isMerchantInfo">
-        <div>
-            商家管理
-            <button @click="gobackHome">返回</button>
-        </div>
-        <h2>商家列表</h2>
-        <div>
-            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()" />
-            <button @click="handleSearch()">搜索</button>
+    <div v-if="!isMerchantInfo" class="box">
+        <div class="head">商家列表</div>
+        <div class="top">
+            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"
+                class="inputtext" />
+            <button @click="handleSearch()" class="search">搜索</button>
         </div>
 
-        <el-table :data="showMerchantsInfo" :border="parentBorder" style="width:100%">
+        <el-table :data="showMerchantsInfo" :border="parentBorder" style="width:100%" class="table">
             <el-table-column type="expand">
                 <template #default="props">
-                    <div m="4">
-                        <p m="t-0 b-2">商家信息</p>
-                        <p m="t-0 b-2">地址：{{ props.row.merchantAddress }}</p>
-                        <p m="t-0 b-2">营业时间：{{ formatTime(props.row.timeforOpenBusiness) }}-{{
+                    <div m="4" style="margin-left: 10%;">
+                        <p m="t-0 b-2"> 商家信息</p>
+                        <p m="t-0 b-2"> 地址：{{ props.row.merchantAddress }}</p>
+                        <p m="t-0 b-2"> 营业时间：{{ formatTime(props.row.timeforOpenBusiness) }}-{{
                             formatTime(props.row.timeforCloseBusiness) }}</p>
-                        <p m="t-0 b-2">联系电话：{{ props.row.contact }}</p>
-                        <p m="t-0 b-2">是否可以使用通用优惠券：{{ props.row.couponType ? '否' : '是' }}</p>
-                        <p m="t-0 b-2">商家评分：{{ props.row.avgRating }}</p>
-                        <button @click="deleteMerchant(currentMerchantId)">销号</button>
+                        <p m="t-0 b-2"> 联系电话：{{ props.row.contact }}</p>
+                        <p m="t-0 b-2"> 是否可以使用通用优惠券：{{ props.row.couponType ? '否' : '是' }}</p>
+                        <p m="t-0 b-2"> 商家评分：{{ props.row.avgRating }}</p>
+                        <!-- <button @click="deleteMerchant(currentMerchantId)" class="choose-des">销号</button> -->
 
                     </div>
                 </template>
@@ -192,8 +135,176 @@ const gobackHome = () => {
             <el-table-column label="商家" prop="merchantName" />
             <el-table-column label="商品类别" prop="dishType" />
         </el-table>
+        <button @click="gobackHome" class="return">返回</button>
     </div>
 
 
 </template>
 <style scoped></style>
+<style scoped lang="scss">
+.choose-des {
+    padding: 5px 8px;
+    /* 按钮内边距 */
+    margin-right: 1px;
+    /* 按钮右边距 */
+    background-color: #f190a0;
+    font-size: 2vmin;
+    /* 字体大小 */
+    border-radius: 9px;
+}
+
+.choose-des:hover {
+    background-color: #FFC0CB;
+}
+
+.table {
+    margin-top: 10px;
+
+    height: 70%;
+    width: 80%;
+    border-radius: 10px;
+    border: 2px solid #01042a;
+    table-layout: auto;
+    margin-top: 1%;
+}
+
+.top {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    margin-bottom: 2%;
+}
+
+.box {
+    padding: 20px;
+    background-color: #7ac2ee;
+    border: 2px solid #000000;
+    border-radius: 20px;
+    margin-right: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    font-size: 3vmin;
+    /* 字体大小 */
+    position: fixed;
+    /* 固定定位 */
+    top: 60px;
+    /* 贴近顶部 */
+    left: 50%;
+    /* 水平居中 */
+    transform: translateX(-50%);
+    /* 修正水平居中 */
+    width: 70%;
+    height: 80%;
+
+}
+
+.return {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: #FFC0CB;
+    font-size: 2.5vmin;
+}
+
+.return:hover {
+    background-color: #f7ced5;
+}
+
+.head {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    left: 50%;
+    font-size: 4vmin;
+    /* 字体大小 */
+    color: #000000;
+    margin-bottom: 1%;
+}
+
+.head4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 垂直居中 */
+    left: 50%;
+    font-size: 3.5vmin;
+    /* 字体大小 */
+    color: #000000;
+    margin-bottom: 1%;
+}
+
+.choose {
+    padding: 5px 8px;
+    /* 按钮内边距 */
+    margin-right: 1px;
+    /* 按钮右边距 */
+    background-color: #f190a0;
+    font-size: 2.5vmin;
+    /* 字体大小 */
+    border-radius: 9px;
+}
+
+.choose:hover {
+    background-color: #FFC0CB;
+}
+
+.head2 {
+    margin-top: 4%;
+    margin-bottom: 3%;
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    color: #f56a81;
+}
+
+.inputtext {
+    height: 25px;
+    width: 450px;
+    right: 5%;
+    font-size: 2.2vmin;
+    border-radius: 9px;
+    margin-right: 0%;
+}
+
+.input {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%;
+    font-size: 3vmin;
+}
+
+.output {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    margin-top: 1%;
+    // width:100%;
+    font-size: 3vmin;
+    color: #583def;
+}
+
+.search {
+    padding: 6px 9px;
+    /* 按钮内边距 */
+    margin-right: 8px;
+    /* 按钮右边距 */
+    background-color: #f3adb8;
+    font-size: 2.5vmin;
+    /* 字体大小 */
+    border-radius: 9px;
+    margin-left: 10px;
+}
+</style>

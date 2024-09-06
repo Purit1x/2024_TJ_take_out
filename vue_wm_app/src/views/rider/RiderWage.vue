@@ -133,8 +133,9 @@ function displayTotalWageWithinThisMonth() {
   border: 2px solid #000000;
   border-radius: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-left:20%;
-  width: 60%;
+  margin-left:15%;
+  width: 70%;
+  height: 70%;
   text-align: center;
 
 }

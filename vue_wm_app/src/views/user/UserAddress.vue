@@ -315,7 +315,7 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 
 /* 按钮组样式 */
 .primary-button {
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: white;
   border-radius: 20px;
@@ -325,7 +325,7 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 }
 
 .primary-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 

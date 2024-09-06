@@ -284,6 +284,7 @@ const removeInCart = async(dish) => {
             <span class="quantity">{{item.dishNum}}</span>
             <button class="quantity-button" @click="addToCart(item)">+</button>
           </div>
+          
           <button class="remove-button" @click="removeInCart(item)">x</button>
         </li>
       </ul>
@@ -337,7 +338,7 @@ const removeInCart = async(dish) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -360,7 +361,7 @@ const removeInCart = async(dish) => {
 }
 
 .merchant-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
 }
 
 /* 菜品列表样式 */
@@ -406,7 +407,7 @@ const removeInCart = async(dish) => {
 .dish-price {
   font-size: 18px;
   font-weight: bold;
-  color: #ff69b4;
+  color: #DDA0DD;
   margin-right: 20px;
 }
 
@@ -414,20 +415,21 @@ const removeInCart = async(dish) => {
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: rgb(243, 235, 243);
 }
 
 .quantity-button {
-  background-color: #ff69b4;
+  background-color: #dbb8db;
   border: none;
   color: white;
   padding: 5px 10px;
-  border-radius: 50%;
+  border-radius: 20%;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .quantity-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
 }
 
 .quantity {
@@ -438,14 +440,14 @@ const removeInCart = async(dish) => {
 .remove-button {
   background-color: transparent;
   border: none;
-  color: #ff69b4;
+  color: #DDA0DD;
   font-size: 18px;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 .remove-button:hover {
-  color: #ff85c1;
+  color: #D8BFD8;
 }
 
 /* 总价样式 */
@@ -464,6 +466,6 @@ const removeInCart = async(dish) => {
 .discount {
   margin-left: 10px;
   font-size: 18px;
-  color: #ff69b4;
+  color: #DDA0DD;
 }
 </style>

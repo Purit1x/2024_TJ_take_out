@@ -128,7 +128,7 @@
                     <el-descriptions-item
                     :rowspan="2"
                     :width="140"
-                    label="Photo"
+                    label="头像"
                     align="center"
                     >
                         <el-avatar
@@ -138,18 +138,18 @@
                             style="width:100px;height: 100px;"
                         />
                     </el-descriptions-item>
-                    <el-descriptions-item label="Id">{{riderInformation.RiderId}}</el-descriptions-item>
-                    <el-descriptions-item label="Telephone">{{riderInformation.PhoneNumber}}</el-descriptions-item>
-                    <el-descriptions-item label="Name">{{riderInformation.RiderName}}</el-descriptions-item>
-                    <el-descriptions-item label="Remarks">
-                        <el-tag size="small">School</el-tag>
+                    <el-descriptions-item width="140" align="center" label="ID" >{{riderInformation.RiderId}}</el-descriptions-item>
+                    <el-descriptions-item width="140" align="center" label="电话号码">{{riderInformation.PhoneNumber}}</el-descriptions-item>
+                    <el-descriptions-item width="140" align="center" label="姓名">{{riderInformation.RiderName}}</el-descriptions-item>
+                    <el-descriptions-item width="140" align="center" label="站点">
+                        <el-tag size="small">{{ riderStation.stationName }} </el-tag>
                     </el-descriptions-item>
-                    <el-descriptions-item label="Address"> {{ riderStation.stationName }}  {{ riderStation.stationAddress }}</el-descriptions-item>
+                    <el-descriptions-item align="center" label="地址"> {{ riderStation.stationAddress }}</el-descriptions-item>
                 </el-descriptions>
 
 
                 <el-dropdown class="user-name" trigger="click">
-                    <el-button type="primary" circle>
+                    <el-button class="editButton" type="primary" circle>
                         <el-icon><Edit /></el-icon>
                     </el-button>
                     <template #dropdown>
@@ -220,8 +220,8 @@
 .personTop {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
     margin-bottom: 20px;
+    margin-top: 20px;
     margin-left:10px;
     margin-right:10px;
     height: 50%;
@@ -229,17 +229,17 @@
     width:100%
 }
 
-.topLeft {
+
+
+.user-name {
     display: flex;
-    align-items: center; 
-    margin-left:10px;
+    justify-content: center;
+    width: 10%;
 }
 
-.topRight {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-
+.editButton {
+    height: 50px;
+    width: 50px;
 }
 
 .name-and-title {

@@ -18,7 +18,7 @@ const merchantsInfo = ref([]); // 存储所有商家信息
 const isMenu = ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
 
-const sortField = ref(''); // 搜索框内容
+const sortField = ref('address'); // 搜索框内容
 const sortOrder = ref('1'); // 搜索框内容
 
 const filterAddressQuery = ref(''); // 过滤器内容(筛选用)
@@ -60,7 +60,7 @@ onBeforeUnmount(() => {
 })
 
 
-const sortCoupons = () => {
+const sortMerchants = () => {
   getAllMerchantsInfo(sortField.value, sortOrder.value).then(res => {
     merchantsInfo.value = res.data;
     fetchDefaultAddress();
@@ -99,11 +99,11 @@ const fetchDefaultAddress = async () => {
           // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
           merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;
         }
-        // merchantsInfo.value.sort((a, b) => {  //升序排列
-        //     const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
-        //     const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
-        //     return distanceA - distanceB;  
-        // });  
+         merchantsInfo.value.sort((a, b) => {  //升序排列
+             const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
+             const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
+             return distanceA - distanceB;  
+         });  
       }
       console.log(merchantsInfo.value);
       showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
@@ -115,6 +115,14 @@ const fetchDefaultAddress = async () => {
     ElMessage.error('请设置默认地址'); // 处理获取默认地址以及其他潜在错误  
     console.error(err); // 可选：记录错误以便调试  
   }
+};
+const sortByAvgRating = () => {
+  merchantsInfo.value.sort((a, b) => {  //降序排列
+      const avgRatingA = parseFloat(a.avgRating) || 0;  
+      const avgRatingB = parseFloat(b.avgRating) || 0;  
+      return avgRatingA - avgRatingB;  
+  });  
+  showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
 };
 watch(
   () => router.currentRoute.value.path,
@@ -206,7 +214,7 @@ const filteredMerchants = async () => {
     showMerchantsInfo.value = merchantsInfo.value.filter(merchant => {
       const addressMatch = !query_address || (merchant.merchantAddress && merchant.merchantAddress.includes(query_address));
       const coupontypeMatch = !query_couponType || (merchant.couponType === 0);
-      const specialOfferMatch = !query_specialOffer || (merchant.merchantId in filteredmerchantIds);
+      const specialOfferMatch = !query_specialOffer || (filteredmerchantIds.includes(merchant.merchantId));
       return addressMatch && coupontypeMatch && specialOfferMatch;
     });
   } else {
@@ -336,8 +344,7 @@ th {
 
 /* 侧边栏样式 */
 .sidebar {
-  width: 80px;
-  /* 调整侧边栏宽度为50px */
+  width: 7vw;
   background: linear-gradient(to bottom, #f0d6f2, #f77dd048);
   padding: 20px 0;
   /* 调整为顶部和底部填充 */
@@ -348,13 +355,15 @@ th {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width:80px;
 }
 
 .sidebar-img {
-  width: 80%;
+  width: 90%;
   /* 根据新宽度调整logo大小 */
   height: auto;
   margin-bottom: 15px;
+  justify-self: center;
 }
 
 .sidebar-button {
@@ -373,7 +382,7 @@ th {
 }
 
 .sidebar-button img {
-  width: 30px;
+  width: 50%;
   /* 调整按钮图片大小 */
   height: auto;
 }
@@ -411,14 +420,14 @@ th {
 
 .search-button {
   border-radius: 50%;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .search-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 
@@ -453,7 +462,7 @@ th {
 .filter-button {
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   cursor: pointer;
@@ -461,7 +470,7 @@ th {
 }
 
 .filter-button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 
@@ -514,7 +523,7 @@ th {
 .col-favorite button {
   padding: 6px 12px;
   border-radius: 20px;
-  background-color: #ff69b4;
+  background-color: #DDA0DD;
   border: none;
   color: #fff;
   cursor: pointer;
@@ -523,7 +532,7 @@ th {
 
 .col-enter button:hover,
 .col-favorite button:hover {
-  background-color: #ff85c1;
+  background-color: #D8BFD8;
   box-shadow: 0 0 8px rgba(255, 105, 180, 0.8);
 }
 </style>
