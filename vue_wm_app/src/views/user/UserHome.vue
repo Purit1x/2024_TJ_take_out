@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
 
-import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo } from "@/api/user";
+import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo, userInfo } from "@/api/user";
 import { getDistanceBetweenAddresses, getMerAvgRating, GetMultiSpecialOffer } from "@/api/merchant";
 
 import { ElMessage } from 'element-plus';
@@ -38,6 +38,8 @@ onMounted(async () => {
     isUserHome.value = true;
   if (userData) {
     user.value = userData;
+    const res=await userInfo(user.value.userId);
+    user.value=res.data;
   } else {
     router.push('/login');
   }
@@ -49,6 +51,7 @@ onMounted(async () => {
     merchantsInfo.value = res.data;
     fetchDefaultAddress();
   });
+  
   await fetchMerAvgRating();
   updateAvgRatingItv = setInterval(fetchMerAvgRating, 5000);
 
@@ -216,6 +219,10 @@ const filteredMerchants = async () => {
 // 提供 user 对象 给其它子网页 
 provide('user', user);
 provide('merchantsInfo', merchantsInfo); 
+
+const test =() => {
+  console.log('test', user.value);
+}
 </script>
 
 <template>
@@ -249,7 +256,7 @@ provide('merchantsInfo', merchantsInfo);
 
   <div class="content">
     <div class="content-header">
-      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userId }}</h1>
+      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userName }}</h1>
     </div>
 
     <div v-if="isUserHome">
