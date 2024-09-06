@@ -8,6 +8,7 @@ using takeout_tj.Models.Platform;
 using takeout_tj.Models.Rider;
 using takeout_tj.Service;
 using takeout_tj.Controllers;
+using System.Text.RegularExpressions;
 
 namespace takeout_tj.Controllers
 {
@@ -515,13 +516,18 @@ namespace takeout_tj.Controllers
         }
         private bool MerchantAddressContainsRegion(string merchantAddress, string region)
         {
-            if (merchantAddress != null)
+            // 正则表达式，用于匹配只包含汉字的字符串
+            Regex regex = new Regex("[\u4e00-\u9fff]+");
+
+            // 检查地区是否为空或不只包含汉字
+            if (string.IsNullOrEmpty(region) || !regex.IsMatch(region))
             {
-                return merchantAddress.Contains(region);
-                // 假设merchantAddress是一个以逗号分隔的地区列表，我们可以用此方式来检查是否包含特定的地区
-                return merchantAddress.Split(',').Any(addrPart => addrPart.Trim().Equals(region, StringComparison.OrdinalIgnoreCase));
+                return false;
             }
-            return false;
+
+            // 检查商家地址是否为空，然后检查是否包含地区
+            // 这里不区分大小写，并且考虑了字符串中可能存在的额外空格
+            return !string.IsNullOrEmpty(merchantAddress) && merchantAddress.IndexOf(region, StringComparison.OrdinalIgnoreCase) >= 0;
         }
         [HttpGet]
         [Route("GetSalesByRegion")]
@@ -540,7 +546,7 @@ namespace takeout_tj.Controllers
                 var totalSales = filteredOrders.Sum(order => order.Price);
 
 
-                if (totalSales >= 0)
+                if (totalSales > 0)
                 {
                     return Ok(new { Region = region, TotalSales = totalSales });
                 }
@@ -560,25 +566,31 @@ namespace takeout_tj.Controllers
         {
             try
             {
-                // 使用LINQ查询指定地区（部分匹配）的订单量
+                // 异步获取所有订单
                 var orders = await _context.Orders.ToListAsync();
-                var filteredOrders = orders
-                    .Where(order =>
+                var orderCount = 0;
+
+                // 遍历所有订单，检查商家地址是否包含指定地区
+                foreach (var order in orders)
+                {
+                    // 异步获取商家地址
+                    string merchantAddress = await GetMerAddrByOrderId(order.OrderId);
+                    // 检查地址是否包含指定地区
+                    if (MerchantAddressContainsRegion(merchantAddress, region))
                     {
-                        string merchantAddress = GetMerAddrByOrderId(order.OrderId).Result;
-                        return MerchantAddressContainsRegion(merchantAddress, region);
-                    })
-                    .ToList(); // 确保在这里调用 .ToList() 以执行查询
+                        orderCount++;
+                    }
+                }
 
-                var orderCount = filteredOrders.Count; // 获取满足条件的订单数量
+                // 返回结果
 
-                if (orderCount >= 0)
+                if (orderCount > 0)
                 {
                     return Ok(new { Region = region, OrderCount = orderCount });
                 }
                 else
                 {
-                    return NotFound(new { errorCode = 404, msg = "没有找到包含指定地区的订单量" });
+                    return NotFound(new { errorCode = 404, msg = "没有找到包含指定地区的订单" });
                 }
             }
             catch (Exception ex)
