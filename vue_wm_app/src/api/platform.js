@@ -194,3 +194,11 @@ export const deleteOrdersComment=async(id)=>{
         throw error;
     }
 }
+export const deleteFinishedOrder=async(orderId) => {  //删除已完成的订单
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Platform/deleteFinishedOrder?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
+    }
+}

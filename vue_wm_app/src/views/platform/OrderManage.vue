@@ -3,7 +3,7 @@ import { useStore } from "vuex";
 import { ElMessage,ElMessageBox } from "element-plus"; 
 import { ref, onMounted, watch ,onBeforeUnmount} from 'vue';  
 import { useRouter } from 'vue-router';
-import {getEcoInfo,getFinishedOrders,getUnfinishedOrders} from '@/api/platform';
+import {getEcoInfo,getFinishedOrders,getUnfinishedOrders,deleteFinishedOrder} from '@/api/platform';
 
 const store = useStore();
 const router = useRouter();
@@ -83,9 +83,11 @@ const renewOrders=async()=>{
                     :key="index"
                     :style="{ backgroundColor: hover ? 'rgba(255, 255, 204, 0.8)' : 'rgba(249, 249, 249, 1)' }"
                 >
+                    
                     <div>订单号：{{order.orderId}}</div>
                     <div>订单总价：{{order.price}}元</div>
                     <div>订单创建时间：{{ order.orderTimestamp }}</div>
+                    <div class = "right-group"><button class="delete-btn" @click="deleteFinishedOrder(order.orderId)">删除订单</button></div>
                     
                 </div>
             </div>
@@ -107,13 +109,11 @@ const renewOrders=async()=>{
             <span style="font-size:15px"> 环保订单比例： {{ecoInfo.ecoOrderRatio}}</span>
             <button @click="gobackHome" class = "return">返回</button>
         </div>
-        <div class="bottom"> 环保订单比例： <div class="text">{{ecoInfo.ecoOrderRatio}}</div></div>
-        <button @click="gobackHome" class="return">返回</button>    
     </div>
 </template>
 
 
-<style scoped>
+<style scoped lang="scss">
 
 .box{
     padding: 20px;
@@ -213,7 +213,7 @@ label.active {
 }
 
 .orders-scroll {
-  max-height: 300px; /* 设置订单区域的最大高度 */
+  max-height: 400px; /* 设置订单区域的最大高度 */
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* 使订单区域可以滚动 */
@@ -249,40 +249,39 @@ label.active {
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    div{
+        margin-left: 20px;
+        font-size: 16px;
+        flex:1 1 50%;
+        box-sizing: border-box;
+    }
+
+    .right-group {
+      margin-right: 10px; /* 将右侧按钮推到右边 */
+      display: flex;
+    }
+
+    button {
+      margin-right: 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+        &.delete-btn {
+            background-color: #f44336;
+            color: white;
+
+            &:hover {
+            background-color: #ff5b58;
+            }
+        }
+    }
   }
 
-.order-item div{
-  margin-left: 20px;
-  font-size: 16px;
-  flex:1 1 50%;
-  box-sizing: border-box;
-}
-.box{
-    padding: 20px;
-    background-color: #7ac2ee;
-    border: 2px solid #000000;
-    border-radius: 20px;
-    margin-right: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-    font-size: 3vmin; /* 字体大小 */
-    position: fixed; /* 固定定位 */
-    top: 60px; /* 贴近顶部 */
-    left: 50%; /* 水平居中 */
-    transform: translateX(-50%); /* 修正水平居中 */
-    width: 70%;
-    height: 85%;
-
-}
-.head{
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    left:50%;
-    font-size: 4vmin; /* 字体大小 */
-    color:#000000;
-    margin-bottom: 3%;
-}
 .return{
     padding: 10px 15px;
     position: absolute;

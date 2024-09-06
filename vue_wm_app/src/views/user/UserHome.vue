@@ -127,7 +127,8 @@ watch(
       (newPath !== '/user-home/address') &&
       (newPath !== '/user-home/personal/coupon') &&
       (newPath !== '/user-home/personal/coupon/couponPurchase') &&
-      (newPath !== '/user-home/personal/myOrder')) {
+      (newPath !== '/user-home/personal/myOrder') &&
+      (newPath !== '/user-home/cart/cartorder')) {
       isUserHome.value = !newPath.startsWith('/user-home/merchant/'); // 如果是商家菜单，设置为 false  
     } else {
       isUserHome.value = false;
