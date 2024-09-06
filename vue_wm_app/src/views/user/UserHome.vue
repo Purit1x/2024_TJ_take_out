@@ -18,7 +18,7 @@ const merchantsInfo = ref([]); // 存储所有商家信息
 const isMenu = ref(false); // 是否在看菜单
 const searchQuery = ref(''); // 搜索框内容
 
-const sortField = ref('address'); // 搜索框内容
+const sortField = ref(''); // 搜索框内容
 const sortOrder = ref('1'); // 搜索框内容
 
 const filterAddressQuery = ref(''); // 过滤器内容(筛选用)
@@ -60,7 +60,7 @@ onBeforeUnmount(() => {
 })
 
 
-const sortMerchants = () => {
+const sortCoupons = () => {
   getAllMerchantsInfo(sortField.value, sortOrder.value).then(res => {
     merchantsInfo.value = res.data;
     fetchDefaultAddress();

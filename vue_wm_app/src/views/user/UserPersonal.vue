@@ -167,7 +167,8 @@ const setView = () => {
 //     personalInfo.value = false;
 // }
 const editPersonalInfo = () => {
-    currentUser.value = userForm.value;
+    //currentUser.value = userForm.value;
+    currentUser.value= {...userForm.value};
     // personalInfo.value = false;
     setView();
     editPI.value = true;

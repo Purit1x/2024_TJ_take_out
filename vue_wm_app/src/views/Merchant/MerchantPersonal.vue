@@ -153,22 +153,27 @@ function editMerchant() {
     currentMerchant.value.reWalletPassword=merchantForm.value.reWalletPassword;
     currentMerchant.value.recharge=0;
     currentMerchant.value.withdrawAmount=0;
-    if(refForm.value)
-    {
-        refForm.value.clearValidate();
-    }
+    //if(refForm.value)
+    //{
+        //refForm.value.clearValidate();
+    //}
 
     isOnlyShow.value = false;
 }
 const saveMerchant = async()=> {
     const isValid = await refForm.value.validate();  
-        if (!isValid) {  
-            return; // 如果不合法，提前退出  
-        }  
-    refForm.value.validate((valid) => {
+    if (!isValid) {  
+        return; // 如果不合法，提前退出  
+    }  
+    console.log("refForm.value",refForm.value);
+    refForm.value.validate((valid,fields) => {
         if (!valid) {
+            console.log("没有通过验证",fields);
             return;
+        }else{  
+            console.log("通过验证",fields);
         }
+    });
         const openTime = new Date(currentMerchant.value.TimeforOpenBusiness);  
         const closeTime = new Date(currentMerchant.value.TimeforCloseBusiness);    
         const startHour = openTime.getHours();  
@@ -224,8 +229,7 @@ const saveMerchant = async()=> {
             } else {  
                     ElMessage.error('网络错误，请重试');  
             }  
-        });     
-    });
+        });       
 }
 const saveWalletPassword= async()=>{
     const isValid = await refForm.value.validate();   
@@ -479,7 +483,7 @@ function displayTotalTurnoverWithinThisDay() {
                 </el-descriptions-item>
             </el-descriptions>
 
-            <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm" label-width="150px" v-else>
+            <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm" size="large" autocomplete="off" label-width="150px" v-else>
                 <div class="updateinfo">
                     <el-form-item label="商家名称" prop="MerchantName">
                         <el-input v-model="currentMerchant.MerchantName"></el-input>
@@ -493,16 +497,16 @@ function displayTotalTurnoverWithinThisDay() {
                     <el-form-item label="商家地址" prop="MerchantAddress">
                         <el-input v-model="currentMerchant.MerchantAddress"></el-input>
                     </el-form-item>
-                    <el-form-item label="联系方式" prop="Contact">
-                        <el-input v-model="currentMerchant.Contact"></el-input>
+                    <el-form-item label="联系方式" prop="Contact" @blur="validateField('Contact')">
+                        <el-input :prefix-icon="User" placeholder="请输入联系方式" v-model="currentMerchant.Contact"></el-input>
                     </el-form-item>
                     <el-form-item label="菜品类型" prop="DishType">
                         <el-input v-model="currentMerchant.DishType"></el-input>
                     </el-form-item>
                     <el-form-item label="是否允许通用优惠券" prop="CouponType">
                         <el-radio-group v-model="currentMerchant.CouponType">  
-                            <el-radio label=0>是</el-radio>  
-                            <el-radio label=1>否</el-radio>  
+                            <el-radio :label=0>是</el-radio>  
+                            <el-radio :label=1>否</el-radio>  
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="营业开始时间" prop="TimeforOpenBusiness">
