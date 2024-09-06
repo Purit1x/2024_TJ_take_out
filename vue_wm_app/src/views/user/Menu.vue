@@ -360,6 +360,7 @@ const onMouseDown = (event) => {
       <div>是否可以使用通用优惠券：{{ MerchantInfo.couponType ? '否' : '是' }}</div>
     </div>
 
+
     <div class="main-section">
       <div class="left-right-container">
         <!-- 左侧显示商品列表 -->
@@ -379,6 +380,7 @@ const onMouseDown = (event) => {
             </ul>
           </div>
         </div>
+
 
         <!-- 右侧显示满减活动和购物车 -->
         <div class="right-section">

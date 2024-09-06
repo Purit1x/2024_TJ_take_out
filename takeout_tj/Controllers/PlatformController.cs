@@ -699,7 +699,42 @@ namespace takeout_tj.Controllers
 
 		}
 
-	}
+        [HttpDelete]
+        [Route("deleteFinishedOrder")]
+        public IActionResult deleteFinishedOrder(int orderId)
+        {
+            var tran = _context.Database.BeginTransaction();  // 开启一个事务  
+            try
+            {
+                // 查询要删除的订单
+                var order = _context.Orders.FirstOrDefault(d => d.OrderId == orderId&&d.State == 3);
+                if (order == null)
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除未找到" });
+                }
+                
+                // 删除订单
+                _context.Orders.Remove(order);
+                var result = _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    tran.Commit();
+                    return Ok(new { msg = "订单删除成功" });
+                }
+                else
+                {
+                    return StatusCode(20000, new { errorCode = 20000, msg = "删除失败" });
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return StatusCode(30000, new { errorCode = 30000, msg = $"删除异常: {ex.Message}" });
+            }
+        }
+
+    }
 		
 }
 
