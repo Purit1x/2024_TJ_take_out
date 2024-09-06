@@ -128,7 +128,7 @@
                     <el-descriptions-item
                     :rowspan="2"
                     :width="140"
-                    label="Photo"
+                    label="头像"
                     align="center"
                     >
                         <el-avatar
@@ -144,7 +144,7 @@
                     <el-descriptions-item width="140" align="center" label="站点">
                         <el-tag size="small">{{ riderStation.stationName }} </el-tag>
                     </el-descriptions-item>
-                    <el-descriptions-item label="地址"> {{ riderStation.stationAddress }}</el-descriptions-item>
+                    <el-descriptions-item align="center" label="地址"> {{ riderStation.stationAddress }}</el-descriptions-item>
                 </el-descriptions>
 
 
@@ -220,7 +220,6 @@
 .personTop {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
     margin-bottom: 20px;
     margin-top: 20px;
     margin-left:10px;
@@ -230,16 +229,12 @@
     width:100%
 }
 
-.topLeft {
-    display: flex;
-    align-items: center; 
-    margin-left:10px;
-}
 
-.topRight {
+
+.user-name {
     display: flex;
-    align-items: center;
-    margin-right: 20px;
+    justify-content: center;
+    width: 10%;
 }
 
 .editButton {

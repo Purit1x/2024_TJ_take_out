@@ -241,7 +241,7 @@ async function handleDeliverOrder(data) {
 
 <template>
     <div>
-        <h2>您所在的位置：订单管理</h2>
+        <h2 class="maintitle">订单管理</h2>
         <div class="orders">
             <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                 <el-tab-pane label="可接订单" name="first"></el-tab-pane>
@@ -330,6 +330,10 @@ async function handleDeliverOrder(data) {
 </template>
 
 <style scoped>
+.maintitle {
+    text-align: center;
+}
+
 .demo-tabs {
     margin-left: 40px;
 }
