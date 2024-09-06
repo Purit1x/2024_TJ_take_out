@@ -110,7 +110,8 @@ const gobackHome = () => {
     <div v-if="!isMerchantInfo" class="box">
         <div class="head">商家列表</div>
         <div class="top">
-            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()" class="inputtext" />
+            <input type="text" v-model="searchQuery" placeholder="搜索店名或类别" v-on:keyup.enter="handleSearch()"
+                class="inputtext" />
             <button @click="handleSearch()" class="search">搜索</button>
         </div>
 
@@ -119,13 +120,14 @@ const gobackHome = () => {
                 <template #default="props">
                     <div m="4" style="margin-left: 10%;">
                         <p m="t-0 b-2"> 商家信息</p>
+                        <p m="t-0 b-2"> ID：{{ props.row.merchantId }}</p>
                         <p m="t-0 b-2"> 地址：{{ props.row.merchantAddress }}</p>
                         <p m="t-0 b-2"> 营业时间：{{ formatTime(props.row.timeforOpenBusiness) }}-{{
                             formatTime(props.row.timeforCloseBusiness) }}</p>
-                        <p m="t-0 b-2">  联系电话：{{ props.row.contact }}</p>
-                        <p m="t-0 b-2">  是否可以使用通用优惠券：{{ props.row.couponType ? '否' : '是' }}</p>
-                        <p m="t-0 b-2">  商家评分：{{ props.row.avgRating }}</p>
-                        <button @click="deleteMerchant(currentMerchantId)" class="choose-des">销号</button>
+                        <p m="t-0 b-2"> 联系电话：{{ props.row.contact }}</p>
+                        <p m="t-0 b-2"> 是否可以使用通用优惠券：{{ props.row.couponType ? '否' : '是' }}</p>
+                        <p m="t-0 b-2"> 商家评分：{{ props.row.avgRating }}</p>
+                        <!-- <button @click="deleteMerchant(currentMerchantId)" class="choose-des">销号</button> -->
 
                     </div>
                 </template>
@@ -141,33 +143,42 @@ const gobackHome = () => {
 </template>
 <style scoped></style>
 <style scoped lang="scss">
-.choose-des{
-    padding: 5px 8px;         /* 按钮内边距 */
-    margin-right: 1px;         /* 按钮右边距 */
+.choose-des {
+    padding: 5px 8px;
+    /* 按钮内边距 */
+    margin-right: 1px;
+    /* 按钮右边距 */
     background-color: #f190a0;
-    font-size: 2vmin; /* 字体大小 */
+    font-size: 2vmin;
+    /* 字体大小 */
     border-radius: 9px;
 }
-.choose-des:hover{
+
+.choose-des:hover {
     background-color: #FFC0CB;
 }
-.table{
-    margin-top:10px;
 
-    height:70%;
-    width:80%;
+.table {
+    margin-top: 10px;
+
+    height: 70%;
+    width: 80%;
     border-radius: 10px;
     border: 2px solid #01042a;
     table-layout: auto;
     margin-top: 1%;
 }
-.top{
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
+
+.top {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
     margin-bottom: 2%;
 }
-.box{
+
+.box {
     padding: 20px;
     background-color: #7ac2ee;
     border: 2px solid #000000;
@@ -175,93 +186,125 @@ const gobackHome = () => {
     margin-right: 30px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
-    font-size: 3vmin; /* 字体大小 */
-    position: fixed; /* 固定定位 */
-    top: 60px; /* 贴近顶部 */
-    left: 50%; /* 水平居中 */
-    transform: translateX(-50%); /* 修正水平居中 */
+    font-size: 3vmin;
+    /* 字体大小 */
+    position: fixed;
+    /* 固定定位 */
+    top: 60px;
+    /* 贴近顶部 */
+    left: 50%;
+    /* 水平居中 */
+    transform: translateX(-50%);
+    /* 修正水平居中 */
     width: 70%;
     height: 80%;
 
 }
 
-.return{
+.return {
     position: absolute;
     right: 10px;
     bottom: 10px;
     background-color: #FFC0CB;
     font-size: 2.5vmin;
 }
-.return:hover{
+
+.return:hover {
     background-color: #f7ced5;
 }
-.head{
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    left:50%;
-    font-size: 4vmin; /* 字体大小 */
-    color:#000000;
+
+.head {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    left: 50%;
+    font-size: 4vmin;
+    /* 字体大小 */
+    color: #000000;
     margin-bottom: 1%;
 }
-.head4{
-    display:flex;
-    justify-content:center; 
-    align-items: center; /* 垂直居中 */
-    left:50%;
-    font-size: 3.5vmin; /* 字体大小 */
-    color:#000000;
+
+.head4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 垂直居中 */
+    left: 50%;
+    font-size: 3.5vmin;
+    /* 字体大小 */
+    color: #000000;
     margin-bottom: 1%;
 }
-.choose{
-    padding: 5px 8px;         /* 按钮内边距 */
-    margin-right: 1px;         /* 按钮右边距 */
+
+.choose {
+    padding: 5px 8px;
+    /* 按钮内边距 */
+    margin-right: 1px;
+    /* 按钮右边距 */
     background-color: #f190a0;
-    font-size: 2.5vmin; /* 字体大小 */
+    font-size: 2.5vmin;
+    /* 字体大小 */
     border-radius: 9px;
 }
-.choose:hover{
+
+.choose:hover {
     background-color: #FFC0CB;
 }
-.head2{
-    margin-top:4%;
+
+.head2 {
+    margin-top: 4%;
     margin-bottom: 3%;
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    color:#f56a81;
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    color: #f56a81;
 }
-.inputtext{
+
+.inputtext {
     height: 25px;
     width: 450px;
-    right:5%;
+    right: 5%;
     font-size: 2.2vmin;
     border-radius: 9px;
     margin-right: 0%;
 }
-.input{
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    margin-left:30%;
-    margin-right:30%;
-    width:40%;
+
+.input {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 40%;
     font-size: 3vmin;
 }
-.output{
-    display:flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    margin-top:1%;
-   // width:100%;
+
+.output {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    margin-top: 1%;
+    // width:100%;
     font-size: 3vmin;
-    color:#583def;
+    color: #583def;
 }
-.search{
-    padding: 6px 9px;         /* 按钮内边距 */
-    margin-right: 8px;         /* 按钮右边距 */
+
+.search {
+    padding: 6px 9px;
+    /* 按钮内边距 */
+    margin-right: 8px;
+    /* 按钮右边距 */
     background-color: #f3adb8;
-    font-size: 2.5vmin; /* 字体大小 */
+    font-size: 2.5vmin;
+    /* 字体大小 */
     border-radius: 9px;
     margin-left: 10px;
 }

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
 
-import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo } from "@/api/user";
+import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo, userInfo } from "@/api/user";
 import { getDistanceBetweenAddresses, getMerAvgRating, GetMultiSpecialOffer } from "@/api/merchant";
 
 import { ElMessage } from 'element-plus';
@@ -38,6 +38,8 @@ onMounted(async () => {
     isUserHome.value = true;
   if (userData) {
     user.value = userData;
+    const res=await userInfo(user.value.userId);
+    user.value=res.data;
   } else {
     router.push('/login');
   }
@@ -49,6 +51,7 @@ onMounted(async () => {
     merchantsInfo.value = res.data;
     fetchDefaultAddress();
   });
+  
   await fetchMerAvgRating();
   updateAvgRatingItv = setInterval(fetchMerAvgRating, 5000);
 
@@ -217,6 +220,10 @@ const filteredMerchants = async () => {
 // 提供 user 对象 给其它子网页 
 provide('user', user);
 provide('merchantsInfo', merchantsInfo); 
+
+const test =() => {
+  console.log('test', user.value);
+}
 </script>
 
 <template>
@@ -250,7 +257,7 @@ provide('merchantsInfo', merchantsInfo);
 
   <div class="content">
     <div class="content-header">
-      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userId }}</h1>
+      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userName }}</h1>
     </div>
 
     <div v-if="isUserHome">
@@ -277,7 +284,22 @@ provide('merchantsInfo', merchantsInfo);
         <el-button type="primary" @click="filteredMerchants()" class="filter-button">筛选</el-button>
       </div>
 
-
+      <div>
+        <label style="font-size: 14px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;排序字段:</label>
+        <el-select v-model="sortField" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="评分"></el-option>
+          <el-option value="2" label="销售额"></el-option>
+          <el-option value="3" label="销量"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+        <label style="font-size: 14px;">排序方式:</label>
+        <el-select v-model="sortOrder" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="升序"></el-option>
+          <el-option value="2" label="降序"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+      </div>
+      <br />
       <table class="styled-table">
         <thead>
           <tr>
@@ -337,8 +359,7 @@ th {
 
 /* 侧边栏样式 */
 .sidebar {
-  width: 80px;
-  /* 调整侧边栏宽度为50px */
+  width: 7vw;
   background: linear-gradient(to bottom, #f0d6f2, #f77dd048);
   padding: 20px 0;
   /* 调整为顶部和底部填充 */
@@ -349,13 +370,15 @@ th {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 80px;
 }
 
 .sidebar-img {
-  width: 80%;
+  width: 90%;
   /* 根据新宽度调整logo大小 */
   height: auto;
   margin-bottom: 15px;
+  justify-self: center;
 }
 
 .sidebar-button {
@@ -374,7 +397,7 @@ th {
 }
 
 .sidebar-button img {
-  width: 30px;
+  width: 50%;
   /* 调整按钮图片大小 */
   height: auto;
 }

@@ -75,16 +75,7 @@ function displayOrdersComment(orderId) {
 
 </script>
 
-<!-- <template>
-    <div>
-        <h2>评论管理</h2>
-        <div class="order-item" v-for="(orderItem, index) in finishedOrders" :key="index">
-            订单号：{{ orderItem.orderId }}
-            评论：{{ displayOrdersComment(orderItem.orderId) }}
-        </div>
-        <button @click="gobackHome">返回</button>
-    </div>
-</template> -->
+
 
 
 <template>
@@ -109,12 +100,8 @@ function displayOrdersComment(orderId) {
 
             <el-table-column label="操作" align="center">
                 <template #default="scope" align="center">
-                    <el-button
-                        size="small"
-                        type="danger"
-                        @click="handleDelete(scope.row.orderId)"
-                    >
-                    删除评论
+                    <el-button size="small" type="danger" @click="handleDelete(scope.row.orderId)">
+                        删除评论
                     </el-button>
                 </template>
             </el-table-column>
@@ -136,6 +123,7 @@ function displayOrdersComment(orderId) {
     border-radius: 20px;
     border: 2px solid #01042a;
     table-layout: auto;
+    overflow: auto;
 }
 
 .box{

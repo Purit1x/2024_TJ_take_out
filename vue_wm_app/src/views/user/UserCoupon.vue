@@ -122,6 +122,20 @@ const leavePurchaseInfo = () => {
     isPurchaseInfo.value = false;
     currentPurchase.value = {};
 }
+function formatDateTime(time) { 
+    const date = new Date(time); 
+    if (isNaN(date.getTime())) { 
+        return null; // 或者处理无效日期的逻辑  
+    } 
+    const year = date.getFullYear(); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0'); 
+    const seconds = String(date.getSeconds()).padStart(2, '0'); 
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; 
+}
 </script>
 
 <template>
@@ -167,7 +181,7 @@ const leavePurchaseInfo = () => {
                     <td>{{ coupon.coupon.couponName }}</td>
                     <td>满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</td>
                     <td>{{ coupon.amountOwned }}张</td>
-                    <td>{{ coupon.expirationDate }}</td>
+                    <td>{{ formatDateTime(coupon.expirationDate) }}</td>
                     <td><el-tag size="large">{{ coupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
                 </tr>
             </tbody>
@@ -222,7 +236,7 @@ const leavePurchaseInfo = () => {
                         <td>{{ coupon.coupon.couponName }}</td>
                         <td>满{{ coupon.coupon.minPrice }}减{{ coupon.coupon.couponValue }}元</td>
                         <td>{{ coupon.purchasingAmount}}张</td>
-                        <td>{{ coupon.purchasingTimestamp }}</td>
+                        <td>{{ formatDateTime(coupon.purchasingTimestamp) }}</td>
                         <td><el-tag size="large">{{ coupon.coupon.couponType===0?'通用券':'特殊券' }}</el-tag></td>
                         <td><button @click="enterPurchaseInfo(coupon)">查看</button></td>
                     </tr>
@@ -273,7 +287,7 @@ const leavePurchaseInfo = () => {
                 <template #label>
                     <div class="cell-item">购买时间</div>
                 </template>
-                {{ currentPurchase.purchasingTimestamp }}
+                {{ formatDateTime(currentPurchase.purchasingTimestamp) }}
                 </el-descriptions-item>
                 <el-descriptions-item label-class-name="my-label">
                 <template #label>

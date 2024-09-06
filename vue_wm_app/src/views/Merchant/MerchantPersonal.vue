@@ -161,6 +161,7 @@ function editMerchant() {
     isOnlyShow.value = false;
 }
 const saveMerchant = async()=> {
+    console.log("Merchant",currentMerchant.value);
     const isValid = await refForm.value.validate();  
         if (!isValid) {  
             return; // 如果不合法，提前退出  
