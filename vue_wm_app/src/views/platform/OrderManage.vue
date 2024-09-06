@@ -1,11 +1,11 @@
 <script setup>
 import { useStore } from "vuex";
-import { ElMessage,ElMessageBox } from "element-plus"; 
-import { ref, onMounted, watch ,onBeforeUnmount} from 'vue';  
+import { ElMessage } from "element-plus"; 
+import { ref, onMounted,onBeforeUnmount} from 'vue';  
 import { useRouter } from 'vue-router';
 import {getEcoInfo,getFinishedOrders,getUnfinishedOrders} from '@/api/platform';
 
-const store = useStore();
+
 const router = useRouter();
 const finishedOrders=ref([]);
 const unFinishedOrders=ref([]);
@@ -98,8 +98,10 @@ function formatDateTime(time) {
                 >
                     <div>订单号：{{order.orderId}}</div>
                     <div>订单总价：{{order.price}}元</div>
+                    <div>是否需要餐具：{{ order.needUtensils?"需要":"不需要"}}</div>
                     <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
-                    
+                    <div>订单完成时间：{{formatDateTime(order.realTimeOfArrival)}}</div>
+                    <div>订单预期完成时间：{{ order.comment}}</div>
                 </div>
             </div>
             <div class="orders-scroll" v-if="showState === 2">
@@ -111,8 +113,11 @@ function formatDateTime(time) {
                 >
                     <div>订单号：{{order.orderId}}</div>
                     <div>订单总价：{{order.price}}元</div>
+                    <div>是否需要餐具：{{ order.needUtensils?"需要":"不需要"}}</div>
                     <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
-                    
+                    <div>订单完成时间：{{formatDateTime(order.realTimeOfArrival)}}</div>
+                    <div>订单预期完成时间：{{ order.comment}}</div>
+                    <div>订单状态：{{ order.state==1?"已付款骑手未接单":"骑手派送中"}}</div>
                 </div>
             </div>
         </div>
@@ -214,19 +219,18 @@ label.active {
     border-radius: 20px;
     padding:5px;
     
-    max-height: 410px; /* 设置订单区域的最大高度 */
-    min-height: 410px;
+    max-height: 60%; /* 设置订单区域的最大高度 */
+    min-height: 60%;
     display: flex;
     flex-direction: column;
     overflow-y: auto; /* 使订单区域可以滚动 */
-    
+    font-size: 1.5vmin;
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom:10px;
 }
 
 .orders-scroll {
-  max-height: 300px; /* 设置订单区域的最大高度 */
   display: flex;
   flex-direction: column;
   overflow-y: auto; /* 使订单区域可以滚动 */

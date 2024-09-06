@@ -252,7 +252,7 @@ const cancelCreate = () => {
 <template>  
     <slot name="sidebar"></slot>
     <div class="content"> 
-        <header class = "welcome-text">这里是菜单页面&nbsp;{{ merchant.merchantName }}</header>  
+        <header class = "welcome-text">本店菜单&nbsp;{{ merchant.merchantName }}</header>  
 
         <div class="search-bar" v-if="!isEditing&!isCreating">
             <el-col :span="8">
