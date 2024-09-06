@@ -77,16 +77,6 @@
 
         <div class="headerRight">
             <div class="headerUsercon">
-                <div class="btn-icon" @click="router.push('/rider-home/information')">
-                    <el-tooltip
-                        effect="dark"
-                        :content="message ? `有${message}条未读消息` : `消息中心`"
-                        placement="bottom"
-                    >
-                        <el-icon><Bell /></el-icon>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>
                 <div class="btn-icon" @click="setFullScreen">
                     <el-tooltip effect="dark" content="全屏" placement="bottom">
                         <el-icon style="font-size: 24px; transform:rotate(45deg)"><Rank /></el-icon>

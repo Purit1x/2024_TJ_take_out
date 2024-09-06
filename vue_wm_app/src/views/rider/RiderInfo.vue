@@ -178,8 +178,8 @@
 }
 
 .person_body {
-    width: 60%;
-    height: 60%;
+    width: 70%;
+    height: 70%;
     padding: 20px;
     background-color: #ffd666;
     border: 2px solid #000000;
@@ -228,6 +228,7 @@
 }
 
 .headline {
+    font-size: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
