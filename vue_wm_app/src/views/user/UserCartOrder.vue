@@ -561,7 +561,7 @@ const gobackCart = () => {
 
       <!-- 应付金额 -->
       <strong>应付金额: {{ groupedPrice[merchantId] - groupedDiscountAmount[merchantId] + packetPrice[merchantId] + riderPrice[merchantId] -
-        (choosedCoupon[merchantId] ? choosedCoupon[merchantId].couponValue : 0) }} 元</strong>
+        (choosedCoupon[merchantId] ? choosedCoupon[merchantId].couponValue.toFixed(2) : 0) }} 元</strong>
 
       <div class="utensils-section">
         <label>
@@ -571,7 +571,7 @@ const gobackCart = () => {
     </div>
 
     <!-- 总计金额 -->
-    <strong>总计金额: {{ FinalPrice }} 元</strong>
+    <strong>总计金额: {{ FinalPrice.toFixed(2) }} 元</strong>
 
     <!-- 提交订单按钮 -->
     <div class="submit-order">
