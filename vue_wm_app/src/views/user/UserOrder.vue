@@ -349,7 +349,7 @@ function formatDateTime(time) {
         <strong>总价: {{ MerchantPrice }} 元</strong>
         <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
       </div>
-      <div class="coupon-section" style="display: flex;justify-content:space-between;align-items: center;">
+      <div class="coupon-section" >
         优惠券：
         {{ isCouponChoosed ? (choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元"): (choosedCoupon ? "有可用优惠券" : "无可用优惠券") }}
         <!-- {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }} -->
@@ -416,6 +416,8 @@ function formatDateTime(time) {
   padding: 20px;
   background-color: #f9f9f9;
   margin-left: 120px; /* 给侧边栏留出空间 */
+  max-width:1100px;
+  max-height: 570px;
 }
 
 .order-header {

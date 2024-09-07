@@ -404,7 +404,12 @@ const onMouseDown = (event) => {
               <!-- {{ cartExpanded ? '收回购物车' : '购物车' }}({{cartItems.length}}) -->
               购物车
             </button>
-            <div class="cart-items-container">
+            <div class="total-section">
+              <strong>总价: {{ finalPrice }} 元</strong>
+              <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
+              <button @click="gotoOrder()" class="checkout-button">结算</button>
+            </div>
+            <div class="cart-items-container" v-if="cartExpanded">
               <ul>
                 <li v-for="item in cartItems" :key="item.dishId" class="cart-item">
                   <div class="cart-info" style="display:flex; flex-direction: row;align-items: center;">
@@ -421,15 +426,17 @@ const onMouseDown = (event) => {
               </ul>
             </div>
           </div>
+          
         </div>
+        
       </div>
-      <div class="total-section">
-        <strong>总价: {{ finalPrice }} 元</strong>
-        <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
-        <button @click="gotoOrder()" class="checkout-button">结算</button>
-      </div>
+      
     </div>
-
+    <div class="total-section">
+            <strong>总价: {{ finalPrice }} 元</strong>
+            <span v-if="discountAmount != 0">({{ totalPrice }}-{{ discountAmount }})</span>
+            <button @click="gotoOrder()" class="checkout-button">结算</button>
+          </div>
 
   </div>
   <router-view />
@@ -500,11 +507,12 @@ body {
 }
 
 .total-section {
-  margin-top: 0px;
+  margin-top: 10px;
   font-size: 18px;
   border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   background-color: #f9f9f9;
-  padding: 15px;
+  padding: 5px;
   text-align: center;
 }
 

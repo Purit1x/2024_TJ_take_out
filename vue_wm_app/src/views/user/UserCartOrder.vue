@@ -470,12 +470,16 @@ const confirmPurchase = async () => {
     }  
 };  
 
+const gobackCart = () => {
+    router.push('/user-home/cart');
+}
+
 
 </script>
 
 <template>
   <div class="content">
-    <button class="action-button" @click="gobackHome">返回</button>
+    <button class="action-button" @click="gobackCart">返回</button>
     <div v-for="(items, merchantId) in groupedItems" :key="merchantId" class="merchant-order">
       <h2 class="order-header">
         {{ merchantInfos[merchantId].merchantName }} 的订单
@@ -599,7 +603,8 @@ const confirmPurchase = async () => {
 .content {
   padding: 20px;
   background-color: #f9f9f9;
-  margin-left: 120px; /* 给侧边栏留出空间 */
+  margin-left: 100px; /* 给侧边栏留出空间 */
+  max-width: 1140px;
 }
 
 .order-header {
