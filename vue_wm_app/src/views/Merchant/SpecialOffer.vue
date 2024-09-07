@@ -108,8 +108,8 @@ const cancelEditingOffer = () => {
 // 修改offer函数
 const updateSpecialOffer = async(offer) => {
     const merchantId = merchant.value.MerchantId;
-    const minPrice = validatePositiveInteger(newOffer.value.minPrice);
-    const amountRemission = validatePositiveInteger(newOffer.value.amountRemission);
+    const minPrice = validatePositiveInteger(editedOffer.value.minPrice);
+    const amountRemission = validatePositiveInteger(editedOffer.value.amountRemission);
 
     if (!minPrice || !amountRemission) {
         // 如果验证失败，返回

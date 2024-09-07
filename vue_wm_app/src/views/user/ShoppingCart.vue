@@ -10,7 +10,9 @@ const store = useStore();
 const router = useRouter();
 const user = ref({});
 const merchants = ref([]);
+const merchantsInfo=ref([]);
 const specialOffers = ref([]);
+const isCart = ref(true);
 
 const isScrolling = ref(true);  // 滚动开关
 
@@ -102,9 +104,32 @@ const calculateDiscount = (merchant) => {
     return maxDiscount;
 };
 
+//结算界面
+const gotoCartOrder = () => {  
+  if(checkedItems.value.length === 0){
+    ElMessage.error('请先添加商品');
+    return;
+  }
+  
+  isCart.value=false;
+  router.push('/user-home/cart/cartorder');  
+};
+
 // 计算勾选商品的总价和折扣
 const checkedItems = computed(() => {
-    return merchants.value.flatMap(merchant => merchant.dishes.filter(item => item.checked));
+    return merchants.value.flatMap(merchant => 
+        merchant.dishes
+            .filter(item => item.checked)
+            .map(item => ({ 
+                ...item, 
+                merchantId: merchant.merchantId 
+            }))
+    );
+});
+
+// 将 checkedItems 存入 Vuex
+watch(checkedItems, (newValue) => {
+  store.dispatch('setCheckedItems', newValue);
 });
 
 const totalPrice = computed(() => {
@@ -262,20 +287,62 @@ const removeInCart = async(dish) => {
     }  
 };
 
+const changeDateToInt = (input) => {
+    const date = new Date(input);
+    const Hour = date.getHours();  
+    const Minute = date.getMinutes();  
+    const Second = date.getSeconds();  
+    return Hour * 3600 + Minute * 60 + Second;  
+}
+
+const checkTime = (merchant) => {   
+    const nowDate = new Date();      
+    const nowTime = changeDateToInt(nowDate);  
+    if (merchant.timeforOpenBusiness < merchant.timeforCloseBusiness) {  
+        // 正常营业时间  
+        if (nowTime < merchant.timeforOpenBusiness || nowTime > merchant.timeforCloseBusiness) {  
+            //ElMessage.error(merchant.merchantName+"暂停营业");  
+            return false;
+        } 
+        return true; 
+    } else {  
+        // 跨越午夜的营业时间  
+        if (nowTime < merchant.timeforOpenBusiness && nowTime > merchant.timeforCloseBusiness) {   
+            //ElMessage.error(merchant.merchantName+"暂停营业");  
+            return false;
+        }  
+        return true;
+    }  
+}  
+
 </script>
 
 <template>
-  <div class="content">
+  <div class="content" v-if="!$route.meta.hideParentContent">
     <header class="header">我的购物车</header>
     <div v-for="merchant in merchants" :key="merchant.merchantId" class="cart-item">
-      <div class="merchant-header">
-        <input type="checkbox" class="checkbox" :checked="merchant.checked" @change="toggleMerchantSelection(merchant)" />
+      <div class="merchant-header" :class="{'closed-merchant': !checkTime(merchant) }">
+        <!--超出营业时间时禁用商家--> 
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          :checked="merchant.checked" 
+          :disabled="!checkTime(merchant)"
+          @change="toggleMerchantSelection(merchant)" 
+        />
         <span class="merchant-name">{{ merchant.merchantName }}</span>
         <button class="merchant-button" @click="goToMerchantPage(merchant.merchantId)">></button>
       </div>
       <ul class="dish-list">
         <li v-for="item in merchant.dishes" :key="item.dishId" class="dish-item">
-          <input type="checkbox" class="checkbox" :checked="item.checked" @change="toggleItemSelection(merchant, item)" />
+          <!-- 禁用商品复选框如果商家不在营业时间 -->
+          <input 
+            type="checkbox" 
+            class="checkbox" 
+            :checked="item.checked" 
+            :disabled="!checkTime(merchant)" 
+            @change="toggleItemSelection(merchant, item)" 
+          />
           <img :src="item.imageUrl" alt="菜品图片" class="dish-img">
           <span class="dish-name">{{item.dishName}}</span>
           <span class="dish-price">{{item.dishPrice}}元</span>
@@ -284,8 +351,10 @@ const removeInCart = async(dish) => {
             <button class="quantity-button" @click="decrementInCart(item)">-</button>
             <span class="quantity">{{item.dishNum}}</span>
             <button class="quantity-button" @click="addToCart(item)">+</button>
+
           </div> -->
           <el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px;width: 10%;" />
+
           
           <button class="remove-button" @click="removeInCart(item)">x</button>
         </li>
@@ -296,8 +365,11 @@ const removeInCart = async(dish) => {
     <div class="total-price-container">
       <strong class="total-price">总价: {{ finalTotalPrice }} 元</strong>
       <span v-if="totalDiscount != 0" class="discount">({{ totalPrice }}-{{ totalDiscount }})</span>
+    
+      <button class="checkout-button" @click="gotoCartOrder()">结算</button>
     </div>
   </div>
+  <router-view /><!--渲染子路由-->
 </template>
 
 <style scoped>
@@ -366,6 +438,10 @@ const removeInCart = async(dish) => {
   background-color: #D8BFD8;
 }
 
+.closed-merchant {
+  background-color: #d3d3d3;
+}
+
 /* 菜品列表样式 */
 .dish-list {
   list-style: none;
@@ -417,14 +493,15 @@ const removeInCart = async(dish) => {
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: rgb(243, 235, 243);
 }
 
 .quantity-button {
-  background-color: #DDA0DD;
+  background-color: #dbb8db;
   border: none;
   color: white;
   padding: 5px 10px;
-  border-radius: 50%;
+  border-radius: 20%;
   cursor: pointer;
   transition: background-color 0.3s;
 }
@@ -468,5 +545,16 @@ const removeInCart = async(dish) => {
   margin-left: 10px;
   font-size: 18px;
   color: #DDA0DD;
+}
+
+.checkout-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-left: 100px;
+  transition: background-color 0.3s ease;
 }
 </style>

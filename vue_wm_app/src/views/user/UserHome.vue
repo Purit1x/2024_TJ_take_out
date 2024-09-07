@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { provide } from 'vue';
 
-import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo } from "@/api/user";
+import { getMerchantIds, getMerchantsInfo, createFavouriteMerchant, GetDefaultAddress, GetUserAddress, getAllMerchantsInfo, userInfo } from "@/api/user";
 import { getDistanceBetweenAddresses, getMerAvgRating, GetMultiSpecialOffer } from "@/api/merchant";
 
 import { ElMessage } from 'element-plus';
@@ -38,6 +38,8 @@ onMounted(async () => {
     isUserHome.value = true;
   if (userData) {
     user.value = userData;
+    const res=await userInfo(user.value.userId);
+    user.value=res.data;
   } else {
     router.push('/login');
   }
@@ -49,6 +51,7 @@ onMounted(async () => {
     merchantsInfo.value = res.data;
     fetchDefaultAddress();
   });
+  
   await fetchMerAvgRating();
   updateAvgRatingItv = setInterval(fetchMerAvgRating, 5000);
 
@@ -127,7 +130,8 @@ watch(
       (newPath !== '/user-home/address') &&
       (newPath !== '/user-home/personal/coupon') &&
       (newPath !== '/user-home/personal/coupon/couponPurchase') &&
-      (newPath !== '/user-home/personal/myOrder')) {
+      (newPath !== '/user-home/personal/myOrder') &&
+      (newPath !== '/user-home/cart/cartorder')) {
       isUserHome.value = !newPath.startsWith('/user-home/merchant/'); // 如果是商家菜单，设置为 false  
     } else {
       isUserHome.value = false;
@@ -216,6 +220,10 @@ const filteredMerchants = async () => {
 // 提供 user 对象 给其它子网页 
 provide('user', user);
 provide('merchantsInfo', merchantsInfo); 
+
+const test =() => {
+  console.log('test', user.value);
+}
 </script>
 
 <template>
@@ -249,7 +257,7 @@ provide('merchantsInfo', merchantsInfo);
 
   <div class="content">
     <div class="content-header">
-      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userId }}</h1>
+      <h1 v-if="isUserHome" class="welcome-text">欢迎，{{ user.userName }}</h1>
     </div>
 
     <div v-if="isUserHome">
@@ -276,7 +284,22 @@ provide('merchantsInfo', merchantsInfo);
         <el-button type="primary" @click="filteredMerchants()" class="filter-button">筛选</el-button>
       </div>
 
-
+      <div>
+        <label style="font-size: 14px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;排序字段:</label>
+        <el-select v-model="sortField" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="评分"></el-option>
+          <el-option value="2" label="销售额"></el-option>
+          <el-option value="3" label="销量"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+        <label style="font-size: 14px;">排序方式:</label>
+        <el-select v-model="sortOrder" @change="sortCoupons" style="width:120px;margin-left:10px;">
+          <el-option value="1" label="升序"></el-option>
+          <el-option value="2" label="降序"></el-option>
+        </el-select>
+        &nbsp;&nbsp;
+      </div>
+      <br />
       <table class="styled-table">
         <thead>
           <tr>
@@ -347,6 +370,7 @@ th {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 80px;
 }
 
 .sidebar-img {

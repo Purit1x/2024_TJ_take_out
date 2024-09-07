@@ -559,13 +559,13 @@ const mySwitch = () => {
                         <el-input :prefix-icon="Lock" show-password  placeholder="请输入密码" v-model="merchantRegisterData.Password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入再次密码" v-model="merchantRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请再次输入密码" v-model="merchantRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="WalletPassword">
                         <el-input :prefix-icon="Lock" show-password  placeholder="请输入支付密码" v-model="merchantRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'merchant'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" show-password  placeholder="请输入再次支付密码" v-model="merchantRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password  placeholder="请再次输入支付密码" v-model="merchantRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                     <!--用户注册-->    
                     <el-form-item v-if="roleType === 'user'" prop="username">
@@ -578,13 +578,13 @@ const mySwitch = () => {
                         <el-input :prefix-icon="Lock" show-password placeholder="请输入密码" v-model="userRegisterData.password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次密码" v-model="userRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请再次输入密码" v-model="userRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="WalletPassword">
                         <el-input :prefix-icon="Lock" show-password placeholder="请输入支付密码" v-model="userRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'user'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次支付密码" v-model="userRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请再次输入支付密码" v-model="userRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                     <!--骑手注册-->  
                     <el-form-item v-if="roleType === 'rider'" prop="RiderName">
@@ -597,13 +597,13 @@ const mySwitch = () => {
                         <el-input :prefix-icon="Lock" show-password placeholder="请输入密码" v-model="riderRegisterData.Password"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="rePassword">
-                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次密码" v-model="riderRegisterData.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请再次输入密码" v-model="riderRegisterData.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="WalletPassword">
                         <el-input :prefix-icon="Lock" show-password placeholder="请输入支付密码" v-model="riderRegisterData.WalletPassword"></el-input>
                     </el-form-item>
                     <el-form-item v-if="roleType === 'rider'" prop="reWalletPassword">
-                        <el-input :prefix-icon="Lock" show-password placeholder="请输入再次支付密码" v-model="riderRegisterData.reWalletPassword"></el-input>
+                        <el-input :prefix-icon="Lock" show-password placeholder="请再次输入支付密码" v-model="riderRegisterData.reWalletPassword"></el-input>
                     </el-form-item>
                 </el-form>
 
@@ -758,6 +758,23 @@ input {
   flex: 1;
   height: 100%;
   display:grid;
+  overflow-y:auto;
+}
+
+/* 隐藏滚动条 */
+.register::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* 滚动条轨道 */
+.register::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 滚动条滑块 */
+.register::-webkit-scrollbar-thumb {
+  background-color: rgba(173, 173, 173, 0.2);
+  border-radius: 20px;
 }
 
 /* 标题盒子 */

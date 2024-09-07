@@ -359,7 +359,7 @@ namespace takeout_tj.Controllers
                 await file.CopyToAsync(stream); //保存文件  
             }
 
-            var imageUrl = $"http://localhost:5079/uploads/{fileName}"; //生成URL  
+            var imageUrl = $"http://39.105.5.211:5079/uploads/{fileName}"; //生成URL  
             return Ok(new { url = imageUrl }); //返回JSON  
         }
         [HttpPut("dishEdit")]

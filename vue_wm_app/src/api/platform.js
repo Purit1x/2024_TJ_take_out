@@ -1,6 +1,6 @@
 import axios from 'axios'
 // 设置基本URL，这里使用你后端的地址  
-const BASE_URL = 'http://localhost:5079/api';
+const BASE_URL = 'http://39.105.5.211:5079/api';
 
 //提供调用登录接口的函数
 export const adminLoginService = async (loginData) => {
@@ -192,5 +192,13 @@ export const deleteOrdersComment=async(id)=>{
     }catch(error)
     {
         throw error;
+    }
+}
+export const deleteFinishedOrder=async(orderId) => {  //删除已完成的订单
+    try {  
+        const response = await axios.delete(`${BASE_URL}/Platform/deleteFinishedOrder?orderId=${orderId}`);  
+        return response.data; // 返回后端返回的数据  
+    } catch (error) {  
+        throw error;   
     }
 }
