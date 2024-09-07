@@ -299,15 +299,15 @@ const checkTime = (merchant) => {
     const nowDate = new Date();      
     const nowTime = changeDateToInt(nowDate);  
     if (merchant.timeforOpenBusiness < merchant.timeforCloseBusiness) {  
-        // 正常营业时间  
-        if (nowTime < merchant.timeforOpenBusiness || nowTime > merchant.timeforCloseBusiness) {  
+        // 正常营业时间 (注意：商店歇业前30分钟就不允许下单了) 
+        if (nowTime < merchant.timeforOpenBusiness || nowTime > merchant.timeforCloseBusiness - 30*60) {  
             //ElMessage.error(merchant.merchantName+"暂停营业");  
             return false;
         } 
         return true; 
     } else {  
         // 跨越午夜的营业时间  
-        if (nowTime < merchant.timeforOpenBusiness && nowTime > merchant.timeforCloseBusiness) {   
+        if (nowTime < merchant.timeforOpenBusiness && nowTime > merchant.timeforCloseBusiness - 30*60) {   
             //ElMessage.error(merchant.merchantName+"暂停营业");  
             return false;
         }  
