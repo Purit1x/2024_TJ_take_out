@@ -96,7 +96,6 @@ builder.Services.AddQuartz(q =>
             .WithInterval(TimeSpan.FromSeconds(60)) // 每60秒执行一次  
             .RepeatForever()));
 });
-
 // 添加 Quartz 服务  
 builder.Services.AddQuartzServer(options =>
 {
@@ -111,8 +110,7 @@ builder.Logging.AddDebug(); // 输出调试信息
 
 var app = builder.Build();
 
-// 允许跨域
-app.UseCors("AllowAllOrigins");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -125,7 +123,9 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseCors("AllowAllOrigins"); // 允许跨域
+
+app.UseAuthorization(); 
 
 // 使 uploads 文件夹对外可访问  
 app.UseStaticFiles(new StaticFileOptions

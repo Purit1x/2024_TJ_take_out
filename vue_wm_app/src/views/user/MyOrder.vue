@@ -232,6 +232,7 @@ const confirmPurchase = async() => {
                  ElMessage.error('购买失败，请稍后再试');  
             }  
         } else {  
+            console.log("error",error);
                 ElMessage.error('网络错误，请重试');  
         }  
     }  
