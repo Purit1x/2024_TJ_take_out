@@ -47,7 +47,6 @@ onMounted(async() => {
         merchantAddress.value=merchantInformation.data.merchantAddress;  // 商家地址
         correctPassword.value=userInformation.data.walletPassword;  // 正确的支付密码
         console.log("商家信息",merchantInformation.data);
-
         start.value=merchantInformation.data.timeforOpenBusiness;  //检查是否在营业时间内
         end.value=merchantInformation.data.timeforCloseBusiness-30*60;  //营业结束前30分钟
         checkTime();
@@ -140,6 +139,10 @@ const checkTime = () => {
         }  
     } else {  
         // 跨越午夜的营业时间  
+        if(start.value-end.value<30*60){  
+            ElMessage.error("商家暂停营业");  
+            router.push('/user-home');
+        }
         if (nowTime < start.value && nowTime > end.value) {   
             ElMessage.error("商家暂停营业");  
             router.push('/user-home');  
