@@ -319,7 +319,7 @@ function formatDateTime(time) {
             <el-scrollbar max-height="500px">
 
                 <ul class="order-list">
-                    <li v-for="(order,index) in deliveringOrders":key ="index" class="order-item">
+                    <li v-for="(order,index) in deliveringOrders" :key ="index" class="order-item">
 
                         <p>订单号：{{order.orderId}}</p>
                         <p>订单总价：{{ order.price }}元</p>
@@ -343,7 +343,7 @@ function formatDateTime(time) {
             <el-scrollbar max-height="500px">
 
                 <ul class="order-list">
-                <li v-for="(order,index) in completedOrders":key ="index" class="order-item">
+                <li v-for="(order,index) in completedOrders" :key ="index" class="order-item">
 
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
@@ -415,6 +415,7 @@ function formatDateTime(time) {
   padding: 20px;
   background-color: transparent;
   margin-left: 120px; /* 考虑侧边栏的宽度 */
+  max-width:1100px;
 }
 
 .header {

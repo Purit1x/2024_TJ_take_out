@@ -3,7 +3,7 @@ import request from '@/utils/request.js'
 import axios from 'axios'  
 import { ElMessage } from 'element-plus';
 // 设置基本URL，这里使用你后端的地址  
-const BASE_URL = 'http://localhost:5079/api'; 
+const BASE_URL = 'http://39.105.5.211:5079/api'; 
 
 // 用户注册服务  
 export const merchantRegisterService = async (merchantData) => {  
@@ -59,7 +59,7 @@ export const walletWithdraw=async(id,withdrawMoney) => {
 }
 export const searchDishes = async(id) => {
     try {  
-        const response = await axios.get(`http://localhost:5079/api/Merchant/dishSearch?merchantId=${id}`);
+        const response = await axios.get(`${BASE_URL}/Merchant/dishSearch?merchantId=${id}`);
         return response.data; // 返回后端返回的数据  
     } catch (error) {  
         throw error;   

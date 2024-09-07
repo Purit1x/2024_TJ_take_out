@@ -4,7 +4,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
 import { getMerchantIds, getMerchantsInfo, GetAddressByAddressId, getOrderDishes } from '@/api/user';
-import { getPaidOrders, getReceivedOrders, receiveOrder, riderInfo, getRiderPrice,getFinishedOrders } from '@/api/rider';
+import { getPaidOrders, getReceivedOrders, receiveOrder, riderInfo, getRiderPrice, getFinishedOrders } from '@/api/rider';
 import { getMerAddrByOrderId, deliverOrder } from '@/api/merchant';
 
 const store = useStore();
@@ -12,7 +12,7 @@ const router = useRouter();
 const showState = ref(1);  // 决定显示可接订单还是已接订单,已完成订单
 const receivedOrders = ref([]);  // 已接订单列表
 const receivableOrders = ref([]);  // 可接订单列表
-const finishedOrders=ref([]);// 已完成订单列表
+const finishedOrders = ref([]);// 已完成订单列表
 const rider = ref({});  // 初始化骑手对象信息
 const deliveryFees = ref({});  // 存储配送费
 const merchantAddresses = ref({});  // 存储各订单商户地址
@@ -92,19 +92,19 @@ const renewRiderOrders = async () => {
         else {
             receivableOrders.value = receivableOrdersData.data;
         }
-        const finishedOrderData=await getFinishedOrders(rider.value.riderId);
-        if(finishedOrderData===0){
-            if(showState.value===3){
+        const finishedOrderData = await getFinishedOrders(rider.value.riderId);
+        if (finishedOrderData === 0) {
+            if (showState.value === 3) {
                 ElMessage.success('无已完成订单');
             }
-            finishedOrders.value=[];
+            finishedOrders.value = [];
         }
-        else{
-            finishedOrders.value=finishedOrderData;
+        else {
+            finishedOrders.value = finishedOrderData;
         }
         console.log('可接订单', receivableOrders.value);
         console.log('已接订单', receivedOrders.value);
-        console.log('已完成订单',finishedOrders.value);
+        console.log('已完成订单', finishedOrders.value);
     } catch (error) {
         throw error;
     }
@@ -133,10 +133,10 @@ const renewDeliveryFees = async () => {  // 保存每个订单的配送费
             deliveryFees.value[receivedOrders.value[i].orderId] = fees2[i];
         }
     }
-    if(finishedOrders.value.length>0){
-        const promise3=finishedOrders.value.map(orderItem=>getRiderPrice(orderItem.orderId));
-        const fees3=await Promise.all(promise3);
-        for(let i=0;i<fees3.length;i++){
+    if (finishedOrders.value.length > 0) {
+        const promise3 = finishedOrders.value.map(orderItem => getRiderPrice(orderItem.orderId));
+        const fees3 = await Promise.all(promise3);
+        for (let i = 0; i < fees3.length; i++) {
             deliveryFees.value[finishedOrders.value[i].orderId] = fees3[i];
         }
     }
@@ -203,7 +203,7 @@ const renewTargetAddresses = async () => {  // 保存每个订单的交付地址
     }
 }
 function displayTargetAddr(orderId) {
-    return targetAddresses.value[orderId] ||'加载中...';
+    return targetAddresses.value[orderId] || '加载中...';
 }
 function displayMerchantAddr(orderId) {
     return merchantAddresses.value[orderId] || '加载中...';
@@ -255,16 +255,21 @@ async function handleDeliverOrder(data) {
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in receivableOrders" :key="index">
                         <el-descriptions title="订单">
-                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.order.orderId }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.order.orderId)
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.order.orderId
                                 }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="商户地址：">{{
+                                displayMerchantAddr(orderItem.order.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="交付地址：">{{
+                                displayTargetAddr(orderItem.order.orderId)
                                 }}</el-descriptions-item>
                             <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="客户电话：">{{
+                                displayTargetPhone(orderItem.order.orderId)
                                 }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.order.orderId)
+                            <el-descriptions-item width="40%" label="配送费：">{{
+                                displayDeliveryFee(orderItem.order.orderId)
                                 }}&nbsp;元</el-descriptions-item>
                         </el-descriptions>
                         <div>
@@ -285,7 +290,8 @@ async function handleDeliverOrder(data) {
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in receivedOrders" :key="index">
                         <el-descriptions title="订单">
-                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId
+                                }}</el-descriptions-item>
                             <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.orderId)
                                 }}</el-descriptions-item>
                             <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.orderId)
@@ -313,15 +319,21 @@ async function handleDeliverOrder(data) {
             <div class="orders-scroll" v-if="showState === 3">
                 <el-scrollbar max-height="500px">
                     <div class="order-item" v-for="(orderItem, index) in finishedOrders" :key="index">
-                        <el-descriptions title="订单" >
-                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.orderId) }}</el-descriptions-item>
-                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.orderId) }}&nbsp;元</el-descriptions-item> 
-                        </el-descriptions>       
-                             
+                        <el-descriptions title="订单">
+                            <el-descriptions-item width="20%" label="订单号：">{{ orderItem.orderId
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="商户地址：">{{ displayMerchantAddr(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="交付地址：">{{ displayTargetAddr(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="20%" label="收货人：">{{ displayTargetName(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="客户电话：">{{ displayTargetPhone(orderItem.orderId)
+                                }}</el-descriptions-item>
+                            <el-descriptions-item width="40%" label="配送费：">{{ displayDeliveryFee(orderItem.orderId)
+                                }}&nbsp;元</el-descriptions-item>
+                        </el-descriptions>
+
                     </div>
                 </el-scrollbar>
             </div>

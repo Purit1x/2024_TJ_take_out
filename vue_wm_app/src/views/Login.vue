@@ -758,6 +758,23 @@ input {
   flex: 1;
   height: 100%;
   display:grid;
+  overflow-y:auto;
+}
+
+/* 隐藏滚动条 */
+.register::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* 滚动条轨道 */
+.register::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 滚动条滑块 */
+.register::-webkit-scrollbar-thumb {
+  background-color: rgba(173, 173, 173, 0.2);
+  border-radius: 20px;
 }
 
 /* 标题盒子 */

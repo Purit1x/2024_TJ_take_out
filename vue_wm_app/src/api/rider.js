@@ -3,7 +3,7 @@ import request from '@/utils/request.js'
 import { tryOnScopeDispose } from '@vueuse/core';
 import axios from 'axios'  
 // 设置基本URL，这里使用你后端的地址  
-const BASE_URL = 'http://localhost:5079/api'; 
+const BASE_URL = 'http://39.105.5.211:5079/api'; 
 
 // 骑手注册服务  
 export const riderRegisterService = async (riderData) => {  
