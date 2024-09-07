@@ -597,6 +597,15 @@ namespace takeout_tj.Controllers
                 if (existingCartRecord != null)
                 {
                     // 如果存在，则将 DishNum 更新
+                    // 检查餐品库存
+                    var targetDish = _context.Dishes.FirstOrDefault(dish => dish.DishId == existingCartRecord.DishId);
+                    if (targetDish == null) {
+                        return StatusCode(20000, new { errorCode = 20000, msg = "创建失败" });
+                    }
+                    if (targetDish.DishInventory < (existingCartRecord.DishNum + dto.DishNum))
+                    {
+                        return StatusCode(20001, new { errorCode = 20001, msg = $"创建失败,商品{targetDish.DishName}的库存仅为{targetDish.DishInventory}" });
+                    }
                     existingCartRecord.DishNum += dto.DishNum;
                     _context.ShoppingCarts.Update(existingCartRecord);
                 }

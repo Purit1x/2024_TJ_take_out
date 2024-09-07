@@ -152,7 +152,7 @@ const goToMerchantPage = (merchantId) => {
 };
 
 // 加入购物车函数
-const addToCart = async(dish,buttonElement) => {
+const addToCart = async(dish) => {
     const userId = user.value.userId;
 
     // 调用API，将购物车项保存到数据库    
@@ -184,6 +184,9 @@ const addToCart = async(dish,buttonElement) => {
         if (errorCode === 20000) {  
           ElMessage.error('添加失败');  
         } 
+        else if(errorCode === 20001){
+          ElMessage.error('库存不足'); 
+        }
         else {  
           ElMessage.error('发生未知错误');  
         }  
@@ -347,13 +350,13 @@ const checkTime = (merchant) => {
           <span class="dish-name">{{item.dishName}}</span>
           <span class="dish-price">{{item.dishPrice}}元</span>
           <!-- 这里是两种不同的按钮样式 -->
-          <!-- <div class="quantity-control">
+          <div class="quantity-control">
             <button class="quantity-button" @click="decrementInCart(item)">-</button>
             <span class="quantity">{{item.dishNum}}</span>
             <button class="quantity-button" @click="addToCart(item)">+</button>
 
-          </div> -->
-          <el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px;width: 10%;" />
+          </div>
+          <!--<el-input-number v-model="item.dishNum" style="margin-left: 10px; margin-right: 10px;width: 10%;" />-->
 
           
           <button class="remove-button" @click="removeInCart(item)">x</button>
