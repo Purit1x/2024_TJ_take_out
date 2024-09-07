@@ -16,6 +16,7 @@ const DefaultAddressId=ref({});  //默认地址id
 const hasDefaultAddress=ref(true);  //是否有默认地址
 const DefaultAddressInfo=ref({});  //默认地址信息
 const Addresses=ref([]);  //用户的所有地址
+
 const ModifyingMerchant = ref(-1);//代表正在修改地址或其他信息的订单所属的商家
 
 const coupons=ref([]);  //用户拥有的所有优惠券
@@ -146,9 +147,31 @@ onMounted(async() => {
             coupon.minPrice=couponData.data.minPrice;
           }
         }
-        
+
         console.log('coupons: ',coupons.value);
         //console.log(availableCoupons.value);
+
+        //选择最佳优惠券
+        for (const merchantId in groupedItems.value) {
+          ModifyingMerchant.value=merchantId;
+          filterCoupon();
+          //console.log('debug best coupon:', availableCoupons.value[ModifyingMerchant.value]);
+          if(availableCoupons.value[ModifyingMerchant.value].length<1){
+            continue;
+          }
+          let bestCoupon = null;
+          const maxValue = 0;
+          for(const coupon of availableCoupons.value[ModifyingMerchant.value]){
+            //console.log('debug best coupon:', coupon);
+            if(coupon.couponValue>maxValue){
+              bestCoupon = coupon;
+            }
+          }
+          if(bestCoupon != null){
+            selectCoupon(bestCoupon);
+          }
+        }
+        ModifyingMerchant.value = -1;
       
     }catch(err){
         ElMessage.error(err.message);
