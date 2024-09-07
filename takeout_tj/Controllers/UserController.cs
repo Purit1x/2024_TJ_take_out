@@ -1348,7 +1348,7 @@ namespace takeout_tj.Controllers
                 {
                     OrderId = _userService.AssignOrderId(),
                     Price = dto.Price,
-                    OrderTimestamp = dto.OrderTimestamp,
+                    OrderTimestamp = DateTime.Now,
                     ExpectedTimeOfArrival = null,
                     RealTimeOfArrival = null,
                     State = 0,
