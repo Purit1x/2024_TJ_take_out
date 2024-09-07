@@ -50,7 +50,7 @@ onMounted(async () => {
   getAllMerchantsInfo().then(res => {
     merchantsInfo.value = res.data;
     showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
-    fetchDefaultAddress();
+    fetchDefaultAddress(true);
   });
   
   await fetchMerAvgRating();
@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 const sortCoupons = () => {
   getAllMerchantsInfo(sortField.value, sortOrder.value).then(res => {
     merchantsInfo.value = res.data;
-    fetchDefaultAddress();
+    fetchDefaultAddress(false);
   })
 }
 const fetchMerAvgRating = async () => {
@@ -83,7 +83,7 @@ const fetchMerAvgRating = async () => {
   }
 
 };
-const fetchDefaultAddress = async () => {
+const fetchDefaultAddress = async (ifsort) => {
   try {
     const res = await GetDefaultAddress(user.value.userId); // 获取用户默认地址  
     if (res.data !== 'none') {
@@ -103,11 +103,13 @@ const fetchDefaultAddress = async () => {
           // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
           merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;
         }
+        if (ifsort===true) {
          merchantsInfo.value.sort((a, b) => {  //升序排列
              const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
              const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
              return distanceA - distanceB;  
          });  
+        }
       }
       console.log(merchantsInfo.value);
       showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
@@ -132,7 +134,7 @@ watch(
   () => router.currentRoute.value.path,
   (newPath) => {
     // 检查当前路由是否是用户主页或商家菜单  
-    fetchDefaultAddress();
+    fetchDefaultAddress(true);
     if (newPath.startsWith('/user-home') &&
       newPath !== '/user-home/personal' &&
       (newPath !== '/user-home/cart') &&

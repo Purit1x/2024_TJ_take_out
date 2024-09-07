@@ -363,7 +363,7 @@ function formatDateTime(time) {
         </div>
         <div v-else>
             <h2 class="header">订单详情</h2>
-            <el-scrollbar max-height="400px">
+            <el-scrollbar max-height="650px">
                 <p>订单号：{{ currentOrder.orderId }}</p>
                 <p>状态：{{
                     currentOrder.state === 0 ? '未支付' : currentOrder.state === 1 ? '待处理' : currentOrder.state === 2 ? '派送中' : currentOrder.state === 3 ?'已完成':'未知状态'
