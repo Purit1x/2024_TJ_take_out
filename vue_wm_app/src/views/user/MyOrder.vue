@@ -277,63 +277,64 @@ function formatDateTime(time) {
 
 <template>
     <div class="content">
-        <div v-if="!isOrderInfo">
-            <h2 class="header">
-                我的订单
-                <button class="action-button" @click="gobackHome">返回</button>
-            </h2>
-            <div class="state-buttons">
-                <button class="state-button" @click="showState = 0">未支付</button>
-                <button class="state-button" @click="showState = 1">待处理</button>
-                <button class="state-button" @click="showState = 2">派送中</button>
-                <button class="state-button" @click="showState = 3">已完成</button>
-            </div>
-            <div v-if="showState === 0">
-                <el-scrollbar max-height="500px">
-                    <ul class="order-list">
-                        <li v-for="(order, index) in nopayedOrders" :key="index" class="order-item">
-                            <p>订单号：{{ order.orderId }}</p>
-                            <p>订单总价：{{ order.price }}元</p>
-                            <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
-                            <p>支付剩余时间:{{ Math.floor(order.countdown / 60) }}:{{ Math.floor(order.countdown % 60) }}</p>
-                            <button class="enter-button" @click="enterOrderInfo(order)">></button>
-                        </li>
-                    </ul>
-                </el-scrollbar>
-            </div>
+    <div v-if="!isOrderInfo">
+        <h2 class="header">
+            我的订单
+            <button class="action-button" @click="gobackHome">返回</button>
+        </h2>
+        <div class="state-buttons">
+            <button class="state-button" @click="showState=0">未支付</button>
+            <button class="state-button" @click="showState=1">待处理</button>
+            <button class="state-button" @click="showState=2">派送中</button>
+            <button class="state-button" @click="showState=3">已完成</button>
+        </div>
+        <div v-if="showState===0">
+            <el-scrollbar max-height="500px">
+                <ul class="order-list">
+                    <li v-for="(order,index) in nopayedOrders" :key="index" class="order-item">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{order.price}}元</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
+                        <p>支付剩余时间:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
+        </div>
+        
+        <div v-if="showState===1">
+            <el-scrollbar max-height="500px">
+                <ul class="order-list">
+                    <li v-for="(order,index) in pendingOrders" :key="index" class="order-item">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{order.price}}元</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
+                        <p>等待骑手接单:{{ Math.floor(order.countdown/60) }}:{{ Math.floor(order.countdown%60) }}</p>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
+        </div>
+        
+        <div v-if="showState===2">
+            <el-scrollbar max-height="500px">
 
-            <div v-if="showState === 1">
-                <el-scrollbar max-height="500px">
-                    <ul class="order-list">
-                        <li v-for="(order, index) in pendingOrders" :key="index" class="order-item">
-                            <p>订单号：{{ order.orderId }}</p>
-                            <p>订单总价：{{ order.price }}元</p>
-                            <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
-                            <p>等待骑手接单:{{ Math.floor(order.countdown / 60) }}:{{ Math.floor(order.countdown % 60) }}</p>
-                            <button class="enter-button" @click="enterOrderInfo(order)">></button>
-                        </li>
-                    </ul>
-                </el-scrollbar>
-            </div>
+                <ul class="order-list">
+                    <li v-for="(order,index) in deliveringOrders" :key ="index" class="order-item">
 
-            <div v-if="showState === 2">
-                <el-scrollbar max-height="500px">
+                        <p>订单号：{{order.orderId}}</p>
+                        <p>订单总价：{{ order.price }}元</p>
+                        <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
+                        <button class="enter-button" @click="enterOrderInfo(order)">></button>
+                    </li>
+                </ul>
+            </el-scrollbar>
+        </div>
+        
+        <div v-if="showState===3">
+            
+            <!-- <ul>
 
-                    <ul class="order-list">
-                        <li v-for="(order, index) in deliveringOrders" :key="index" class="order-item">
-
-                            <p>订单号：{{ order.orderId }}</p>
-                            <p>订单总价：{{ order.price }}元</p>
-                            <p>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</p>
-                            <button class="enter-button" @click="enterOrderInfo(order)">></button>
-                        </li>
-                    </ul>
-                </el-scrollbar>
-            </div>
-
-            <div v-if="showState === 3">
-
-                <!-- <ul>
                 <li v-for="(order,index) in completedOrders":key ="inkey">
                     <p>订单号：{{order.orderId}}</p>
                     <p>订单总价：{{ order.price }}元</p>
@@ -343,8 +344,10 @@ function formatDateTime(time) {
             </ul> -->
                 <el-scrollbar max-height="500px">
 
-                    <ul class="order-list">
-                        <li v-for="(order, index) in completedOrders" :key="index" class="order-item">
+
+                <ul class="order-list">
+                <li v-for="(order,index) in completedOrders" :key ="index" class="order-item">
+
 
                             <p>订单号：{{ order.orderId }}</p>
                             <p>订单总价：{{ order.price }}元</p>
@@ -417,10 +420,11 @@ function formatDateTime(time) {
 
 <style scoped lang="scss">
 .content {
-    padding: 20px;
-    background-color: transparent;
-    margin-left: 120px;
-    /* 考虑侧边栏的宽度 */
+
+  padding: 20px;
+  background-color: transparent;
+  margin-left: 120px; /* 考虑侧边栏的宽度 */
+
 }
 
 .header {

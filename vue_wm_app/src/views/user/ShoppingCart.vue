@@ -366,7 +366,7 @@ const checkTime = (merchant) => {
       <strong class="total-price">总价: {{ finalTotalPrice }} 元</strong>
       <span v-if="totalDiscount != 0" class="discount">({{ totalPrice }}-{{ totalDiscount }})</span>
     
-      <button @click="gotoCartOrder()">结算</button>
+      <button class="checkout-button" @click="gotoCartOrder()">结算</button>
     </div>
   </div>
   <router-view /><!--渲染子路由-->
@@ -545,5 +545,16 @@ const checkTime = (merchant) => {
   margin-left: 10px;
   font-size: 18px;
   color: #DDA0DD;
+}
+
+.checkout-button {
+  background-color: #DDA0DD;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-left: 100px;
+  transition: background-color 0.3s ease;
 }
 </style>
