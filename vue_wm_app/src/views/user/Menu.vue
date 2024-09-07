@@ -170,6 +170,9 @@ const addToCart = async (dish) => {
       if (errorCode === 20000) {
         ElMessage.error('添加失败');
       }
+      else if(errorCode === 20001){
+        ElMessage.error('库存不足');
+      }
       else {
         ElMessage.error('发生未知错误');
       }
