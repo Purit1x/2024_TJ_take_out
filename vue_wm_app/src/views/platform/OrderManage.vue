@@ -101,7 +101,6 @@ function formatDateTime(time) {
                     <div>是否需要餐具：{{ order.needUtensils?"需要":"不需要"}}</div>
                     <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
                     <div>订单完成时间：{{formatDateTime(order.realTimeOfArrival)}}</div>
-                    <div>订单预期完成时间：{{ order.comment}}</div>
                 </div>
             </div>
             <div class="orders-scroll" v-if="showState === 2">
@@ -115,8 +114,7 @@ function formatDateTime(time) {
                     <div>订单总价：{{order.price}}元</div>
                     <div>是否需要餐具：{{ order.needUtensils?"需要":"不需要"}}</div>
                     <div>订单创建时间：{{ formatDateTime(order.orderTimestamp) }}</div>
-                    <div>订单完成时间：{{formatDateTime(order.realTimeOfArrival)}}</div>
-                    <div>订单预期完成时间：{{ order.comment}}</div>
+
                     <div>订单状态：{{ order.state==1?"已付款骑手未接单":"骑手派送中"}}</div>
                 </div>
             </div>
