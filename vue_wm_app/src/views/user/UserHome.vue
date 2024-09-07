@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 const sortCoupons = () => {
   getAllMerchantsInfo(sortField.value, sortOrder.value).then(res => {
     merchantsInfo.value = res.data;
-    fetchDefaultAddress(false);
+    showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
   })
 }
 const fetchMerAvgRating = async () => {
