@@ -230,7 +230,7 @@ const submitEdit = async () => {
     const isValid = await refForm.value.validate();  
     if (!isValid) {  
         return; // 如果不合法，提前退出  
-    }  
+    }
     updateUser(currentUser.value).then(data=>{
             ElMessage.success('修改成功');
             editPI.value = false;
@@ -254,6 +254,10 @@ const submitEdit = async () => {
 const SaveRecharge=async()=>{
     const isValid = await refForm.value.validate();   
     if (!isValid) return; // 如果不合法，提前退出
+    if(currentUser.value.recharge<0)
+    {
+        return;
+    }
     walletRecharge(currentUser.value.UserId,currentUser.value.recharge).then(data=>{
         currentUser.value.Wallet=data.data;
         userForm.value.Wallet=data.data;
@@ -281,7 +285,11 @@ const SaveWithdraw=async()=>{
     if(currentUser.value.Wallet < currentUser.value.withdrawAmount) 
     {
         ElMessage.error('提现金额超出钱包金额')
-        return
+        return;
+    }
+    if(currentUser.value.withdrawAmount < 0) 
+    {
+        return;
     }
     walletWithdraw(currentUser.value.UserId,currentUser.value.withdrawAmount).then(data=>{
         currentUser.value.Wallet=data.data;

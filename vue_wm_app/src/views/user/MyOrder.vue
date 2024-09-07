@@ -221,21 +221,23 @@ const confirmPurchase = async () => {
         paymentPassword.value = '';
         paymentError.value = '';
         isOrderInfo.value = false;
-    } catch (error) {
-        if (error.response && error.response.data) {
-            const errorCode = error.response.data.errorCode;
+    } catch (error) {  
+        if (error.response && error.response.data) {  
+             const errorCode = error.response.data.errorCode;  
 
-            if (errorCode === 20001) {
-                ElMessage.error('购买失败');
-            } else if (errorCode === 20000) {
-                ElMessage.error('余额不足');
-            } else {
-                ElMessage.error('购买失败，请稍后再试');
-            }
-        } else {
-            ElMessage.error('网络错误，请重试');
-        }
-    }
+            if (errorCode === 20001) {  
+                ElMessage.error('购买失败');  
+            } else if (errorCode === 20000) {  
+                ElMessage.error('余额不足');  
+            } else {  
+                 ElMessage.error('购买失败，请稍后再试');  
+            }  
+        } else {  
+            console.log("error",error);
+                ElMessage.error('网络错误，请重试');  
+        }  
+    }  
+
 }
 
 const validateField = (field) => {

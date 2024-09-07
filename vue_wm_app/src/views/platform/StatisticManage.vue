@@ -47,7 +47,7 @@
                 <button @click="fetchOrderCount" class="choose">查询订单量</button>
                 
             </div>
-            <div v-if="orderCount !== null"class="output">
+            <div v-if="orderCount !== null" class="output">
                 区域 {{ region_c }} 的订单量: {{ orderCount }}
             </div>
         </div>

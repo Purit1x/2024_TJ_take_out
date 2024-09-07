@@ -140,64 +140,48 @@ onBeforeUnmount(() => {
 })
 function editMerchant() {
     // 除去验证结果
-    currentMerchant.value.MerchantId = merchantForm.value.MerchantId;
-    currentMerchant.value.Password = merchantForm.value.Password;
-    currentMerchant.value.rePassword = merchantForm.value.rePassword;
-    currentMerchant.value.MerchantName = merchantForm.value.MerchantName;
-    currentMerchant.value.MerchantAddress = merchantForm.value.MerchantAddress;
-    currentMerchant.value.Contact = merchantForm.value.Contact;
-    currentMerchant.value.CouponType = merchantForm.value.CouponType;
-    currentMerchant.value.DishType = merchantForm.value.DishType;
-    currentMerchant.value.TimeforOpenBusiness = merchantForm.value.TimeforOpenBusiness;
-    currentMerchant.value.TimeforCloseBusiness = merchantForm.value.TimeforCloseBusiness;
-    currentMerchant.value.Wallet = merchantForm.value.Wallet;
-    currentMerchant.value.WalletPassword = merchantForm.value.WalletPassword;
-    currentMerchant.value.reWalletPassword = merchantForm.value.reWalletPassword;
-    currentMerchant.value.recharge = 0;
-    currentMerchant.value.withdrawAmount = 0;
-    if (refForm.value) {
-        refForm.value.clearValidate();
-    }
+    currentMerchant.value={...merchantForm.value};
+    currentMerchant.value.recharge=0;
+    currentMerchant.value.withdrawAmount=0;
+    //if(refForm.value)
+    //{
+        //refForm.value.clearValidate();
+    //}
 
     isOnlyShow.value = false;
 }
-const saveMerchant = async () => {
-    const isValid = await refForm.value.validate();
-    if (!isValid) {
-        return; // 如果不合法，提前退出  
+
+const saveMerchant = async ()=> {
+    const isValid = await refForm.value.validate();   
+    if (!isValid) return; // 如果不合法，提前退出
+    if(currentMerchant.value.Password !== currentMerchant.value.rePassword){
+        return;
     }
-    refForm.value.validate((valid) => {
-        if (!valid) {
-            return;
-        }
-        const openTime = new Date(currentMerchant.value.TimeforOpenBusiness);
-        const closeTime = new Date(currentMerchant.value.TimeforCloseBusiness);
-        const startHour = openTime.getHours();
-        const startMinute = openTime.getMinutes();
-        const startSecond = openTime.getSeconds();
-        currentMerchant.value.TimeforOpenBusiness = startHour * 3600 + startMinute * 60 + startSecond;
+    if(currentMerchant.value.Contact.length !== 11){
+        return;
+    }
+        console.log("Merchant",currentMerchant.value);
+        const openTime = new Date(currentMerchant.value.TimeforOpenBusiness);  
+        const closeTime = new Date(currentMerchant.value.TimeforCloseBusiness);    
+        const startHour = openTime.getHours();  
+        const startMinute = openTime.getMinutes();  
+        const startSecond = openTime.getSeconds();  
+        currentMerchant.value.TimeforOpenBusiness = startHour * 3600 + startMinute * 60 + startSecond;  
 
         const endHour = closeTime.getHours();
         const endMinute = closeTime.getMinutes();
         const endSecond = closeTime.getSeconds();
         currentMerchant.value.TimeforCloseBusiness = endHour * 3600 + endMinute * 60 + endSecond;
-        updateMerchant(currentMerchant.value).then(data => {
+
+        updateMerchant(currentMerchant.value).then(data=>{
             ElMessage.success('修改成功');
             isOnlyShow.value = true;
-            merchantForm.value.MerchantName = currentMerchant.value.MerchantName;
-            merchantForm.value.Password = currentMerchant.value.Password;
-            merchantForm.value.rePassword = currentMerchant.value.rePassword;
-            merchantForm.value.MerchantAddress = currentMerchant.value.MerchantAddress;
-            merchantForm.value.Contact = currentMerchant.value.Contact;
-            merchantForm.value.DishType = currentMerchant.value.DishType;
-            merchantForm.value.CouponType = currentMerchant.value.CouponType;
-            merchantForm.value.TimeforOpenBusiness = currentMerchant.value.TimeforOpenBusiness;
-            merchantForm.value.TimeforCloseBusiness = currentMerchant.value.TimeforCloseBusiness;
-            assignStationToMerchant(merchantForm.value.MerchantAddress).then(res => {
-                const stationId = res;
-                const data = {
-                    MerchantId: merchantForm.value.MerchantId,
-                    StationId: stationId,
+            merchantForm.value={...currentMerchant.value};
+            assignStationToMerchant(merchantForm.value.MerchantAddress).then(res=>{
+                const stationId=res;
+                const data={
+                    MerchantId:merchantForm.value.MerchantId,
+                    StationId:stationId,
                 }
                 AssignStation(data).then(data => {
                     console.log(data);
@@ -213,25 +197,28 @@ const saveMerchant = async () => {
                 console.log(error);
             });
         }).catch(error => {
-            if (error.response && error.response.data) {
-                const errorCode = error.response.data.errorCode;
-                if (errorCode === 20000) {
-                    ElMessage.error('没有更新数据');
-                } else if (errorCode === 30000) {
-                    ElMessage.error('连接失败' + error.response.data.msg);
-                } else {
-                    ElMessage.error('发生未知错误');
-                }
-            } else {
-                ElMessage.error('网络错误，请重试');
-            }
-        });
-    });
+        if (error.response && error.response.data) {  
+                const errorCode = error.response.data.errorCode;  
+                if (errorCode === 20000) {  
+                    ElMessage.error('没有更新数据');  
+                } else if (errorCode === 30000) {  
+                    ElMessage.error('连接失败' + error.response.data.msg);  
+                } else {  
+                    ElMessage.error('发生未知错误');  
+                }  
+            } else {  
+                    ElMessage.error('网络错误，请重试');  
+            }  
+        });    
 }
-const saveWalletPassword = async () => {
-    const isValid = await refForm.value.validate();
-    if (!isValid) return; // 如果不合法，提前退出
-    updateMerchant(currentMerchant.value).then(data => {
+
+const saveWalletPassword= async()=>{
+    const valid = await refForm.value.validate();  
+    if (!valid) {  
+        ElMessage.error('请检查输入的字段');  
+        return; 
+    }  
+    updateMerchant(currentMerchant.value).then(data=>{
         ElMessage.success('修改成功');
         isChangeWP.value = false;
     }).catch(error => {
@@ -249,10 +236,13 @@ const saveWalletPassword = async () => {
         }
     });
 }
-const SaveRecharge = async () => {
-    const isValid = await refForm.value.validate();
-    if (!isValid) return; // 如果不合法，提前退出
-    walletRecharge(currentMerchant.value.MerchantId, currentMerchant.value.recharge).then(data => {
+const SaveRecharge=async()=>{
+    const valid = await refForm.value.validate();  
+    if (!valid) {  
+        ElMessage.error('请检查输入的字段');  
+        return; 
+    }  
+    walletRecharge(currentMerchant.value.MerchantId,currentMerchant.value.recharge).then(data=>{
         console.log(data);
         currentMerchant.value.Wallet = data.data;
         merchantForm.value.Wallet = data.data;
@@ -478,7 +468,7 @@ function displayTotalTurnoverWithinThisDay() {
                 </el-descriptions-item>
             </el-descriptions>
 
-            <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm" label-width="150px" v-else>
+            <el-form :model="currentMerchant" :rules="merchantRules" ref="refForm" label-width="150px" v-if="!isOnlyShow">
                 <div class="updateinfo">
                     <el-form-item label="商家名称" prop="MerchantName">
                         <el-input v-model="currentMerchant.MerchantName"></el-input>
@@ -488,22 +478,21 @@ function displayTotalTurnoverWithinThisDay() {
                             v-model="currentMerchant.Password"></el-input>
                     </el-form-item>
                     <el-form-item label="确认密码" prop="rePassword">
-                        <el-input :prefix-icon="Lock" type="rePassword" placeholder="请再次确认密码"
-                            v-model="currentMerchant.rePassword"></el-input>
+                        <el-input :prefix-icon="Lock" type="password" placeholder="请再次确认密码" v-model="currentMerchant.rePassword"></el-input>
                     </el-form-item>
                     <el-form-item label="商家地址" prop="MerchantAddress">
                         <el-input v-model="currentMerchant.MerchantAddress"></el-input>
                     </el-form-item>
                     <el-form-item label="联系方式" prop="Contact">
-                        <el-input v-model="currentMerchant.Contact"></el-input>
+                        <el-input placeholder="请输入联系方式" v-model="currentMerchant.Contact"></el-input>
                     </el-form-item>
                     <el-form-item label="菜品类型" prop="DishType">
                         <el-input v-model="currentMerchant.DishType"></el-input>
                     </el-form-item>
                     <el-form-item label="是否允许通用优惠券" prop="CouponType">
-                        <el-radio-group v-model="currentMerchant.CouponType">
-                            <el-radio label=0>是</el-radio>
-                            <el-radio label=1>否</el-radio>
+                        <el-radio-group v-model="currentMerchant.CouponType">  
+                            <el-radio :label=0>是</el-radio>  
+                            <el-radio :label=1>否</el-radio>  
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="营业开始时间" prop="TimeforOpenBusiness">

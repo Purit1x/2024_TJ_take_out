@@ -189,7 +189,7 @@ const cancelPurchase = () => {
                 <span>&nbsp;&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
             </li>  
         </ul>  -->
-
+        <el-scrollbar max-height="700px">
         <table class="styled-table" style="margin-top: 20px;">
         <thead>
           <tr>
@@ -212,6 +212,7 @@ const cancelPurchase = () => {
           </tr>
         </tbody>
       </table>
+      </el-scrollbar>
     </div>
     <div v-if="isCouponInfo">
         <header>优惠券详情

@@ -207,29 +207,28 @@ const goToPersonal = () => {
 };
 
 // 跳转到满减活动  
-const goToSpecialOffer = () => {
-  router.push('/merchant-home/specialOffer');
-  isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
-};
+const goToSpecialOffer = () => { 
+    router.push('/merchant-home/specialOffer');  
+    isMerchantHome.value = false; // 进入满减活动页面时隐藏欢迎信息和按钮  
+};  
+function formatDateTime(time) {  
+    const date = new Date(time);  
+    if (isNaN(date.getTime())) {  
+        return null; // 或者处理无效日期的逻辑  
+    }  
+    const year = date.getFullYear();  
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
+    const day = String(date.getDate()).padStart(2, '0');  
+    const hours = String(date.getHours()).padStart(2, '0');  
+    const minutes = String(date.getMinutes()).padStart(2, '0');  
+    const seconds = String(date.getSeconds()).padStart(2, '0');  
 
-// 提供 merchant 对象 给其它子网页 
-provide('merchant', merchant);
-provide('isMerchantHome', isMerchantHome);
-function formatDateTime(time) {
-  const date = new Date(time);
-  if (isNaN(date.getTime())) {
-    return null; // 或者处理无效日期的逻辑  
-  }
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始  
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;  
 }
-</script>
+// 提供 merchant 对象 给其它子网页 
+provide('merchant', merchant); 
+provide('isMerchantHome', isMerchantHome); 
+</script>  
 
 <template>
   <!-- 左侧导航栏 在dish和personal界面下出现主页按钮的虚影，不知道是哪里的bug-->

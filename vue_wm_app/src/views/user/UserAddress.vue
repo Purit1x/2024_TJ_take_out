@@ -137,11 +137,11 @@ const createAddress = async() => {  // 新建地址信息
         const response = await submitAddressService(data);  
         if(response.msg='用户地址信息创建成功'){
             ElMessage.success('创建成功');
-            if(userAddresses.length==1)hasDefaultAddress.value=false;
             isCreating.value = false;
             isEditing.value = false;
             currentAddress.value = {};
             userAddresses.value = await getAddressService(userId.value);
+            if(userAddresses.length==1)hasDefaultAddress.value=false;
         } else {
             ElMessage.error('尚未创建信息');
         }
@@ -196,7 +196,7 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
 <template>
   <div v-if="!isEditing&&!isCreating" class="content">
     <h2 class="header">我的地址</h2>
-
+    <el-scrollbar max-height="700px">
     <table class="address-table">
       <thead>
         <tr>
@@ -241,6 +241,7 @@ const setDefaultAddress = async(addressId) => {  // 设置默认地址信息
         </tr>
       </tbody>
     </table>
+    </el-scrollbar>
   </div>
 
   <div v-if="isEditing||isCreating" class="edit-container">

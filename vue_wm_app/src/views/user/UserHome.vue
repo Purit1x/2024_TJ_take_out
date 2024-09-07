@@ -49,6 +49,7 @@ onMounted(async () => {
   });
   getAllMerchantsInfo().then(res => {
     merchantsInfo.value = res.data;
+    showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
     fetchDefaultAddress();
   });
   
@@ -102,11 +103,11 @@ const fetchDefaultAddress = async () => {
           // 将计算的距离添加到商家信息中，单位为米，并保留一位小数  
           merchant.distanceFromDefaultAddress = distance ? (distance * 1000).toFixed(1) : 0;
         }
-        // merchantsInfo.value.sort((a, b) => {  //升序排列
-        //     const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
-        //     const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
-        //     return distanceA - distanceB;  
-        // });  
+         merchantsInfo.value.sort((a, b) => {  //升序排列
+             const distanceA = parseFloat(a.distanceFromDefaultAddress) || 0;  
+             const distanceB = parseFloat(b.distanceFromDefaultAddress) || 0;  
+             return distanceA - distanceB;  
+         });  
       }
       console.log(merchantsInfo.value);
       showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
@@ -118,6 +119,14 @@ const fetchDefaultAddress = async () => {
     ElMessage.error('请设置默认地址'); // 处理获取默认地址以及其他潜在错误  
     console.error(err); // 可选：记录错误以便调试  
   }
+};
+const sortByAvgRating = () => {
+  merchantsInfo.value.sort((a, b) => {  //降序排列
+      const avgRatingA = parseFloat(a.avgRating) || 0;  
+      const avgRatingB = parseFloat(b.avgRating) || 0;  
+      return avgRatingA - avgRatingB;  
+  });  
+  showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表  
 };
 watch(
   () => router.currentRoute.value.path,
