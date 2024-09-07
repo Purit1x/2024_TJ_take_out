@@ -351,7 +351,7 @@ function formatDateTime(time) {
       </div>
       <div class="coupon-section" >
         优惠券：
-        {{ isCouponChoosed ? (choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元"): (choosedCoupon ? "有可用优惠券" : "无可用优惠券") }}
+        {{ choosedCoupon ? (choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元"): (choosedCoupon ? "有可用优惠券" : "无可用优惠券") }}
         <!-- {{ choosedCoupon ? choosedCoupon.couponName + " " + choosedCoupon.couponValue + "元" : "无" }} -->
         <el-button class="action-button" @click="showCouponDialog=true">更换</el-button>
       </div>

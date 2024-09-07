@@ -25,6 +25,11 @@ onMounted(() => {
         isUserCoupon.value = false;
     else
         isUserCoupon.value = true; 
+    updateCoupons();
+});
+const updateCoupons=()=>{
+    userCoupons.value = [];
+    couponPurchaseList.value = [];
     getUserCoupons(userId.value).then(data => {
         if (data.data && data.data.length > 0) {  
             for (const coupon of data.data) {  
@@ -57,12 +62,13 @@ onMounted(() => {
     }).catch(err => {
         ElMessage.error('尚未购买优惠券');
     });
-});
+}
 watch(  
     () => router.currentRoute.value.path,  
     (newPath) => {  
         if (newPath.startsWith('/user-home/personal/coupon') && newPath !== '/user-home/personal/coupon/couponPurchase') {  
             isUserCoupon.value = true; // 返回到商家主页时显示欢迎信息和按钮  
+            updateCoupons();
         } else {  
             isUserCoupon.value = false; // 进入子路由时隐藏  
         } 
@@ -165,7 +171,7 @@ function formatDateTime(time) {
                 <span>&nbsp;&nbsp;<button @click="enterCouponInfo(coupon)">></button></span>
             </li>  
         </ul>  -->
-        
+        <el-scrollbar max-height="700px">
         <table class="styled-table">
             <thead>
                 <tr>
@@ -186,6 +192,7 @@ function formatDateTime(time) {
                 </tr>
             </tbody>
         </table>
+        </el-scrollbar>
     </div>
     <!-- <div v-if="isShowCouponInfo">
         <h2>优惠券详情</h2>
@@ -220,6 +227,7 @@ function formatDateTime(time) {
             </li>  
         </ul>  -->
         <div>
+            <el-scrollbar max-height="700px">
             <table class="styled-table">
                 <thead>
                     <tr>
@@ -242,6 +250,7 @@ function formatDateTime(time) {
                     </tr>
                 </tbody>
             </table>
+            </el-scrollbar>
         </div>
     </div>
     <div v-if="isPurchaseInfo">

@@ -49,6 +49,7 @@ onMounted(async () => {
   });
   getAllMerchantsInfo().then(res => {
     merchantsInfo.value = res.data;
+    showMerchantsInfo.value = merchantsInfo.value; // 显示商家信息列表
     fetchDefaultAddress();
   });
   
