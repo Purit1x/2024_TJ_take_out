@@ -109,7 +109,9 @@ const renewOrders = async () => {  //更新order信息
             .map(order => {
                 // 计算离过期时间  
                 const orderCreationTime = new Date(order.orderTimestamp).getTime();
-                const currentTime = new Date().getTime();
+                const currentTime = new Date().getTime()+8*60*60*1000; // 加上8小时，因为后端时间是北京时间，需要转换为utc时间  
+                console.log('订单创建时间', orderCreationTime);
+                console.log('当前时间', currentTime);
                 const timeDiff = (currentTime - orderCreationTime - 8 * 60 * 60 * 1000);
                 // 如果超过15分钟，返回null，后面会通过filter删除  
                 if (timeDiff > 15 * 60 * 1000) {
@@ -127,7 +129,7 @@ const renewOrders = async () => {  //更新order信息
             .map(order => {
                 // 计算离过期时间  
                 const orderCreationTime = new Date(order.orderTimestamp).getTime();
-                const currentTime = new Date().getTime();
+                const currentTime = new Date().getTime()+8*60*60*1000;
                 const timeDiff = (currentTime - orderCreationTime - 8 * 60 * 60 * 1000);
                 // 如果超过30分钟，返回null，后面会通过filter删除  
                 if (timeDiff > 30 * 60 * 1000) {
